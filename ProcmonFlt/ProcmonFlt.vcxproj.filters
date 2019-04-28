@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Driver Files">
+      <UniqueIdentifier>{8E41214B-6785-4CFE-B992-037D68949A14}</UniqueIdentifier>
+      <Extensions>inf;inv;inx;mof;mc;</Extensions>
+    </Filter>
+    <Filter Include="Header Files\definitions">
+      <UniqueIdentifier>{59f69990-4131-4c10-b5b8-4a6bb2131173}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\definitions">
+      <UniqueIdentifier>{a851c9a5-adf9-40e9-907f-de865f65d5d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Km Objects">
+      <UniqueIdentifier>{6cd57aec-c8f9-4f3c-9d95-8c7754f3a06f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cpp Support">
+      <UniqueIdentifier>{3512f866-a7c8-4fd1-b728-7196f45eeba9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cpp Support">
+      <UniqueIdentifier>{610413ee-6bb3-48ec-b9ff-5981f08b5310}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cpp Support\objects">
+      <UniqueIdentifier>{5fb39a53-c8ca-4ee6-864e-80e0982afa77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Km Objects">
+      <UniqueIdentifier>{da311dad-2183-4bda-adbf-801690f3f85e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Communication">
+      <UniqueIdentifier>{771e975f-cb8f-4c9e-b5b5-24216fb6b0b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Communication">
+      <UniqueIdentifier>{a1517a3e-e50a-43ea-a05b-e67e898e1613}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Filters">
+      <UniqueIdentifier>{363d9d8b-537d-4eb8-b71e-afa9d99f0915}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Filters">
+      <UniqueIdentifier>{ff244d14-14b9-4202-a6ee-4e958973421e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Inf Include="ProcmonFlt.inf">
+      <Filter>Driver Files</Filter>
+    </Inf>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ProcmonFlt.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="trace.hpp">
+      <Filter>Header Files\definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalData.hpp">
+      <Filter>Header Files\definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="DriverRoutines.hpp">
+      <Filter>Header Files\definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_definitions.hpp">
+      <Filter>Header Files\Cpp Support</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_tags.hpp">
+      <Filter>Header Files\Cpp Support</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_init.hpp">
+      <Filter>Header Files\Cpp Support</Filter>
+    </ClInclude>
+    <ClInclude Include="FltPort.hpp">
+      <Filter>Header Files\Km Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_allocator_object.hpp">
+      <Filter>Header Files\Cpp Support\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_lock.hpp">
+      <Filter>Header Files\Cpp Support\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_lockguard.hpp">
+      <Filter>Header Files\Cpp Support\objects</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessFilter.hpp">
+      <Filter>Header Files\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortMessage.hpp">
+      <Filter>Header Files\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortProcessCreateMessage.hpp">
+      <Filter>Header Files\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortProcessTerminateMessage.hpp">
+      <Filter>Header Files\Communication</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Minifilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalData.cpp">
+      <Filter>Source Files\definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_definitions.cpp">
+      <Filter>Source Files\Cpp Support</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_init.cpp">
+      <Filter>Source Files\Cpp Support</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_externals.cpp">
+      <Filter>Source Files\Cpp Support</Filter>
+    </ClCompile>
+    <ClCompile Include="FltPort.cpp">
+      <Filter>Source Files\Km Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessFilter.cpp">
+      <Filter>Source Files\Filters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortMessage.cpp">
+      <Filter>Source Files\Communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortProcessCreateMessage.cpp">
+      <Filter>Source Files\Communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortProcessTerminateMessage.cpp">
+      <Filter>Source Files\Communication</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

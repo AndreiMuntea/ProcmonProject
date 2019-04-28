@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Commands">
+      <UniqueIdentifier>{ad0bc001-e5d0-438e-9b8e-8d7e91bcfe23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Data Structures">
+      <UniqueIdentifier>{82b1ed8d-b6e2-4221-8c7c-e377ea8c78e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Dynamic Imports">
+      <UniqueIdentifier>{6c4e9050-d97c-4153-859e-661a790b700e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Km Utils">
+      <UniqueIdentifier>{5baf6674-896b-4634-838c-bfe4c3d9587d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Definitions">
+      <UniqueIdentifier>{18dd5a99-8d67-4530-8da3-fa6717b40f03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Commands">
+      <UniqueIdentifier>{46c7c697-23a6-4b18-b9a1-14ebaba98d09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Definitions">
+      <UniqueIdentifier>{9e1a80fe-a0e9-462b-98cf-87f19b4291f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Km Utils">
+      <UniqueIdentifier>{cc90b9ff-8fe2-4271-9b2c-ff22bd0d16b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Data Structures">
+      <UniqueIdentifier>{e45c3d40-5d94-4682-8215-1019b09f886d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CommShared">
+      <UniqueIdentifier>{aae20ae0-d2b3-48d0-9667-841d13ce9d62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CommShared">
+      <UniqueIdentifier>{2550f2bb-d493-44f6-ac80-f2c70914436d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CommShared\Private">
+      <UniqueIdentifier>{6727f94f-d3b3-4a24-95df-ddcc99a65de9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CommShared\Private">
+      <UniqueIdentifier>{c591c79b-bd9d-44ef-8f24-929922f314a0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CommandInterpreter.hpp">
+      <Filter>Header Files\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.hpp">
+      <Filter>Header Files\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadPool.hpp">
+      <Filter>Header Files\Data Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicImports.hpp">
+      <Filter>Header Files\Dynamic Imports</Filter>
+    </ClInclude>
+    <ClInclude Include="NtDefinitions.hpp">
+      <Filter>Header Files\Dynamic Imports</Filter>
+    </ClInclude>
+    <ClInclude Include="Ioctl.hpp">
+      <Filter>Header Files\Km Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessUtils.hpp">
+      <Filter>Header Files\Km Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="RemoteThread.hpp">
+      <Filter>Header Files\Km Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="trace.h">
+      <Filter>Header Files\Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalData.hpp">
+      <Filter>Header Files\Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterPort.hpp">
+      <Filter>Header Files\Km Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortMessage.hpp">
+      <Filter>Header Files\CommShared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortProcessCreateMessage.hpp">
+      <Filter>Header Files\CommShared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortProcessTerminateMessage.hpp">
+      <Filter>Header Files\CommShared</Filter>
+    </ClInclude>
+    <ClInclude Include="FltPortSerializers.hpp">
+      <Filter>Header Files\CommShared\Private</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandInterpreter.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalData.cpp">
+      <Filter>Source Files\Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterPort.cpp">
+      <Filter>Source Files\Km Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Ioctl.cpp">
+      <Filter>Source Files\Km Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessUtils.cpp">
+      <Filter>Source Files\Km Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteThread.cpp">
+      <Filter>Source Files\Km Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>Source Files\Data Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_externals.cpp">
+      <Filter>Source Files\Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortMessage.cpp">
+      <Filter>Source Files\CommShared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortProcessCreateMessage.cpp">
+      <Filter>Source Files\CommShared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortProcessTerminateMessage.cpp">
+      <Filter>Source Files\CommShared</Filter>
+    </ClCompile>
+    <ClCompile Include="FltPortSerializers.cpp">
+      <Filter>Source Files\CommShared\Private</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

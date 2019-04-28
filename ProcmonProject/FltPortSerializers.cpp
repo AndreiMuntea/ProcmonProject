@@ -50,3 +50,16 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::ThreadTerminateMe
 
     return Stream;
 }
+
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::ModuleMessage & ModuleMessage)
+{
+    Stream << "[ImageLoadedMessage]" << std::endl
+        << "\t> [Timestamp] " << ModuleMessage.timestamp << std::endl
+        << "\t> [Process ID] " << ModuleMessage.processId << std::endl
+        << "\t> [Image Name] " << ModuleMessage.imageName << std::endl
+        << "\t> [Image Base] " << std::hex << ModuleMessage.imageBase << std::dec << std::endl
+        << "\t> [Image Size] " << std::hex << ModuleMessage.imageSize << std::dec << std::endl
+        << std::endl;
+
+    return Stream;
+}

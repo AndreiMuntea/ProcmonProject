@@ -7,6 +7,7 @@
 #include "FltPort.hpp"
 #include "ProcessFilter.hpp"
 #include "ThreadFilter.hpp"
+#include "ModuleFilter.hpp"
 
 typedef struct _GLOBAL_DATA
 {
@@ -21,6 +22,7 @@ typedef struct _GLOBAL_DATA
 
     Cpp::UniquePointer<Minifilter::ProcessFilter> ProcessFilter;
     Cpp::UniquePointer<Minifilter::ThreadFilter> ThreadFilter;
+    Cpp::UniquePointer<Minifilter::ModuleFilter> ModuleFilter;
 }GLOBAL_DATA, *PGLOBAL_DATA;
 
 extern GLOBAL_DATA gDrvData;

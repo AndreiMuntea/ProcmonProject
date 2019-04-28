@@ -45,6 +45,7 @@ void GdrvInitGlobalData(_In_ PDRIVER_OBJECT DriverObject)
 
 void GdrvUninitGlobalData()
 {
+    gDrvData.ModuleFilter.Update(nullptr);
     gDrvData.ProcessFilter.Update(nullptr);
     gDrvData.ThreadFilter.Update(nullptr);
 

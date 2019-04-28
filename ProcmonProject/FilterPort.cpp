@@ -107,6 +107,9 @@ FilterPort::HandleMessage(
     case KmUmShared::MessageCode::msgThreadTerminate:
         status = HandleMessageNotification<KmUmShared::ThreadTerminateMessage>(InputData);
         break;
+    case KmUmShared::MessageCode::msgModuleLoaded:
+        status = HandleMessageNotification<KmUmShared::ModuleMessage>(InputData);
+        break;
     default:
         status = ERROR_NOT_FOUND;
         break;

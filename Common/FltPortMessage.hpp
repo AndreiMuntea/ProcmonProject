@@ -11,6 +11,7 @@ namespace KmUmShared
         msgProcessTerminate = 1,
         msgThreadCreate = 2,
         msgThreadTerminate = 3,
+        msgModuleLoaded = 4,
         msgMaxValue,
     };
 

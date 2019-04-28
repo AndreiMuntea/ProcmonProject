@@ -8,6 +8,7 @@
 #include "ProcessFilter.hpp"
 #include "ThreadFilter.hpp"
 #include "ModuleFilter.hpp"
+#include "RegistryFilter.hpp"
 
 typedef struct _GLOBAL_DATA
 {
@@ -23,6 +24,7 @@ typedef struct _GLOBAL_DATA
     Cpp::UniquePointer<Minifilter::ProcessFilter> ProcessFilter;
     Cpp::UniquePointer<Minifilter::ThreadFilter> ThreadFilter;
     Cpp::UniquePointer<Minifilter::ModuleFilter> ModuleFilter;
+    Cpp::UniquePointer<Minifilter::RegistryFilter> RegistryFilter;
 
     EX_RUNDOWN_REF RundownProtection;
     bool MonitoringStarted;

@@ -63,3 +63,15 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::ModuleMessage & M
 
     return Stream;
 }
+
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::RegistryCreateMessage & RegistryCreateMessage)
+{
+    Stream << "[RegistryCreateMessage]" << std::endl
+        << "\t> [Timestamp] " << RegistryCreateMessage.timestamp << std::endl
+        << "\t> [Process ID] " << RegistryCreateMessage.processId << std::endl
+        << "\t> [Key Name] " << RegistryCreateMessage .string1 << std::endl
+        << "\t> [Status] " << RegistryCreateMessage.status << std::endl
+        << std::endl;
+
+    return Stream;
+}

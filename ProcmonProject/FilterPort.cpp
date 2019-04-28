@@ -110,6 +110,9 @@ FilterPort::HandleMessage(
     case KmUmShared::MessageCode::msgModuleLoaded:
         status = HandleMessageNotification<KmUmShared::ModuleMessage>(InputData);
         break;
+    case KmUmShared::MessageCode::msgRegistryCreate:
+        status = HandleMessageNotification<KmUmShared::RegistryCreateMessage>(InputData);
+        break;
     default:
         status = ERROR_NOT_FOUND;
         break;

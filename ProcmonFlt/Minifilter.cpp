@@ -70,13 +70,23 @@ DriverEntry(
     //    goto Exit;
     //}
 
-    // Create Module filter
-    gDrvData.ModuleFilter.Update(new Minifilter::ModuleFilter());
-    if (!gDrvData.ModuleFilter.IsValid() || !gDrvData.ModuleFilter->IsValid())
+    //// Create Module filter
+    //gDrvData.ModuleFilter.Update(new Minifilter::ModuleFilter());
+    //if (!gDrvData.ModuleFilter.IsValid() || !gDrvData.ModuleFilter->IsValid())
+    //{
+    //    gDrvData.CommunicationPort.Update(nullptr);
+    //    ::FltUnregisterFilter(gDrvData.FilterHandle);
+    //    MyDriverLogCritical("Failed to initialize ModuleFilter");
+    //    goto Exit;
+    //}
+
+    // Create Registry Filter
+    gDrvData.RegistryFilter.Update(new Minifilter::RegistryFilter());
+    if (!gDrvData.RegistryFilter.IsValid() || !gDrvData.RegistryFilter->IsValid())
     {
         gDrvData.CommunicationPort.Update(nullptr);
         ::FltUnregisterFilter(gDrvData.FilterHandle);
-        MyDriverLogCritical("Failed to initialize ModuleFilter");
+        MyDriverLogCritical("Failed to initialize RegistryFilter");
         goto Exit;
     }
 
@@ -125,6 +135,7 @@ DriverUnload(
     gDrvData.ThreadFilter.Update(nullptr);
     gDrvData.ProcessFilter.Update(nullptr);
     gDrvData.ModuleFilter.Update(nullptr);
+    gDrvData.RegistryFilter.Update(nullptr);
 
     // Close communication port (has a reference to filter handle => has to be done before FltUnregisterFilter)
     gDrvData.CommunicationPort.Update(nullptr);

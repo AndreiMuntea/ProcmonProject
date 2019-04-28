@@ -244,6 +244,7 @@
     <ClInclude Include="..\Common\FltPortMessage.hpp" />
     <ClInclude Include="..\Common\FltPortModuleMessage.hpp" />
     <ClInclude Include="..\Common\FltPortProcessMessage.hpp" />
+    <ClInclude Include="..\Common\FltPortRegistryMessage.hpp" />
     <ClInclude Include="..\Common\FltPortThreadMessage.hpp" />
     <ClInclude Include="cpp_allocator_object.hpp" />
     <ClInclude Include="cpp_definitions.hpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="ModuleFilter.hpp" />
     <ClInclude Include="ProcessFilter.hpp" />
     <ClInclude Include="Queue.hpp" />
+    <ClInclude Include="RegistryFilter.hpp" />
     <ClInclude Include="ThreadFilter.hpp" />
     <ClInclude Include="ThreadPool.hpp" />
     <ClInclude Include="trace.hpp" />
@@ -267,6 +269,7 @@
     <ClCompile Include="..\Common\FltPortMessage.cpp" />
     <ClCompile Include="..\Common\FltPortModuleMessage.cpp" />
     <ClCompile Include="..\Common\FltPortProcessMessage.cpp" />
+    <ClCompile Include="..\Common\FltPortRegistryMessage.cpp" />
     <ClCompile Include="..\Common\FltPortThreadMessage.cpp" />
     <ClCompile Include="cpp_definitions.cpp" />
     <ClCompile Include="cpp_externals.cpp" />
@@ -276,6 +279,7 @@
     <ClCompile Include="Minifilter.cpp" />
     <ClCompile Include="ModuleFilter.cpp" />
     <ClCompile Include="ProcessFilter.cpp" />
+    <ClCompile Include="RegistryFilter.cpp" />
     <ClCompile Include="ThreadFilter.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
   </ItemGroup>

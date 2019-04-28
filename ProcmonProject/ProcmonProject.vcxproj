@@ -149,6 +149,7 @@
     <ClInclude Include="..\Common\FltPortMessage.hpp" />
     <ClInclude Include="..\Common\FltPortModuleMessage.hpp" />
     <ClInclude Include="..\Common\FltPortProcessMessage.hpp" />
+    <ClInclude Include="..\Common\FltPortRegistryMessage.hpp" />
     <ClInclude Include="..\Common\FltPortThreadMessage.hpp" />
     <ClInclude Include="Command.hpp" />
     <ClInclude Include="CommandInterpreter.hpp" />
@@ -167,6 +168,7 @@
     <ClCompile Include="..\Common\FltPortMessage.cpp" />
     <ClCompile Include="..\Common\FltPortModuleMessage.cpp" />
     <ClCompile Include="..\Common\FltPortProcessMessage.cpp" />
+    <ClCompile Include="..\Common\FltPortRegistryMessage.cpp" />
     <ClCompile Include="..\Common\FltPortThreadMessage.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="CommandInterpreter.cpp" />

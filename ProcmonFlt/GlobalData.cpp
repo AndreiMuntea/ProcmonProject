@@ -51,6 +51,7 @@ void GdrvUninitGlobalData()
     gDrvData.ModuleFilter.Update(nullptr);
     gDrvData.ProcessFilter.Update(nullptr);
     gDrvData.ThreadFilter.Update(nullptr);
+    gDrvData.RegistryFilter.Update(nullptr);
 
     gDrvData.CommunicationPort.Update(nullptr);
     gDrvData.CommunicationPortName = { 0,0,nullptr };

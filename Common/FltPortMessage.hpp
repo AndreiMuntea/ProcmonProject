@@ -12,6 +12,12 @@ namespace KmUmShared
         msgThreadCreate = 2,
         msgThreadTerminate = 3,
         msgModuleLoaded = 4,
+        msgRegistryCreate = 5,
+        msgRegistrySetValue = 6,
+        msgRegistryDeleteKey = 7,
+        msgRegistryDeleteValue = 8,
+        msgRegistryLoadKey = 9,
+        msgRegistryRenameKey = 10,
         msgMaxValue,
     };
 

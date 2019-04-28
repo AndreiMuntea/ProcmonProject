@@ -102,6 +102,9 @@
     <ClInclude Include="..\Common\FltPortModuleMessage.hpp">
       <Filter>Header Files\CommShared</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\FltPortRegistryMessage.hpp">
+      <Filter>Header Files\CommShared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -147,6 +150,9 @@
       <Filter>Source Files\CommShared</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\FltPortModuleMessage.cpp">
+      <Filter>Source Files\CommShared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortRegistryMessage.cpp">
       <Filter>Source Files\CommShared</Filter>
     </ClCompile>
   </ItemGroup>

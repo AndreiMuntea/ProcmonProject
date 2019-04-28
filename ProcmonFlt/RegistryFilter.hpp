@@ -22,10 +22,17 @@ namespace Minifilter
         );
 
         static void 
-        RegistryHandlePostCreate(
+        RegistryHandlePostCreateKey(
             _In_ unsigned __int32 ProcessId,
             _In_ unsigned __int64 Timestamp,
             _Inout_ PREG_POST_CREATE_KEY_INFORMATION Parameters
+        );
+
+        static void 
+        RegistryHandlePostCreateKeyEx(
+            _In_ unsigned __int32 ProcessId,
+            _In_ unsigned __int64 Timestamp,
+            _Inout_ PREG_POST_OPERATION_INFORMATION Parameters
         );
 
         static NTSTATUS

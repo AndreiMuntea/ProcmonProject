@@ -45,7 +45,7 @@ Minifilter::RegistryFilter::RegistrySolveKeyName(
 }
 
 void 
-Minifilter::RegistryFilter::RegistryHandlePostCreate(
+Minifilter::RegistryFilter::RegistryHandlePostCreateKey(
     _In_ unsigned __int32 ProcessId,
     _In_ unsigned __int64 Timestamp,
     _Inout_ PREG_POST_CREATE_KEY_INFORMATION Parameters
@@ -64,7 +64,45 @@ Minifilter::RegistryFilter::RegistryHandlePostCreate(
     auto status = gDrvData.CommunicationPort->Send(Cpp::Forward<Cpp::Stream>(stream));
     if (!NT_SUCCESS(status))
     {
-        MyDriverLogWarning("Send process create message failed with status 0x%x", status);
+        MyDriverLogWarning("Send create key message failed with status 0x%x", status);
+    }
+}
+
+void Minifilter::RegistryFilter::RegistryHandlePostCreateKeyEx(
+    _In_ unsigned __int32 ProcessId,
+    _In_ unsigned __int64 Timestamp,
+    _Inout_ PREG_POST_OPERATION_INFORMATION Parameters
+)
+{
+    Cpp::String keyName;
+    NTSTATUS status = STATUS_UNSUCCESSFUL;
+    
+    if (NT_SUCCESS(Parameters->Status))
+    {
+        status = RegistrySolveKeyName(Parameters->Object, keyName);
+    }
+
+    if (!NT_SUCCESS(status))
+    {
+        // Fallback strategy. Retrieve as much as it is possible from pre info
+        auto preInformation = (PREG_CREATE_KEY_INFORMATION)Parameters->PreInformation;  
+        keyName = Cpp::String{ (const unsigned __int8*)preInformation->CompleteName->Buffer, preInformation->CompleteName->Length };
+    }
+
+    Cpp::Stream stream;
+    KmUmShared::RegistryCreateMessage message(
+        Timestamp,
+        ProcessId,
+        keyName.GetNakedPointer(),
+        keyName.GetSize(),
+        Parameters->Status
+    );
+
+    stream << message;
+    status = gDrvData.CommunicationPort->Send(Cpp::Forward<Cpp::Stream>(stream));
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogWarning("Send create key message failed with status 0x%x", status);
     }
 }
 
@@ -93,7 +131,10 @@ Minifilter::RegistryFilter::RegistryNotifyRoutine(
     switch (notifyClass)
     {
     case(RegNtPostCreateKey):
-        RegistryHandlePostCreate(processId, timestamp, (PREG_POST_CREATE_KEY_INFORMATION)Argument2);
+        RegistryHandlePostCreateKey(processId, timestamp, (PREG_POST_CREATE_KEY_INFORMATION)Argument2);
+        break;
+    case(RegNtPostCreateKeyEx):
+        RegistryHandlePostCreateKeyEx(processId, timestamp, (PREG_POST_OPERATION_INFORMATION)Argument2);
         break;
     default:
         break;

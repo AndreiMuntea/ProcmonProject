@@ -13,8 +13,8 @@ namespace Cpp
         Stream(unsigned __int32 Capacity);
         virtual ~Stream();
 
+        Stream(Stream&& Other);
         Stream(const Stream& Other) = delete;
-        Stream(Stream&& Other) = delete;
 
         void operator=(const Stream& Other) = delete;
         void operator=(Stream&& Other) = delete;

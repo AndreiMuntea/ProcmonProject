@@ -5,9 +5,25 @@
 
 #include "cpp_allocator_object.hpp"
 #include "cpp_lock.hpp"
+#include "ThreadPool.hpp"
 
 namespace Minifilter
 {
+    class FltPortDataPackage : public Cpp::CppPagedObject<'TLF#'>
+    {
+        friend class FltPort;
+    public:
+        FltPortDataPackage(
+            FltPort* Port,
+            Cpp::Stream&& DataStream
+        );
+
+        virtual ~FltPortDataPackage();
+
+    private:
+        FltPort* port = nullptr;
+        Cpp::Stream dataStream;
+    };
 
     class FltPort : public Cpp::CppNonPagedObject<'TLF#'>
     {
@@ -23,15 +39,20 @@ namespace Minifilter
         FltPort& operator=(const FltPort& Other) = delete;
         FltPort& operator=(FltPort&& Other) = delete;
 
-        NTSTATUS Send(Cpp::Stream& DataStream);
+        NTSTATUS Send(Cpp::Stream&& DataStream);
 
         virtual ~FltPort();
 
     private:
+
+        static void DataPackageCleanupCallback(PVOID Context);
+        static void DataPackageCallback(PVOID Context);
+
         PFLT_FILTER filter = nullptr;
         PFLT_PORT clientPort = nullptr;
         PFLT_PORT serverPort = nullptr;
         Cpp::Pushlock lock;
+        Cpp::ThreadPool threadpool;
 
         void CloseClientPort();
         void CloseServerPort();

@@ -253,7 +253,11 @@
     <ClInclude Include="DriverRoutines.hpp" />
     <ClInclude Include="FltPort.hpp" />
     <ClInclude Include="GlobalData.hpp" />
+    <ClInclude Include="LinkedList.hpp" />
+    <ClInclude Include="LinkedListEntry.hpp" />
     <ClInclude Include="ProcessFilter.hpp" />
+    <ClInclude Include="Queue.hpp" />
+    <ClInclude Include="ThreadPool.hpp" />
     <ClInclude Include="trace.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -267,6 +271,7 @@
     <ClCompile Include="GlobalData.cpp" />
     <ClCompile Include="Minifilter.cpp" />
     <ClCompile Include="ProcessFilter.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

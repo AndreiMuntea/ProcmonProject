@@ -50,6 +50,12 @@
     <Filter Include="Source Files\Filters">
       <UniqueIdentifier>{ff244d14-14b9-4202-a6ee-4e958973421e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Cpp Support\structures">
+      <UniqueIdentifier>{2f5e7844-db04-4eef-bcdd-c47ab95a0e80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cpp Support\structures">
+      <UniqueIdentifier>{991d3e95-eff8-402f-b632-392c384af0fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Inf Include="ProcmonFlt.inf">
@@ -104,6 +110,18 @@
     <ClInclude Include="..\Common\FltPortProcessTerminateMessage.hpp">
       <Filter>Header Files\Communication</Filter>
     </ClInclude>
+    <ClInclude Include="ThreadPool.hpp">
+      <Filter>Header Files\Cpp Support\structures</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedList.hpp">
+      <Filter>Header Files\Cpp Support\structures</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedListEntry.hpp">
+      <Filter>Header Files\Cpp Support\structures</Filter>
+    </ClInclude>
+    <ClInclude Include="Queue.hpp">
+      <Filter>Header Files\Cpp Support\structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Minifilter.cpp">
@@ -135,6 +153,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\FltPortProcessTerminateMessage.cpp">
       <Filter>Source Files\Communication</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>Source Files\Cpp Support\structures</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

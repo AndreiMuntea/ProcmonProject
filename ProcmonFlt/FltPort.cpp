@@ -3,14 +3,23 @@
 #include "FltPort.tmh"
 
 #include <cpp_lockguard.hpp>
+#include <CppSemantics.hpp>
+
 
 Minifilter::FltPort::FltPort(
     _In_ PFLT_FILTER Filter,
     _In_ PUNICODE_STRING PortName
-) : filter{ Filter }
+) : filter{ Filter },
+    threadpool{10}
 {
     OBJECT_ATTRIBUTES objAttr = { 0 };
     PSECURITY_DESCRIPTOR securityDescriptor = nullptr;
+
+    if (!threadpool.IsValid())
+    {
+        MyDriverLogError("Couldn't start threadpool");
+        return;
+    }
 
     auto status = ::FltBuildDefaultSecurityDescriptor(&securityDescriptor, FLT_PORT_ALL_ACCESS);
     if (!NT_VERIFY(NT_SUCCESS(status)))
@@ -47,66 +56,36 @@ Minifilter::FltPort::FltPort(
 }
 
 NTSTATUS 
-Minifilter::FltPort::Send(Cpp::Stream& DataStream)
+Minifilter::FltPort::Send(Cpp::Stream&& DataStream)
 {
-    LARGE_INTEGER timeout = { 0 };
-    timeout.QuadPart = -60 * 10 * 1000 * 1000; // 60 seconds
-
-    NTSTATUS replyStatus = STATUS_UNSUCCESSFUL;
-    ULONG replySize = sizeof(replyStatus);
-
-    Cpp::SharedLockguard guard(&this->lock);
-    if (!this->clientPort)
+    FltPortDataPackage* package = new FltPortDataPackage(this, Cpp::Forward<Cpp::Stream>(DataStream));
+    if (!package)
     {
-        MyDriverLogWarning("Client is disconnected. Cannot send message");
-        return STATUS_CONNECTION_DISCONNECTED;
+        return STATUS_INSUFFICIENT_RESOURCES;
+    }
+    if (!package->IsValid())
+    {
+        delete package;
+        return STATUS_INSUFFICIENT_RESOURCES;
     }
 
-    if (!DataStream.IsValid() || !DataStream.GetRawData())
-    {
-        MyDriverLogError("Buffer is not valid");
-        return STATUS_INVALID_PARAMETER;
-    }
-
-    if (DataStream.GetSize() > MAXULONG || DataStream.GetSize() == 0)
-    {
-        MyDriverLogError("Buffer size is not valid");
-        return STATUS_INVALID_BUFFER_SIZE;
-    }
-
-    auto status = ::FltSendMessage(
-        filter,
-        &this->clientPort,
-        DataStream.GetRawData(),
-        static_cast<ULONG>(DataStream.GetSize()),
-        &replyStatus,
-        &replySize,
-        &timeout
-    );
-
+    auto status = threadpool.EnqueueItem(DataPackageCallback, DataPackageCleanupCallback, package);
     if (!NT_SUCCESS(status))
     {
-        MyDriverLogError("::FltSendMessage failed with status 0x%X", status);
-        return status;
+        MyDriverLogError("EnqueueItem failed with status 0x%x", status);
+        delete package;
     }
 
-    if (status == STATUS_TIMEOUT)
-    {
-        MyDriverLogError("::FltSendMessage timeout");
-        return STATUS_MESSAGE_LOST;
-    }
-
-    if (replySize != sizeof(replyStatus))
-    {
-        MyDriverLogError("::FltSendMessage invalid reply size");
-        return STATUS_INVALID_BUFFER_SIZE;
-    }
-
-    return replyStatus;
+    return status;
 }
 
 Minifilter::FltPort::~FltPort()
 {
+    if (threadpool.IsValid())
+    {
+        threadpool.Shutdown();
+    }
+
     if (!this->IsValid())
     {
         return;
@@ -116,6 +95,81 @@ Minifilter::FltPort::~FltPort()
 
     CloseClientPort();
     CloseServerPort();
+}
+
+void 
+Minifilter::FltPort::DataPackageCleanupCallback(
+    PVOID Context
+)
+{
+    auto dataPackage = (FltPortDataPackage*)(Context);
+    delete dataPackage;
+}
+
+void 
+Minifilter::FltPort::DataPackageCallback(
+    PVOID Context
+)
+{
+    auto dataPackage = (FltPortDataPackage*)(Context);
+
+    LARGE_INTEGER timeout = { 0 };
+    timeout.QuadPart = -60 * 10 * 1000 * 1000; // 60 seconds
+
+    NTSTATUS replyStatus = STATUS_UNSUCCESSFUL;
+    ULONG replySize = sizeof(replyStatus);
+
+    Cpp::SharedLockguard guard(&dataPackage->port->lock);
+    if (!dataPackage->port->clientPort)
+    {
+        MyDriverLogWarning("Client is disconnected. Cannot send message");
+        goto CleanUp;
+    }
+
+    if (!dataPackage->dataStream.IsValid() || !dataPackage->dataStream.GetRawData())
+    {
+        MyDriverLogError("Buffer is not valid");
+        goto CleanUp;
+    }
+
+    if (dataPackage->dataStream.GetSize() > MAXULONG || dataPackage->dataStream.GetSize() == 0)
+    {
+        MyDriverLogError("Buffer size is not valid");
+        goto CleanUp;
+    }
+
+    auto status = ::FltSendMessage(
+        dataPackage->port->filter,
+        &dataPackage->port->clientPort,
+        dataPackage->dataStream.GetRawData(),
+        static_cast<ULONG>(dataPackage->dataStream.GetSize()),
+        &replyStatus,
+        &replySize,
+        &timeout
+    );
+
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogError("::FltSendMessage failed with status 0x%X", status);
+        goto CleanUp;
+    }
+
+    if (status == STATUS_TIMEOUT)
+    {
+        MyDriverLogError("::FltSendMessage timeout");
+        goto CleanUp;
+    }
+
+    if (replySize != sizeof(replyStatus))
+    {
+        MyDriverLogError("::FltSendMessage invalid reply size");
+        goto CleanUp;
+    }
+
+    MyDriverLogTrace("::FltSendMessage sent message");
+
+CleanUp:
+    delete dataPackage;
 }
 
 void 
@@ -213,4 +267,18 @@ Minifilter::FltPort::MessageNotifyCallback(
     }
 
     return STATUS_SUCCESS;
+}
+
+Minifilter::FltPortDataPackage::FltPortDataPackage(
+    FltPort* Port,
+    Cpp::Stream&& DataStream
+) : port{Port},
+    dataStream{Cpp::Forward<Cpp::Stream>(DataStream)}
+{
+    Validate();
+}
+
+Minifilter::FltPortDataPackage::~FltPortDataPackage()
+{
+    port = nullptr;
 }

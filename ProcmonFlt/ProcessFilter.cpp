@@ -7,6 +7,8 @@
 #include "../Common/FltPortProcessCreateMessage.hpp"
 #include "../Common/FltPortProcessTerminateMessage.hpp"
 
+#include <CppSemantics.hpp>
+
 Minifilter::ProcessFilter::ProcessFilter()
 {
     auto status = ::PsSetCreateProcessNotifyRoutineEx(&ProcessCreateNotifyRoutine, false);
@@ -89,7 +91,7 @@ Minifilter::ProcessFilter::HandleProcessCreate(
     Cpp::Stream stream;
     stream << KmUmShared::ProcessCreateMessage{ timestamp, parentId, processId, imagePath, imagePathSize, commandLine, commandLineSize };
 
-    auto status = gDrvData.CommunicationPort->Send(stream);
+    auto status = gDrvData.CommunicationPort->Send(Cpp::Forward<Cpp::Stream>(stream));
     if (!NT_SUCCESS(status))
     {
         MyDriverLogWarning("Send process create message failed with status 0x%x", status);
@@ -113,7 +115,7 @@ Minifilter::ProcessFilter::HandleProcessTerminate(
     Cpp::Stream stream;
     stream << KmUmShared::ProcessTerminateMessage{ timestamp, processId};
 
-    auto status = gDrvData.CommunicationPort->Send(stream);
+    auto status = gDrvData.CommunicationPort->Send(Cpp::Forward<Cpp::Stream>(stream));
     if (!NT_SUCCESS(status))
     {
         MyDriverLogWarning("Send process create message failed with status 0x%x", status);

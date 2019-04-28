@@ -13,7 +13,7 @@ namespace Cpp
         inline void Invalidate() { isValid = false; }
         inline bool IsValid() const { return isValid; }
 
-    private:
+    protected:
         bool isValid = false;
     };
 }

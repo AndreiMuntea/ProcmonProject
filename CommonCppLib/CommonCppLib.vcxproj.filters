@@ -48,6 +48,9 @@
     <ClInclude Include="include\CppShallowStream.hpp">
       <Filter>Header Files\Data Structures</Filter>
     </ClInclude>
+    <ClInclude Include="include\CppSemantics.hpp">
+      <Filter>Header Files\Data Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CppString.cpp">

@@ -126,6 +126,7 @@
     <ClInclude Include="include\CppDefaultDeleter.hpp" />
     <ClInclude Include="include\CppExternals.hpp" />
     <ClInclude Include="include\CppObject.hpp" />
+    <ClInclude Include="include\CppSemantics.hpp" />
     <ClInclude Include="include\CppShallowStream.hpp" />
     <ClInclude Include="include\CppStream.hpp" />
     <ClInclude Include="include\CppString.hpp" />

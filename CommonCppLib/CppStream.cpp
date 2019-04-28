@@ -27,6 +27,15 @@ Cpp::Stream::~Stream()
     }
 }
 
+Cpp::Stream::Stream(Stream && Other)
+{
+    Cpp::Swap(this->capacity, Other.capacity);
+    Cpp::Swap(this->size, Other.size);
+    Cpp::Swap(this->cursor, Other.cursor);
+    Cpp::Swap(this->buffer, Other.buffer);
+    Cpp::Swap(this->isValid, Other.isValid);
+}
+
 bool 
 Cpp::Stream::EnsureCapacity(
     unsigned __int32 NeededSize

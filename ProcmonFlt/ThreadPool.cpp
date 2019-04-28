@@ -86,7 +86,7 @@ NTSTATUS Cpp::ThreadPool::EnqueueItem(
         return STATUS_INSUFFICIENT_RESOURCES;
     }
 
-    ExclusiveLockguard guard(&lock);
+    Cpp::ExclusiveLockguard guard(&lock);
     if (pendingShutdown)
     {
         delete element;
@@ -98,6 +98,8 @@ NTSTATUS Cpp::ThreadPool::EnqueueItem(
     {
         KeSetEvent(&events[ITEM_ENQUEUED_NOTIFICATION_EVENT], 0, false);
     }
+
+    return STATUS_SUCCESS;
 }
 
 void Cpp::ThreadPool::WaitThreads()
@@ -128,7 +130,7 @@ void Cpp::ThreadPool::CleanupThreadPool()
 
 Cpp::ThreadPoolWorkItem* Cpp::ThreadPool::GetWorkerItem()
 {
-    ExclusiveLockguard guard(&lock);
+    Cpp::ExclusiveLockguard guard(&lock);
     ThreadPoolWorkItem* result = nullptr;
 
     if (workItems.IsEmpty())

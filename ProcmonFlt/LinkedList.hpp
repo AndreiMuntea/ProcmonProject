@@ -35,7 +35,6 @@ namespace Cpp
     template<class Object>
     inline LinkedList<Object>::LinkedList()
     {
-        static_assert(__is_base_of(LinkedListEntry, Object), "Linked list template should be of type Linked list entry");
         Validate();
     }
 

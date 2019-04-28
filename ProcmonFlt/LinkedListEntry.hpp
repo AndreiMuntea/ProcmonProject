@@ -3,9 +3,10 @@
 
 #include "cpp_allocator_object.hpp"
 
+
 namespace Cpp
 {
-    class LinkedListEntry : public CppNonPagedObject<'TLL#'>
+    class LinkedListEntry : public Cpp::CppNonPagedObject<'TLL#'>
     {
     public:
         LinkedListEntry()

@@ -6,7 +6,7 @@
 namespace Cpp
 {
     template <class T>
-    class Queue : public CppNonPagedObject<'TDQ#'>
+    class Queue : public Cpp::CppNonPagedObject<'TDQ#'>
     {
     public:
         Queue();

@@ -27,11 +27,11 @@ Minifilter::ProcessFilter::~ProcessFilter()
 {
     if (IsValid())
     {
-        auto status = ::PsSetCreateProcessNotifyRoutineEx(&ProcessCreateNotifyRoutine, true);
-        NT_VERIFY(NT_SUCCESS(status));
-
         ::ExWaitForRundownProtectionRelease(&this->rundownProtect);
         ::ExRundownCompleted(&this->rundownProtect);
+
+        auto status = ::PsSetCreateProcessNotifyRoutineEx(&ProcessCreateNotifyRoutine, true);
+        NT_VERIFY(NT_SUCCESS(status));
     }
 }
 

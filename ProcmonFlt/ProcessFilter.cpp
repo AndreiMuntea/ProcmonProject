@@ -17,8 +17,6 @@ Minifilter::ProcessFilter::ProcessFilter()
         Invalidate();
         return;
     }
-
-    ::ExInitializeRundownProtection(&this->rundownProtect);
     Validate();
 }
 
@@ -28,9 +26,6 @@ Minifilter::ProcessFilter::~ProcessFilter()
     {
         auto status = ::PsSetCreateProcessNotifyRoutineEx(&ProcessCreateNotifyRoutine, true);
         NT_VERIFY(NT_SUCCESS(status));
-
-        ::ExWaitForRundownProtectionRelease(&this->rundownProtect);
-        ::ExRundownCompleted(&this->rundownProtect);
     }
 }
 
@@ -41,7 +36,7 @@ Minifilter::ProcessFilter::ProcessCreateNotifyRoutine(
     _Inout_opt_ PPS_CREATE_NOTIFY_INFO CreateInfo
 )
 {
-    auto rundownAcquired = ::ExAcquireRundownProtection(&gDrvData.ProcessFilter->rundownProtect);
+    auto rundownAcquired = ::ExAcquireRundownProtection(&gDrvData.RundownProtection);
     if (!rundownAcquired)
     {
         MyDriverLogWarning("ExAcquireRundownProtection failed at ProcessCreateNotifyRoutine");
@@ -51,7 +46,7 @@ Minifilter::ProcessFilter::ProcessCreateNotifyRoutine(
     (CreateInfo != nullptr) ? HandleProcessCreate(Process, ProcessId, CreateInfo)
                             : HandleProcessTerminate(Process, ProcessId);
 
-    ::ExReleaseRundownProtection(&gDrvData.ProcessFilter->rundownProtect);
+    ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
 }
 
 void 

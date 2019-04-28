@@ -23,6 +23,9 @@ typedef struct _GLOBAL_DATA
     Cpp::UniquePointer<Minifilter::ProcessFilter> ProcessFilter;
     Cpp::UniquePointer<Minifilter::ThreadFilter> ThreadFilter;
     Cpp::UniquePointer<Minifilter::ModuleFilter> ModuleFilter;
+
+    EX_RUNDOWN_REF RundownProtection;
+    bool MonitoringStarted;
 }GLOBAL_DATA, *PGLOBAL_DATA;
 
 extern GLOBAL_DATA gDrvData;

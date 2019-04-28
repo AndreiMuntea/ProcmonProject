@@ -17,9 +17,6 @@ namespace Minifilter
             _In_ HANDLE ProcessId,
             _In_ PIMAGE_INFO ImageInfo
         );
-
-    protected:
-        EX_RUNDOWN_REF rundownProtect = { 0 };
     };
 }
 

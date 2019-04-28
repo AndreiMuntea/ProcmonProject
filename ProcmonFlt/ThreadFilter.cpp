@@ -17,7 +17,6 @@ Minifilter::ThreadFilter::ThreadFilter()
         return;
     }
 
-    ::ExInitializeRundownProtection(&this->rundownProtect);
     Validate();
 }
 
@@ -25,9 +24,6 @@ Minifilter::ThreadFilter::~ThreadFilter()
 {
     if (IsValid())
     {
-        ::ExWaitForRundownProtectionRelease(&this->rundownProtect);
-        ::ExRundownCompleted(&this->rundownProtect);
-
         auto status = ::PsRemoveCreateThreadNotifyRoutine(&ThreadFilter::CreateThreadNotifyRoutine);
         NT_VERIFY(NT_SUCCESS(status));
     }
@@ -40,7 +36,7 @@ Minifilter::ThreadFilter::CreateThreadNotifyRoutine(
     _In_ BOOLEAN Create
 )
 {
-    auto rundownAcquired = ::ExAcquireRundownProtection(&gDrvData.ThreadFilter->rundownProtect);
+    auto rundownAcquired = ::ExAcquireRundownProtection(&gDrvData.RundownProtection);
     if (!rundownAcquired)
     {
         MyDriverLogWarning("ExAcquireRundownProtection failed at CreateThreadNotifyRoutine");
@@ -65,5 +61,5 @@ Minifilter::ThreadFilter::CreateThreadNotifyRoutine(
         MyDriverLogWarning("Send thread create/terminate message failed with status 0x%x", status);
     }
 
-    ::ExReleaseRundownProtection(&gDrvData.ThreadFilter->rundownProtect);
+    ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
 }

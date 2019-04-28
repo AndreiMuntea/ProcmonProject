@@ -2,6 +2,7 @@
 #define __PROCESS_FILTER_HPP__ 
 
 #include "cpp_allocator_object.hpp"
+#include "FltPort.hpp"
 
 namespace Minifilter
 {
@@ -19,9 +20,7 @@ namespace Minifilter
             _Inout_opt_ PPS_CREATE_NOTIFY_INFO CreateInfo
         );
 
-    protected:
-        EX_RUNDOWN_REF rundownProtect = { 0 };
-
+    private:
         static void 
         HandleProcessCreate(
             _Inout_ PEPROCESS Process,

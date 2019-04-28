@@ -90,6 +90,9 @@ DriverEntry(
         goto Exit;
     }
 
+    // Start monitoring
+    gDrvData.MonitoringStarted = true;
+
 Exit:
     if (!NT_SUCCESS(status))
     {
@@ -111,7 +114,14 @@ DriverUnload(
     MyDriverLogTrace("We are now in driver unload routine!");
     WPP_CLEANUP(gDrvData.DriverObject);
 
-    // Destroy filters
+    // Wait for running callbacks to complete
+    ::ExWaitForRundownProtectionRelease(&gDrvData.RundownProtection);
+    ::ExRundownCompleted(&gDrvData.RundownProtection);
+
+    // Stop monitoring
+    gDrvData.MonitoringStarted = false;
+
+    // Release filters
     gDrvData.ThreadFilter.Update(nullptr);
     gDrvData.ProcessFilter.Update(nullptr);
     gDrvData.ModuleFilter.Update(nullptr);

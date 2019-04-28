@@ -16,7 +16,6 @@ Minifilter::ModuleFilter::ModuleFilter()
         return;
     }
 
-    ::ExInitializeRundownProtection(&this->rundownProtect);
     Validate();
 }
 
@@ -26,9 +25,6 @@ Minifilter::ModuleFilter::~ModuleFilter()
     {
         auto status = ::PsRemoveLoadImageNotifyRoutine(&ModuleFilter::LoadImageNotifyRoutine);
         NT_VERIFY(NT_SUCCESS(status));
-
-        ::ExWaitForRundownProtectionRelease(&this->rundownProtect);
-        ::ExRundownCompleted(&this->rundownProtect);
     }
 }
 
@@ -38,7 +34,7 @@ void Minifilter::ModuleFilter::LoadImageNotifyRoutine(
     _In_ PIMAGE_INFO ImageInfo
 )
 {
-    auto rundownAcquired = ::ExAcquireRundownProtection(&gDrvData.ModuleFilter->rundownProtect);
+    auto rundownAcquired = ::ExAcquireRundownProtection(&gDrvData.RundownProtection);
     if (!rundownAcquired)
     {
         MyDriverLogWarning("ExAcquireRundownProtection failed at LoadImageNotifyRoutine");
@@ -60,5 +56,5 @@ void Minifilter::ModuleFilter::LoadImageNotifyRoutine(
         MyDriverLogWarning("Send image notify message failed with status 0x%x", status);
     }
 
-    ::ExReleaseRundownProtection(&gDrvData.ModuleFilter->rundownProtect);
+    ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
 }

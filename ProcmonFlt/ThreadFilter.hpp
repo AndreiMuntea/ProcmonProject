@@ -17,9 +17,6 @@ namespace Minifilter
             _In_ HANDLE ThreadId,
             _In_ BOOLEAN Create
         );
-
-    protected:
-        EX_RUNDOWN_REF rundownProtect = { 0 };
     };
 }
 

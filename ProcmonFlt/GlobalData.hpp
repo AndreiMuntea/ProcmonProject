@@ -6,6 +6,7 @@
 
 #include "FltPort.hpp"
 #include "ProcessFilter.hpp"
+#include "ThreadFilter.hpp"
 
 typedef struct _GLOBAL_DATA
 {
@@ -19,6 +20,7 @@ typedef struct _GLOBAL_DATA
     Cpp::UniquePointer<Minifilter::FltPort> CommunicationPort;
 
     Cpp::UniquePointer<Minifilter::ProcessFilter> ProcessFilter;
+    Cpp::UniquePointer<Minifilter::ThreadFilter> ThreadFilter;
 }GLOBAL_DATA, *PGLOBAL_DATA;
 
 extern GLOBAL_DATA gDrvData;

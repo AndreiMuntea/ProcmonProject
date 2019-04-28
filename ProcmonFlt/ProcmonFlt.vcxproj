@@ -243,6 +243,7 @@
   <ItemGroup>
     <ClInclude Include="..\Common\FltPortMessage.hpp" />
     <ClInclude Include="..\Common\FltPortProcessMessage.hpp" />
+    <ClInclude Include="..\Common\FltPortThreadMessage.hpp" />
     <ClInclude Include="cpp_allocator_object.hpp" />
     <ClInclude Include="cpp_definitions.hpp" />
     <ClInclude Include="cpp_init.hpp" />
@@ -256,12 +257,14 @@
     <ClInclude Include="LinkedListEntry.hpp" />
     <ClInclude Include="ProcessFilter.hpp" />
     <ClInclude Include="Queue.hpp" />
+    <ClInclude Include="ThreadFilter.hpp" />
     <ClInclude Include="ThreadPool.hpp" />
     <ClInclude Include="trace.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\FltPortMessage.cpp" />
     <ClCompile Include="..\Common\FltPortProcessMessage.cpp" />
+    <ClCompile Include="..\Common\FltPortThreadMessage.cpp" />
     <ClCompile Include="cpp_definitions.cpp" />
     <ClCompile Include="cpp_externals.cpp" />
     <ClCompile Include="cpp_init.cpp" />
@@ -269,6 +272,7 @@
     <ClCompile Include="GlobalData.cpp" />
     <ClCompile Include="Minifilter.cpp" />
     <ClCompile Include="ProcessFilter.cpp" />
+    <ClCompile Include="ThreadFilter.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

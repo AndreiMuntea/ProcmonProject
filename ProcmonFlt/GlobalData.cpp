@@ -46,6 +46,7 @@ void GdrvInitGlobalData(_In_ PDRIVER_OBJECT DriverObject)
 void GdrvUninitGlobalData()
 {
     gDrvData.ProcessFilter.Update(nullptr);
+    gDrvData.ThreadFilter.Update(nullptr);
 
     gDrvData.CommunicationPort.Update(nullptr);
     gDrvData.CommunicationPortName = { 0,0,nullptr };

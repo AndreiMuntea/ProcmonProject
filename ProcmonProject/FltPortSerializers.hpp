@@ -3,6 +3,7 @@
 
 #include "../Common/FltPortMessage.hpp"
 #include "../Common/FltPortProcessMessage.hpp"
+#include "../Common/FltPortThreadMessage.hpp"
 
 #include <CppString.hpp>
 #include <sstream>
@@ -11,5 +12,7 @@
 std::wostream& operator<<(std::wostream& Stream, Cpp::String& String);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::ProcessCreateMessage& ProcessCreateMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::ProcessTerminateMessage& ProcessTerminateMessage);
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::ThreadCreateMessage& ThreadCreateMessage);
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::ThreadTerminateMessage& ThreadTerminateMessage);
 
 #endif //__FLT_PORT_SERIALIZERS_HPP__

@@ -119,6 +119,12 @@
     <ClInclude Include="..\Common\FltPortProcessMessage.hpp">
       <Filter>Header Files\Communication</Filter>
     </ClInclude>
+    <ClInclude Include="ThreadFilter.hpp">
+      <Filter>Header Files\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortThreadMessage.hpp">
+      <Filter>Header Files\Communication</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Minifilter.cpp">
@@ -149,6 +155,12 @@
       <Filter>Source Files\Cpp Support\structures</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\FltPortProcessMessage.cpp">
+      <Filter>Source Files\Communication</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadFilter.cpp">
+      <Filter>Source Files\Filters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortThreadMessage.cpp">
       <Filter>Source Files\Communication</Filter>
     </ClCompile>
   </ItemGroup>

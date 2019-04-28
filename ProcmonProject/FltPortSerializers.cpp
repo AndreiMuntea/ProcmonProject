@@ -28,3 +28,25 @@ std::wostream& operator<<(std::wostream& Stream, KmUmShared::ProcessTerminateMes
 
     return Stream;
 }
+
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::ThreadCreateMessage & ThreadCreateMessage)
+{
+    Stream << "[ThreadCreateMessage]" << std::endl
+        << "\t> [Timestamp] " << ThreadCreateMessage.timestamp << std::endl
+        << "\t> [Process ID] " << ThreadCreateMessage.processId << std::endl
+        << "\t> [Thread ID] " << ThreadCreateMessage.threadId << std::endl
+        << std::endl;
+
+    return Stream;
+}
+
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::ThreadTerminateMessage & ThreadTerminateMessage)
+{
+    Stream << "[ThreadTerminateMessage]" << std::endl
+        << "\t> [Timestamp] " << ThreadTerminateMessage.timestamp << std::endl
+        << "\t> [Process ID] " << ThreadTerminateMessage.processId << std::endl
+        << "\t> [Thread ID] " << ThreadTerminateMessage.threadId << std::endl
+        << std::endl;
+
+    return Stream;
+}

@@ -45,7 +45,7 @@ namespace KmUmShared
         );
 
         friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const ProcessTerminateMessage& ProcessCreateMessage);
-        friend Cpp::Stream& operator >> (Cpp::Stream& Stream, ProcessTerminateMessage& ProcessCreateMessage);
+        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, ProcessTerminateMessage& ProcessCreateMessage);
 
     public:
         unsigned __int64 timestamp = 0;

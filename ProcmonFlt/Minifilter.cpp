@@ -41,21 +41,32 @@ DriverEntry(
         goto Exit;
     }
 
-    // Create Process filter
-    gDrvData.ProcessFilter.Update(new Minifilter::ProcessFilter());
-    if (!gDrvData.ProcessFilter.IsValid() || !gDrvData.ProcessFilter->IsValid())
-    {
-        ::FltUnregisterFilter(gDrvData.FilterHandle);
-        MyDriverLogCritical("Failed to initialize ProcessFilter");
-        goto Exit;
-    }
-
     // Create a new communication port
     gDrvData.CommunicationPort.Update(new Minifilter::FltPort(gDrvData.FilterHandle, &gDrvData.CommunicationPortName));
     if (!gDrvData.CommunicationPort.IsValid() || !gDrvData.CommunicationPort->IsValid())
     {
         ::FltUnregisterFilter(gDrvData.FilterHandle);
         MyDriverLogCritical("Failed to initialize Filter communication port");
+        goto Exit;
+    }
+
+    // Create Process filter
+    gDrvData.ProcessFilter.Update(new Minifilter::ProcessFilter());
+    if (!gDrvData.ProcessFilter.IsValid() || !gDrvData.ProcessFilter->IsValid())
+    {
+        gDrvData.CommunicationPort.Update(nullptr);
+        ::FltUnregisterFilter(gDrvData.FilterHandle);
+        MyDriverLogCritical("Failed to initialize ProcessFilter");
+        goto Exit;
+    }
+
+    // Create Thread filter
+    gDrvData.ThreadFilter.Update(new Minifilter::ThreadFilter());
+    if (!gDrvData.ThreadFilter.IsValid() || !gDrvData.ThreadFilter->IsValid())
+    {
+        gDrvData.CommunicationPort.Update(nullptr);
+        ::FltUnregisterFilter(gDrvData.FilterHandle);
+        MyDriverLogCritical("Failed to initialize ThreadFilter");
         goto Exit;
     }
 
@@ -90,11 +101,12 @@ DriverUnload(
     MyDriverLogTrace("We are now in driver unload routine!");
     WPP_CLEANUP(gDrvData.DriverObject);
 
+    // Stop filters
+    gDrvData.ProcessFilter.Update(nullptr);
+    gDrvData.ThreadFilter.Update(nullptr);
+
     // Close communication port (has a reference to filter handle => has to be done before FltUnregisterFilter)
     gDrvData.CommunicationPort.Update(nullptr);
-    
-    // Destroy registered filters
-    gDrvData.ProcessFilter.Update(nullptr);
 
     // Unregister filter
     ::FltUnregisterFilter(gDrvData.FilterHandle);

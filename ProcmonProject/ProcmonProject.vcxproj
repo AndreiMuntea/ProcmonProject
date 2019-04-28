@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="..\Common\FltPortMessage.hpp" />
     <ClInclude Include="..\Common\FltPortProcessMessage.hpp" />
+    <ClInclude Include="..\Common\FltPortThreadMessage.hpp" />
     <ClInclude Include="Command.hpp" />
     <ClInclude Include="CommandInterpreter.hpp" />
     <ClInclude Include="DynamicImports.hpp" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClCompile Include="..\Common\FltPortMessage.cpp" />
     <ClCompile Include="..\Common\FltPortProcessMessage.cpp" />
+    <ClCompile Include="..\Common\FltPortThreadMessage.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="CommandInterpreter.cpp" />
     <ClCompile Include="cpp_externals.cpp" />

@@ -41,7 +41,6 @@ private:
     HANDLE driverPort = INVALID_HANDLE_VALUE;
 };
 
-#endif //__FILTER_PORT_HPP__
 
 template<class T>
 inline NTSTATUS FilterPort::HandleMessageNotification(Cpp::ShallowStream & InputData)
@@ -57,3 +56,5 @@ inline NTSTATUS FilterPort::HandleMessageNotification(Cpp::ShallowStream & Input
     std::wcout << message;
     return ERROR_SUCCESS;
 }
+
+#endif //__FILTER_PORT_HPP__

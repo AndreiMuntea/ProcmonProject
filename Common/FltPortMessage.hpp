@@ -9,6 +9,8 @@ namespace KmUmShared
     {
         msgProcessCreate = 0,
         msgProcessTerminate = 1,
+        msgThreadCreate = 2,
+        msgThreadTerminate = 3,
         msgMaxValue,
     };
 

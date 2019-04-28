@@ -104,12 +104,6 @@
     <ClInclude Include="..\Common\FltPortMessage.hpp">
       <Filter>Header Files\Communication</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\FltPortProcessCreateMessage.hpp">
-      <Filter>Header Files\Communication</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\FltPortProcessTerminateMessage.hpp">
-      <Filter>Header Files\Communication</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadPool.hpp">
       <Filter>Header Files\Cpp Support\structures</Filter>
     </ClInclude>
@@ -121,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="Queue.hpp">
       <Filter>Header Files\Cpp Support\structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortProcessMessage.hpp">
+      <Filter>Header Files\Communication</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -148,14 +145,11 @@
     <ClCompile Include="..\Common\FltPortMessage.cpp">
       <Filter>Source Files\Communication</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\FltPortProcessCreateMessage.cpp">
-      <Filter>Source Files\Communication</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\FltPortProcessTerminateMessage.cpp">
-      <Filter>Source Files\Communication</Filter>
-    </ClCompile>
     <ClCompile Include="ThreadPool.cpp">
       <Filter>Source Files\Cpp Support\structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortProcessMessage.cpp">
+      <Filter>Source Files\Communication</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

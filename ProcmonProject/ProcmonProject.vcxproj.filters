@@ -90,14 +90,11 @@
     <ClInclude Include="..\Common\FltPortMessage.hpp">
       <Filter>Header Files\CommShared</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\FltPortProcessCreateMessage.hpp">
-      <Filter>Header Files\CommShared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\FltPortProcessTerminateMessage.hpp">
-      <Filter>Header Files\CommShared</Filter>
-    </ClInclude>
     <ClInclude Include="FltPortSerializers.hpp">
       <Filter>Header Files\CommShared\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortProcessMessage.hpp">
+      <Filter>Header Files\CommShared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -134,14 +131,11 @@
     <ClCompile Include="..\Common\FltPortMessage.cpp">
       <Filter>Source Files\CommShared</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\FltPortProcessCreateMessage.cpp">
-      <Filter>Source Files\CommShared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\FltPortProcessTerminateMessage.cpp">
-      <Filter>Source Files\CommShared</Filter>
-    </ClCompile>
     <ClCompile Include="FltPortSerializers.cpp">
       <Filter>Source Files\CommShared\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortProcessMessage.cpp">
+      <Filter>Source Files\CommShared</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -4,8 +4,7 @@
 
 #include "GlobalData.hpp"
 
-#include "../Common/FltPortProcessCreateMessage.hpp"
-#include "../Common/FltPortProcessTerminateMessage.hpp"
+#include "../Common/FltPortProcessMessage.hpp"
 
 #include <CppSemantics.hpp>
 

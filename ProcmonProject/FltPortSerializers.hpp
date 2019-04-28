@@ -2,8 +2,7 @@
 #define __FLT_PORT_SERIALIZERS_HPP__
 
 #include "../Common/FltPortMessage.hpp"
-#include "../Common/FltPortProcessCreateMessage.hpp"
-#include "../Common/FltPortProcessTerminateMessage.hpp"
+#include "../Common/FltPortProcessMessage.hpp"
 
 #include <CppString.hpp>
 #include <sstream>

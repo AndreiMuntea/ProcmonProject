@@ -8,45 +8,45 @@ static UNICODE_STRING gFltPortName = RTL_CONSTANT_STRING(L"\\MyCommunicationPort
 
 static CONST FLT_OPERATION_REGISTRATION Callbacks[] =
 {
-    //{ 
-    //    IRP_MJ_CREATE,
-    //    0,
-    //    Minifilter::FileFilter::PreCreateCallback,
-    //    Minifilter::FileFilter::PostCreateCallback,
-    //    nullptr
-    //},
+    { 
+        IRP_MJ_CREATE,
+        0,
+        Minifilter::FileFilter::PreCreateCallback,
+        Minifilter::FileFilter::PostCreateCallback,
+        nullptr
+    },
 
-    //{
-    //    IRP_MJ_CLOSE,
-    //    0,
-    //    Minifilter::FileFilter::PreCloseCallback,
-    //    Minifilter::FileFilter::PostCloseCallback,
-    //    nullptr
-    //},
+    {
+        IRP_MJ_CLOSE,
+        0,
+        Minifilter::FileFilter::PreCloseCallback,
+        Minifilter::FileFilter::PostCloseCallback,
+        nullptr
+    },
 
-    //{
-    //    IRP_MJ_CLEANUP,
-    //    0,
-    //    Minifilter::FileFilter::PreCleanupCallback,
-    //    Minifilter::FileFilter::PostCleanupCallback,
-    //    nullptr
-    //},
+    {
+        IRP_MJ_CLEANUP,
+        0,
+        Minifilter::FileFilter::PreCleanupCallback,
+        Minifilter::FileFilter::PostCleanupCallback,
+        nullptr
+    },
     
-    //{
-    //    IRP_MJ_WRITE,
-    //    0,
-    //    Minifilter::FileFilter::PreWriteCallback,
-    //    Minifilter::FileFilter::PostWriteCallback,
-    //    nullptr
-    //},
+    {
+        IRP_MJ_WRITE,
+        0,
+        Minifilter::FileFilter::PreWriteCallback,
+        Minifilter::FileFilter::PostWriteCallback,
+        nullptr
+    },
 
-    //{
-    //    IRP_MJ_READ,
-    //    0,
-    //    Minifilter::FileFilter::PreReadCallback,
-    //    Minifilter::FileFilter::PostReadCallback,
-    //    nullptr
-    //},
+    {
+        IRP_MJ_READ,
+        0,
+        Minifilter::FileFilter::PreReadCallback,
+        Minifilter::FileFilter::PostReadCallback,
+        nullptr
+    },
 
     {
         IRP_MJ_SET_INFORMATION,

@@ -82,6 +82,24 @@ namespace KmUmShared
         friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const RegistryCreateMessage& RegistryCreateMessage);
         friend Cpp::Stream& operator>>(Cpp::Stream& Stream, RegistryCreateMessage& RegistryCreateMessage);
     };
+
+    class RegistrySetValueMessage : public RegistryTemplate2StringMessage
+    {
+    public:
+        RegistrySetValueMessage() = default;
+        RegistrySetValueMessage(
+            unsigned __int64 Timestamp,
+            unsigned __int32 ProcessId,
+            const unsigned __int8* KeyNameBuffer,
+            unsigned __int32 KeyNameBufferSize,
+            const unsigned __int8* ValueNameBuffer,
+            unsigned __int32 ValueNameBufferSize,
+            long Status
+        );
+
+        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const RegistrySetValueMessage& RegistrySetValueMessage);
+        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, RegistrySetValueMessage& RegistrySetValueMessage);
+    };
 }
 
 #endif // __FLT_PORT_REGISTRY_MESSAGE_HPP__

@@ -44,24 +44,6 @@ Minifilter::RegistryFilter::RegistrySolveKeyName(
     return STATUS_SUCCESS;
 }
 
-NTSTATUS 
-Minifilter::RegistryFilter::RegistryRegisterCallContext(
-    _Out_ PVOID* CallContext,
-    _Inout_ Cpp::String&& KeyName
-)
-{
-    *CallContext = nullptr;
-
-    auto context = new RegistryKeyContext(Cpp::Forward<Cpp::String>(KeyName));
-    if (!context)
-    {
-        return STATUS_INSUFFICIENT_RESOURCES;
-    }
-
-    *CallContext = context;
-    return STATUS_SUCCESS;
-}
-
 void 
 Minifilter::RegistryFilter::RegistryHandlePreCreateKeyEx(
     _Inout_ PREG_CREATE_KEY_INFORMATION Parameters
@@ -78,7 +60,7 @@ Minifilter::RegistryFilter::RegistryHandlePreCreateKeyEx(
     }
 
     root += newKey;
-    status = RegistryRegisterCallContext(&Parameters->CallContext, Cpp::Forward<Cpp::String>(root));
+    status = RegistryRegisterCallContext<RegistryKeyContext>(&Parameters->CallContext, Cpp::Forward<Cpp::String>(root));
     if (!NT_SUCCESS(status))
     {
         MyDriverLogCritical("Failed to register registry context");
@@ -110,6 +92,30 @@ Minifilter::RegistryFilter::RegistryHandlePostCreateKey(
     }
 }
 
+void 
+Minifilter::RegistryFilter::RegistryHandlePreOperationKeyValue(
+    _In_ PVOID Object,
+    _In_ PCUNICODE_STRING Value,
+    _Inout_ PVOID* CallContext
+)
+{
+    Cpp::String keyName;
+    Cpp::String value{ (const unsigned __int8*)Value->Buffer, Value->Length };
+
+    auto status = RegistrySolveKeyName(Object, keyName);
+    if (!NT_SUCCESS(status) || !keyName.IsValid() || !value.IsValid())
+    {
+        return;
+    }
+
+    status = RegistryRegisterCallContext<RegistryKeyValueContext>(CallContext, Cpp::Forward<Cpp::String>(keyName), Cpp::Forward<Cpp::String>(value));
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogCritical("Failed to register registry context");
+        return;
+    }
+}
+
 NTSTATUS 
 Minifilter::RegistryFilter::RegistryNotifyRoutine(
     _In_ PVOID CallbackContext,
@@ -134,17 +140,36 @@ Minifilter::RegistryFilter::RegistryNotifyRoutine(
     REG_NOTIFY_CLASS notifyClass = (REG_NOTIFY_CLASS)(SIZE_T)Argument1;
     switch (notifyClass)
     {
-    case(RegNtPostCreateKey):
-        RegistryHandlePostCreateKey(processId, timestamp, (PREG_POST_CREATE_KEY_INFORMATION)Argument2);
+    //case(RegNtPostCreateKey):
+    //{
+    //    RegistryHandlePostCreateKey(processId, timestamp, (PREG_POST_CREATE_KEY_INFORMATION)Argument2);
+    //    break;
+    //}
+    //case(RegNtPreCreateKeyEx):
+    //{
+    //    RegistryHandlePreCreateKeyEx((PREG_CREATE_KEY_INFORMATION)Argument2);
+    //    break;
+    //}
+    //case(RegNtPostCreateKeyEx):
+    //{
+    //    RegistryHandlePostKeyContextMessage<KmUmShared::RegistryCreateMessage>(processId, timestamp, (PREG_POST_OPERATION_INFORMATION)Argument2);
+    //    break;
+    //}
+    case(RegNtPreSetValueKey):
+    {
+        auto parameters = (PREG_SET_VALUE_KEY_INFORMATION)Argument2;
+        RegistryHandlePreOperationKeyValue(parameters->Object, parameters->ValueName, &parameters->CallContext);
         break;
-    case(RegNtPreCreateKeyEx):
-        RegistryHandlePreCreateKeyEx((PREG_CREATE_KEY_INFORMATION)Argument2);
+    }
+    case(RegNtPostSetValueKey):
+    {
+        RegistryHandlePostKeyValueContextMessage<KmUmShared::RegistrySetValueMessage>(processId, timestamp, (PREG_POST_OPERATION_INFORMATION)Argument2);
         break;
-    case(RegNtPostCreateKeyEx):
-        RegistryHandlePostKeyContextMessage<KmUmShared::RegistryCreateMessage>(processId, timestamp, (PREG_POST_OPERATION_INFORMATION)Argument2);
-        break;
+    }
     default:
+    {
         break;
+    }
     }
 
     ::ExReleaseRundownProtection(&gDrvData.RundownProtection);

@@ -87,3 +87,25 @@ Cpp::Stream & KmUmShared::operator>>(Cpp::Stream & Stream, RegistryCreateMessage
 {
     return RegistryCreateMessage.Deserialize(Stream);
 }
+
+Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const RegistrySetValueMessage & RegistrySetValueMessage)
+{
+    return RegistrySetValueMessage.Serialize(Stream);
+}
+
+Cpp::Stream & KmUmShared::operator>>(Cpp::Stream & Stream, RegistrySetValueMessage & RegistrySetValueMessage)
+{
+    return RegistrySetValueMessage.Deserialize(Stream);
+}
+
+KmUmShared::RegistrySetValueMessage::RegistrySetValueMessage(
+    unsigned __int64 Timestamp,
+    unsigned __int32 ProcessId,
+    const unsigned __int8* KeyNameBuffer,
+    unsigned __int32 KeyNameBufferSize,
+    const unsigned __int8* ValueNameBuffer,
+    unsigned __int32 ValueNameBufferSize,
+    long Status
+) : RegistryTemplate2StringMessage { MessageCode::msgRegistrySetValue, Timestamp, ProcessId, KeyNameBuffer, KeyNameBufferSize, ValueNameBuffer, ValueNameBufferSize, Status}
+{
+}

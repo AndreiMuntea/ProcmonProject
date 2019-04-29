@@ -155,15 +155,26 @@ Minifilter::RegistryFilter::RegistryNotifyRoutine(
     //    RegistryHandlePostKeyContextMessage<KmUmShared::RegistryCreateMessage>(processId, timestamp, (PREG_POST_OPERATION_INFORMATION)Argument2);
     //    break;
     //}
-    case(RegNtPreSetValueKey):
+    //case(RegNtPreSetValueKey):
+    //{
+    //    auto parameters = (PREG_SET_VALUE_KEY_INFORMATION)Argument2;
+    //    RegistryHandlePreOperationKeyValue(parameters->Object, parameters->ValueName, &parameters->CallContext);
+    //    break;
+    //}
+    //case(RegNtPostSetValueKey):
+    //{
+    //    RegistryHandlePostKeyValueContextMessage<KmUmShared::RegistrySetValueMessage>(processId, timestamp, (PREG_POST_OPERATION_INFORMATION)Argument2);
+    //    break;
+    //}
+    case (RegNtPreDeleteValueKey):
     {
-        auto parameters = (PREG_SET_VALUE_KEY_INFORMATION)Argument2;
+        auto parameters = (PREG_DELETE_VALUE_KEY_INFORMATION)Argument2;
         RegistryHandlePreOperationKeyValue(parameters->Object, parameters->ValueName, &parameters->CallContext);
         break;
     }
-    case(RegNtPostSetValueKey):
+    case (RegNtPostDeleteValueKey):
     {
-        RegistryHandlePostKeyValueContextMessage<KmUmShared::RegistrySetValueMessage>(processId, timestamp, (PREG_POST_OPERATION_INFORMATION)Argument2);
+        RegistryHandlePostKeyValueContextMessage<KmUmShared::RegistryDeleteKeyValueMessage>(processId, timestamp, (PREG_POST_OPERATION_INFORMATION)Argument2);
         break;
     }
     default:

@@ -81,14 +81,14 @@ DriverEntry(
     //}
 
     // Create Registry Filter
-    gDrvData.RegistryFilter.Update(new Minifilter::RegistryFilter());
-    if (!gDrvData.RegistryFilter.IsValid() || !gDrvData.RegistryFilter->IsValid())
-    {
-        gDrvData.CommunicationPort.Update(nullptr);
-        ::FltUnregisterFilter(gDrvData.FilterHandle);
-        MyDriverLogCritical("Failed to initialize RegistryFilter");
-        goto Exit;
-    }
+    //gDrvData.RegistryFilter.Update(new Minifilter::RegistryFilter());
+    //if (!gDrvData.RegistryFilter.IsValid() || !gDrvData.RegistryFilter->IsValid())
+    //{
+    //    gDrvData.CommunicationPort.Update(nullptr);
+    //    ::FltUnregisterFilter(gDrvData.FilterHandle);
+    //    MyDriverLogCritical("Failed to initialize RegistryFilter");
+    //    goto Exit;
+    //}
 
     // Start filtering
     status = ::FltStartFiltering(gDrvData.FilterHandle);

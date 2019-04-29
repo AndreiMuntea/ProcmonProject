@@ -73,6 +73,52 @@ namespace Minifilter
             _In_ FLT_POST_OPERATION_FLAGS Flags
         );
 
+        static FLT_PREOP_CALLBACK_STATUS FLTAPI
+        PreReadCallback(
+            _Inout_ PFLT_CALLBACK_DATA Data,
+            _In_ PCFLT_RELATED_OBJECTS FltObjects,
+            _Outptr_result_maybenull_ PVOID *CompletionContext
+        );
+
+        static FLT_POSTOP_CALLBACK_STATUS FLTAPI
+        PostReadCallback(
+            _Inout_ PFLT_CALLBACK_DATA Data,
+            _In_ PCFLT_RELATED_OBJECTS FltObjects,
+            _In_opt_ PVOID CompletionContext,
+            _In_ FLT_POST_OPERATION_FLAGS Flags
+        );
+
+        static FLT_POSTOP_CALLBACK_STATUS FLTAPI
+        PostReadSafeCallback(
+            _Inout_ PFLT_CALLBACK_DATA Data,
+            _In_ PCFLT_RELATED_OBJECTS FltObjects,
+            _In_opt_ PVOID CompletionContext,
+            _In_ FLT_POST_OPERATION_FLAGS Flags
+        );
+
+        static FLT_PREOP_CALLBACK_STATUS FLTAPI
+        PreWriteCallback(
+            _Inout_ PFLT_CALLBACK_DATA Data,
+            _In_ PCFLT_RELATED_OBJECTS FltObjects,
+            _Outptr_result_maybenull_ PVOID *CompletionContext
+        );
+
+        static FLT_POSTOP_CALLBACK_STATUS FLTAPI
+        PostWriteCallback(
+            _Inout_ PFLT_CALLBACK_DATA Data,
+            _In_ PCFLT_RELATED_OBJECTS FltObjects,
+            _In_opt_ PVOID CompletionContext,
+            _In_ FLT_POST_OPERATION_FLAGS Flags
+        );
+
+        static FLT_POSTOP_CALLBACK_STATUS FLTAPI
+        PostWriteSafeCallback(
+            _Inout_ PFLT_CALLBACK_DATA Data,
+            _In_ PCFLT_RELATED_OBJECTS FltObjects,
+            _In_opt_ PVOID CompletionContext,
+            _In_ FLT_POST_OPERATION_FLAGS Flags
+        );
+
         static void FLTAPI
         FileContextCleanup(
             _In_ PFLT_CONTEXT Context,

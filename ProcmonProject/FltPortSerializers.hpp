@@ -27,5 +27,7 @@ std::wostream& operator<<(std::wostream& Stream, KmUmShared::RegistryRenameKeyMe
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileCreateMessage& FileCreateMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileCloseMessage& FileCloseMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileCleanupMessage& FileCleanupMessage);
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileReadMessage& FileReadMessage);
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileWriteMessage& FileWriteMessage);
 
 #endif //__FLT_PORT_SERIALIZERS_HPP__

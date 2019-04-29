@@ -171,3 +171,25 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::FileCleanupMessag
         << std::endl;
     return Stream;
 }
+
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::FileReadMessage & FileReadMessage)
+{
+    Stream << "[FileReadMessage]" << std::endl
+        << "\t> [Timestamp] " << FileReadMessage.timestamp << std::endl
+        << "\t> [Process ID] " << FileReadMessage.processId << std::endl
+        << "\t> [File Name] " << FileReadMessage.string1 << std::endl
+        << "\t> [Status] " << FileReadMessage.status << std::endl
+        << std::endl;
+    return Stream;
+}
+
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::FileWriteMessage & FileWriteMessage)
+{
+    Stream << "[FileWriteMessage]" << std::endl
+        << "\t> [Timestamp] " << FileWriteMessage.timestamp << std::endl
+        << "\t> [Process ID] " << FileWriteMessage.processId << std::endl
+        << "\t> [File Name] " << FileWriteMessage.string1 << std::endl
+        << "\t> [Status] " << FileWriteMessage.status << std::endl
+        << std::endl;
+    return Stream;
+}

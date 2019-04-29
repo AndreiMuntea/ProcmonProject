@@ -134,6 +134,12 @@ FilterPort::HandleMessage(
     case KmUmShared::MessageCode::msgFileCleanup:
         status = HandleMessageNotification<KmUmShared::FileCleanupMessage>(InputData);
         break;
+    case KmUmShared::MessageCode::msgFileRead:
+        status = HandleMessageNotification<KmUmShared::FileReadMessage>(InputData);
+        break;
+    case KmUmShared::MessageCode::msgFileWrite:
+        status = HandleMessageNotification<KmUmShared::FileWriteMessage>(InputData);
+        break;
     default:
         status = ERROR_NOT_FOUND;
         break;

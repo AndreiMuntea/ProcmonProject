@@ -76,6 +76,26 @@ Cpp::Stream & KmUmShared::operator >> (Cpp::Stream & Stream, FileCleanupMessage 
     return FileCleanupMessage.Deserialize(Stream);
 }
 
+Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const FileReadMessage & FileReadMessage)
+{
+    return FileReadMessage.Serialize(Stream);
+}
+
+Cpp::Stream & KmUmShared::operator >> (Cpp::Stream & Stream, FileReadMessage & FileReadMessage)
+{
+    return FileReadMessage.Deserialize(Stream);
+}
+
+Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const FileWriteMessage & FileWriteMessage)
+{
+    return FileWriteMessage.Serialize(Stream);
+}
+
+Cpp::Stream & KmUmShared::operator >> (Cpp::Stream & Stream, FileWriteMessage & FileWriteMessage)
+{
+    return FileWriteMessage.Deserialize(Stream);
+}
+
 KmUmShared::FileCloseMessage::FileCloseMessage(
     unsigned __int64 Timestamp,
     unsigned __int32 ProcessId,
@@ -93,5 +113,25 @@ KmUmShared::FileCleanupMessage::FileCleanupMessage(
     unsigned __int32 String1BufferSize,
     long Status
 ) : FileMessage(MessageCode::msgFileCleanup, Timestamp, ProcessId, String1Buffer, String1BufferSize, Status) 
+{
+}
+
+KmUmShared::FileReadMessage::FileReadMessage(
+    unsigned __int64 Timestamp,
+    unsigned __int32 ProcessId,
+    const unsigned __int8 * String1Buffer,
+    unsigned __int32 String1BufferSize,
+    long Status
+) : FileMessage(MessageCode::msgFileRead, Timestamp, ProcessId, String1Buffer, String1BufferSize, Status) 
+{
+}
+
+KmUmShared::FileWriteMessage::FileWriteMessage(
+    unsigned __int64 Timestamp,
+    unsigned __int32 ProcessId,
+    const unsigned __int8 * String1Buffer,
+    unsigned __int32 String1BufferSize,
+    long Status
+) : FileMessage(MessageCode::msgFileWrite, Timestamp, ProcessId, String1Buffer, String1BufferSize, Status) 
 {
 }

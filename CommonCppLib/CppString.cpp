@@ -78,6 +78,32 @@ Cpp::String& Cpp::String::operator=(String&& Other)
     return *this;
 }
 
+Cpp::String& Cpp::String::operator+=(const String & Other)
+{
+    unsigned __int32 newSize = this->size + Other.size;
+    if (newSize < this->size || !Other.IsValid())
+    {
+        this->Invalidate();
+        return *this;
+    }
+
+    unsigned __int8* temp = (unsigned __int8*)Cpp::LibAlloc(newSize);
+    if (!temp)
+    {
+        this->Invalidate();
+        return *this;
+    }
+
+    LibCopyMemory(temp, this->buffer, this->size);
+    LibCopyMemory(temp + this->size, Other.buffer, Other.size);
+
+    DisposeBuffer();
+    this->buffer = temp;
+    this->size = newSize;
+
+    return *this;
+}
+
 unsigned __int8* 
 Cpp::String::GetNakedPointer()
 {

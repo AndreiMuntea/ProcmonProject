@@ -118,6 +118,26 @@ Cpp::Stream & KmUmShared::operator>>(Cpp::Stream & Stream, RegistryDeleteKeyValu
     return RegistryDeleteKeyValueMessage.Deserialize(Stream);
 }
 
+Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const RegistryLoadKeyMessage & RegistryLoadKeyMessage)
+{
+    return RegistryLoadKeyMessage.Serialize(Stream);
+}
+
+Cpp::Stream & KmUmShared::operator>>(Cpp::Stream & Stream, RegistryLoadKeyMessage & RegistryLoadKeyMessage)
+{
+    return RegistryLoadKeyMessage.Deserialize(Stream);
+}
+
+Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const RegistryRenameKeyMessage & RegistryRenameKeyMessage)
+{
+    return RegistryRenameKeyMessage.Serialize(Stream);
+}
+
+Cpp::Stream & KmUmShared::operator>>(Cpp::Stream & Stream, RegistryRenameKeyMessage & RegistryRenameKeyMessage)
+{
+    return RegistryRenameKeyMessage.Deserialize(Stream);
+}
+
 KmUmShared::RegistrySetValueMessage::RegistrySetValueMessage(
     unsigned __int64 Timestamp,
     unsigned __int32 ProcessId,
@@ -149,5 +169,28 @@ KmUmShared::RegistryDeleteKeyMessage::RegistryDeleteKeyMessage(
     unsigned __int32 KeyNameBufferSize,
     long Status
 ) : RegistryTemplate1StringMessage{ MessageCode::msgRegistryDeleteKey, Timestamp, ProcessId, KeyNameBuffer, KeyNameBufferSize, Status }
+{
+}
+
+KmUmShared::RegistryLoadKeyMessage::RegistryLoadKeyMessage(
+    unsigned __int64 Timestamp,
+    unsigned __int32 ProcessId,
+    const unsigned __int8 * KeyNameBuffer,
+    unsigned __int32 KeyNameBufferSize,
+    long Status
+) : RegistryTemplate1StringMessage{ MessageCode::msgRegistryLoadKey, Timestamp, ProcessId, KeyNameBuffer, KeyNameBufferSize, Status }
+{
+
+}
+
+KmUmShared::RegistryRenameKeyMessage::RegistryRenameKeyMessage(
+    unsigned __int64 Timestamp,
+    unsigned __int32 ProcessId,
+    const unsigned __int8* KeyNameBuffer,
+    unsigned __int32 KeyNameBufferSize,
+    const unsigned __int8* ValueNameBuffer,
+    unsigned __int32 ValueNameBufferSize,
+    long Status
+) : RegistryTemplate2StringMessage{ MessageCode::msgRegistryRenameKey, Timestamp, ProcessId, KeyNameBuffer, KeyNameBufferSize, ValueNameBuffer, ValueNameBufferSize, Status }
 {
 }

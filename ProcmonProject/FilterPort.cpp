@@ -122,6 +122,9 @@ FilterPort::HandleMessage(
     case KmUmShared::MessageCode::msgRegistryDeleteValue:
         status = HandleMessageNotification<KmUmShared::RegistryDeleteKeyValueMessage>(InputData);
         break;
+    case KmUmShared::MessageCode::msgRegistryRenameKey:
+        status = HandleMessageNotification<KmUmShared::RegistryRenameKeyMessage>(InputData);
+        break;
     default:
         status = ERROR_NOT_FOUND;
         break;

@@ -114,3 +114,27 @@ std::wostream& operator<<(std::wostream& Stream, KmUmShared::RegistryDeleteKeyMe
 
     return Stream;
 }
+
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::RegistryLoadKeyMessage& RegistryLoadKeyMessage)
+{
+    Stream << "[RegistryLoadKeyMessage]" << std::endl
+        << "\t> [Timestamp] " << RegistryLoadKeyMessage.timestamp << std::endl
+        << "\t> [Process ID] " << RegistryLoadKeyMessage.processId << std::endl
+        << "\t> [Key Name] " << RegistryLoadKeyMessage.string1 << std::endl
+        << "\t> [Status] " << RegistryLoadKeyMessage.status << std::endl
+        << std::endl;
+
+    return Stream;
+}
+
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::RegistryRenameKeyMessage & RegistryLoadKeyMessage)
+{
+    Stream << "[RegistryDeleteKeyValueMessage]" << std::endl
+        << "\t> [Timestamp] " << RegistryLoadKeyMessage.timestamp << std::endl
+        << "\t> [Process ID] " << RegistryLoadKeyMessage.processId << std::endl
+        << "\t> [Old Key Name] " << RegistryLoadKeyMessage.string1 << std::endl
+        << "\t> [New Key Name] " << RegistryLoadKeyMessage.string2 << std::endl
+        << "\t> [Status] " << RegistryLoadKeyMessage.status << std::endl
+        << std::endl;
+    return Stream;
+}

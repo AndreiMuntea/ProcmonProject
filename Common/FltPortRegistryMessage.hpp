@@ -134,6 +134,40 @@ namespace KmUmShared
         friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const RegistryDeleteKeyValueMessage& RegistryDeleteKeyValueMessage);
         friend Cpp::Stream& operator>>(Cpp::Stream& Stream, RegistryDeleteKeyValueMessage& RegistryDeleteKeyValueMessage);
     };
+
+    class RegistryLoadKeyMessage : public RegistryTemplate1StringMessage
+    {
+    public:
+        RegistryLoadKeyMessage() = default;
+        RegistryLoadKeyMessage(
+            unsigned __int64 Timestamp,
+            unsigned __int32 ProcessId,
+            const unsigned __int8* KeyNameBuffer,
+            unsigned __int32 KeyNameBufferSize,
+            long Status
+        );
+
+        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const RegistryLoadKeyMessage& RegistryLoadKeyMessage);
+        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, RegistryLoadKeyMessage& RegistryLoadKeyMessage);
+    };
+
+    class RegistryRenameKeyMessage : public RegistryTemplate2StringMessage
+    {
+    public:
+        RegistryRenameKeyMessage() = default;
+        RegistryRenameKeyMessage(
+            unsigned __int64 Timestamp,
+            unsigned __int32 ProcessId,
+            const unsigned __int8* KeyNameBuffer,
+            unsigned __int32 KeyNameBufferSize,
+            const unsigned __int8* ValueNameBuffer,
+            unsigned __int32 ValueNameBufferSize,
+            long Status
+        );
+
+        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const RegistryRenameKeyMessage& RegistryRenameKeyMessage);
+        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, RegistryRenameKeyMessage& RegistryRenameKeyMessage);
+    };
 }
 
 #endif // __FLT_PORT_REGISTRY_MESSAGE_HPP__

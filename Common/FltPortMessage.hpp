@@ -18,6 +18,9 @@ namespace KmUmShared
         msgRegistryDeleteValue = 8,
         msgRegistryLoadKey = 9,
         msgRegistryRenameKey = 10,
+        msgFileCreate = 11,
+        msgFileClose = 12,
+        msgFileCleanup = 13,
         msgMaxValue,
     };
 

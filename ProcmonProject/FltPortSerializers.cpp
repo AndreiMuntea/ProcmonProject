@@ -138,3 +138,36 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::RegistryRenameKey
         << std::endl;
     return Stream;
 }
+
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileCreateMessage& FileCreateMessage)
+{
+    Stream << "[FileCreateMessage]" << std::endl
+        << "\t> [Timestamp] " << FileCreateMessage.timestamp << std::endl
+        << "\t> [Process ID] " << FileCreateMessage.processId << std::endl
+        << "\t> [File Name] " << FileCreateMessage.string1 << std::endl
+        << "\t> [Status] " << FileCreateMessage.status << std::endl
+        << std::endl;
+    return Stream;
+}
+
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::FileCloseMessage & FileCloseMessage)
+{
+    Stream << "[FileCloseMessage]" << std::endl
+        << "\t> [Timestamp] " << FileCloseMessage.timestamp << std::endl
+        << "\t> [Process ID] " << FileCloseMessage.processId << std::endl
+        << "\t> [File Name] " << FileCloseMessage.string1 << std::endl
+        << "\t> [Status] " << FileCloseMessage.status << std::endl
+        << std::endl;
+    return Stream;
+}
+
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::FileCleanupMessage & FileCleanupMessage)
+{
+    Stream << "[FileCleanupMessage]" << std::endl
+        << "\t> [Timestamp] " << FileCleanupMessage.timestamp << std::endl
+        << "\t> [Process ID] " << FileCleanupMessage.processId << std::endl
+        << "\t> [File Name] " << FileCleanupMessage.string1 << std::endl
+        << "\t> [Status] " << FileCleanupMessage.status << std::endl
+        << std::endl;
+    return Stream;
+}

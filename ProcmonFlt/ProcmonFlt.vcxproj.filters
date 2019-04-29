@@ -137,6 +137,12 @@
     <ClInclude Include="RegistryFilter.hpp">
       <Filter>Header Files\Filters</Filter>
     </ClInclude>
+    <ClInclude Include="FileFilter.hpp">
+      <Filter>Header Files\Filters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortFileMessage.hpp">
+      <Filter>Header Files\Communication</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Minifilter.cpp">
@@ -186,6 +192,12 @@
     </ClCompile>
     <ClCompile Include="RegistryFilter.cpp">
       <Filter>Source Files\Filters</Filter>
+    </ClCompile>
+    <ClCompile Include="FileFilter.cpp">
+      <Filter>Source Files\Filters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortFileMessage.cpp">
+      <Filter>Source Files\Communication</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

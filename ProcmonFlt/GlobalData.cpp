@@ -1,5 +1,6 @@
 #include "GlobalData.hpp"
 #include "DriverRoutines.hpp"
+#include "FileFilter.hpp"
 
 GLOBAL_DATA gDrvData;
 
@@ -7,7 +8,45 @@ static UNICODE_STRING gFltPortName = RTL_CONSTANT_STRING(L"\\MyCommunicationPort
 
 static CONST FLT_OPERATION_REGISTRATION Callbacks[] =
 {
+    { 
+        IRP_MJ_CREATE,
+        0,
+        Minifilter::FileFilter::PreCreateCallback,
+        Minifilter::FileFilter::PostCreateCallback,
+        nullptr
+    },
+
+    {
+        IRP_MJ_CLOSE,
+        0,
+        Minifilter::FileFilter::PreCloseCallback,
+        Minifilter::FileFilter::PostCloseCallback,
+        nullptr
+    },
+
+    {
+        IRP_MJ_CLEANUP,
+        0,
+        Minifilter::FileFilter::PreCleanupCallback,
+        Minifilter::FileFilter::PostCleanupCallback,
+        nullptr
+    },
+
     { IRP_MJ_OPERATION_END }
+};
+
+CONST FLT_CONTEXT_REGISTRATION Contexts[] = {
+    {
+        FLT_STREAM_CONTEXT,
+        0,
+        Minifilter::FileFilter::FileContextCleanup,
+        sizeof(Minifilter::FILE_STREAM_CONTEXT),
+        'XTS#',
+        nullptr,
+        nullptr,
+        nullptr
+    },
+    { FLT_CONTEXT_END }
 };
 
 static CONST FLT_REGISTRATION FilterRegistration =
@@ -16,7 +55,7 @@ static CONST FLT_REGISTRATION FilterRegistration =
     FLT_REGISTRATION_VERSION,   //  Version
     0,                          //  Flags
 
-    nullptr,                    //  Context
+    Contexts,                   //  Context
     Callbacks,                  //  Operation callbacks
 
     DriverUnload,               //  MiniFilterUnload

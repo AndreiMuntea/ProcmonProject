@@ -152,7 +152,7 @@ Minifilter::RegistryFilter::RegistryNotifyRoutine(
     auto rundownAcquired = ::ExAcquireRundownProtection(&gDrvData.RundownProtection);
     if (!rundownAcquired)
     {
-        MyDriverLogWarning("ExAcquireRundownProtection failed at ProcessCreateNotifyRoutine");
+        MyDriverLogWarning("ExAcquireRundownProtection failed at RegistryNotifyRoutine");
         return STATUS_SUCCESS;
     }
 

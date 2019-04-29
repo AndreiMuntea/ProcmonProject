@@ -241,6 +241,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\FltPortFileMessage.hpp" />
     <ClInclude Include="..\Common\FltPortMessage.hpp" />
     <ClInclude Include="..\Common\FltPortModuleMessage.hpp" />
     <ClInclude Include="..\Common\FltPortProcessMessage.hpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="cpp_lockguard.hpp" />
     <ClInclude Include="cpp_tags.hpp" />
     <ClInclude Include="DriverRoutines.hpp" />
+    <ClInclude Include="FileFilter.hpp" />
     <ClInclude Include="FltPort.hpp" />
     <ClInclude Include="GlobalData.hpp" />
     <ClInclude Include="LinkedList.hpp" />
@@ -266,6 +268,7 @@
     <ClInclude Include="trace.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\FltPortFileMessage.cpp" />
     <ClCompile Include="..\Common\FltPortMessage.cpp" />
     <ClCompile Include="..\Common\FltPortModuleMessage.cpp" />
     <ClCompile Include="..\Common\FltPortProcessMessage.cpp" />
@@ -274,6 +277,7 @@
     <ClCompile Include="cpp_definitions.cpp" />
     <ClCompile Include="cpp_externals.cpp" />
     <ClCompile Include="cpp_init.cpp" />
+    <ClCompile Include="FileFilter.cpp" />
     <ClCompile Include="FltPort.cpp" />
     <ClCompile Include="GlobalData.cpp" />
     <ClCompile Include="Minifilter.cpp" />

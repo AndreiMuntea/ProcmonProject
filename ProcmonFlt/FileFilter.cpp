@@ -1,0 +1,300 @@
+#include "FileFilter.hpp"
+#include "trace.hpp"
+#include "FileFilter.tmh"
+
+#include "GlobalData.hpp"
+
+FLT_PREOP_CALLBACK_STATUS FLTAPI 
+Minifilter::FileFilter::PreCreateCallback(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _Outptr_result_maybenull_ PVOID *CompletionContext
+)
+{
+    UNREFERENCED_PARAMETER(FltObjects);
+    UNREFERENCED_PARAMETER(CompletionContext);
+
+    return IsSystemAction(Data) ? FLT_PREOP_SUCCESS_NO_CALLBACK
+                                : FLT_PREOP_SUCCESS_WITH_CALLBACK;
+}
+
+FLT_POSTOP_CALLBACK_STATUS FLTAPI
+Minifilter::FileFilter::PostCreateCallback(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _In_opt_ PVOID CompletionContext,
+    _In_ FLT_POST_OPERATION_FLAGS Flags
+)
+{
+    UNREFERENCED_PARAMETER(CompletionContext);
+    if (FlagOn(Flags, FLTFL_POST_OPERATION_DRAINING))
+    {
+        return FLT_POSTOP_FINISHED_PROCESSING;
+    }
+
+    auto rundownAcquired = ::ExAcquireRundownProtection(&gDrvData.RundownProtection);
+    if (!rundownAcquired)
+    {
+        return FLT_POSTOP_FINISHED_PROCESSING;
+    }
+
+    NotifyEvent<KmUmShared::FileCreateMessage>(Data, FltObjects);
+
+    ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
+    return FLT_POSTOP_FINISHED_PROCESSING;
+}
+
+FLT_PREOP_CALLBACK_STATUS FLTAPI
+Minifilter::FileFilter::PreCloseCallback(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _Outptr_result_maybenull_ PVOID *CompletionContext
+)
+{
+    UNREFERENCED_PARAMETER(FltObjects);
+    UNREFERENCED_PARAMETER(CompletionContext);
+
+    if (IsSystemAction(Data))
+    {
+        return FLT_PREOP_SUCCESS_NO_CALLBACK;
+    }
+
+    auto rundownAcquired = ::ExAcquireRundownProtection(&gDrvData.RundownProtection);
+    if (!rundownAcquired)
+    {
+        return FLT_PREOP_SUCCESS_NO_CALLBACK;
+    }
+
+    NotifyEvent<KmUmShared::FileCloseMessage>(Data, FltObjects);
+
+    ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
+    return FLT_PREOP_SUCCESS_NO_CALLBACK;
+}
+
+FLT_POSTOP_CALLBACK_STATUS FLTAPI
+Minifilter::FileFilter::PostCloseCallback(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _In_opt_ PVOID CompletionContext,
+    _In_ FLT_POST_OPERATION_FLAGS Flags
+)
+{
+    UNREFERENCED_PARAMETER(Data);
+    UNREFERENCED_PARAMETER(FltObjects);
+    UNREFERENCED_PARAMETER(CompletionContext);
+    UNREFERENCED_PARAMETER(Flags);
+
+    /// SHOULDN'T BE CALLED
+    NT_ASSERT(false);
+
+    return FLT_POSTOP_FINISHED_PROCESSING;
+}
+
+FLT_PREOP_CALLBACK_STATUS FLTAPI
+Minifilter::FileFilter::PreCleanupCallback(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _Outptr_result_maybenull_ PVOID *CompletionContext
+)
+{
+    UNREFERENCED_PARAMETER(FltObjects);
+    UNREFERENCED_PARAMETER(CompletionContext);
+
+    if (IsSystemAction(Data))
+    {
+        return FLT_PREOP_SUCCESS_NO_CALLBACK;
+    }
+
+    auto rundownAcquired = ::ExAcquireRundownProtection(&gDrvData.RundownProtection);
+    if (!rundownAcquired)
+    {
+        return FLT_PREOP_SUCCESS_NO_CALLBACK;
+    }
+
+    FILE_STREAM_CONTEXT* context = nullptr;
+    auto status = GetSetStreamContext(Data, FltObjects, &context);
+    if (!NT_SUCCESS(status))
+    {
+        ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
+        return FLT_PREOP_SUCCESS_NO_CALLBACK;
+    }
+
+    FltReleaseContext(context);
+    ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
+    return FLT_PREOP_SUCCESS_WITH_CALLBACK;
+}
+
+FLT_POSTOP_CALLBACK_STATUS FLTAPI
+Minifilter::FileFilter::PostCleanupCallback(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _In_opt_ PVOID CompletionContext,
+    _In_ FLT_POST_OPERATION_FLAGS Flags
+)
+{
+    UNREFERENCED_PARAMETER(CompletionContext);
+    FLT_POSTOP_CALLBACK_STATUS callbackStatus = FLT_POSTOP_FINISHED_PROCESSING;
+
+    if (FlagOn(Flags, FLTFL_POST_OPERATION_DRAINING))
+    {
+        return callbackStatus;
+    }
+
+    FltDoCompletionProcessingWhenSafe(Data, FltObjects, CompletionContext, Flags, PostCleanupSafeCallback, &callbackStatus);
+    return callbackStatus;
+}
+
+FLT_POSTOP_CALLBACK_STATUS FLTAPI
+Minifilter::FileFilter::PostCleanupSafeCallback(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _In_opt_ PVOID CompletionContext,
+    _In_ FLT_POST_OPERATION_FLAGS Flags
+)
+{
+    UNREFERENCED_PARAMETER(Flags);
+    UNREFERENCED_PARAMETER(FltObjects);
+    UNREFERENCED_PARAMETER(CompletionContext);
+
+    if (IsSystemAction(Data))
+    {
+        return FLT_POSTOP_FINISHED_PROCESSING;
+    }
+
+    auto rundownAcquired = ::ExAcquireRundownProtection(&gDrvData.RundownProtection);
+    if (!rundownAcquired)
+    {
+        return FLT_POSTOP_FINISHED_PROCESSING;
+    }
+
+    NotifyEvent<KmUmShared::FileCleanupMessage>(Data, FltObjects);
+    ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
+
+    return FLT_POSTOP_FINISHED_PROCESSING;
+}
+
+void 
+Minifilter::FileFilter::FileContextCleanup(
+    _In_ PFLT_CONTEXT Context,
+    _In_ FLT_CONTEXT_TYPE ContextType
+)
+{
+    PFILE_STREAM_CONTEXT context = (PFILE_STREAM_CONTEXT)(Context);
+    if (ContextType == FLT_STREAM_CONTEXT && context->FileName.Buffer)
+    {
+        ExFreePoolWithTag(context->FileName.Buffer, 'TFF#');
+    }
+}
+
+bool
+Minifilter::FileFilter::IsSystemAction(
+    _Inout_ PFLT_CALLBACK_DATA Data
+)
+{
+    auto processId = FltGetRequestorProcessIdEx(Data);
+    if (processId == (HANDLE)(4) || processId == (HANDLE)(0))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+NTSTATUS
+Minifilter::FileFilter::GetFileName(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _Inout_ UNICODE_STRING& FileName
+)
+{
+    UNREFERENCED_PARAMETER(FltObjects);
+    PFLT_FILE_NAME_INFORMATION fileNameInfo = nullptr;
+
+    auto status = FltGetFileNameInformation(Data, FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_DEFAULT, &fileNameInfo);
+    if (!NT_SUCCESS(status))
+    {
+        return status;
+    }
+
+    if (!fileNameInfo->Name.Buffer || fileNameInfo->Name.Length == 0)
+    {
+        FltReleaseFileNameInformation(fileNameInfo);
+        return STATUS_INVALID_BUFFER_SIZE;
+    }
+
+    FileName.Buffer = (PWCHAR)ExAllocatePoolWithTag(NonPagedPool, fileNameInfo->Name.Length, 'TFF#');
+    if (!FileName.Buffer)
+    {
+        FltReleaseFileNameInformation(fileNameInfo);
+        return STATUS_INSUFFICIENT_RESOURCES;
+    }
+
+    RtlCopyMemory(FileName.Buffer, fileNameInfo->Name.Buffer, fileNameInfo->Name.Length);
+    FileName.Length = fileNameInfo->Name.Length;
+    FileName.MaximumLength = fileNameInfo->Name.Length;
+    
+    FltReleaseFileNameInformation(fileNameInfo);
+
+    return STATUS_SUCCESS;
+}
+
+NTSTATUS
+Minifilter::FileFilter::CreateStreamContext(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _Out_ FILE_STREAM_CONTEXT** StreamContext
+)
+{
+    *StreamContext = nullptr;
+    FILE_STREAM_CONTEXT* context = nullptr;
+
+    auto status = FltAllocateContext(FltObjects->Filter, FLT_STREAM_CONTEXT, sizeof(FILE_STREAM_CONTEXT), NonPagedPool, (PFLT_CONTEXT *)&context);
+    if (!NT_SUCCESS(status))
+    {
+        return status;
+    }
+    RtlZeroMemory(context, sizeof(*context));
+
+    status = GetFileName(Data, FltObjects, context->FileName);
+    if (!NT_SUCCESS(status) || !context->FileName.Buffer)
+    {
+        FltReleaseContext(context);
+        return STATUS_FILE_NOT_AVAILABLE;
+    }
+
+    status = FltSetStreamContext(FltObjects->Instance, FltObjects->FileObject, FLT_SET_CONTEXT_KEEP_IF_EXISTS, context, nullptr);
+    if (status == STATUS_FLT_CONTEXT_ALREADY_DEFINED)
+    {
+        status = STATUS_SUCCESS;
+    }
+
+    FltReleaseContext(context);
+    return status;
+}
+
+NTSTATUS
+Minifilter::FileFilter::GetSetStreamContext(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _Out_ FILE_STREAM_CONTEXT** StreamContext
+)
+{
+    *StreamContext = nullptr;
+
+    auto status = FltGetStreamContext(FltObjects->Instance, FltObjects->FileObject, (PFLT_CONTEXT*)StreamContext);
+    if (!NT_SUCCESS(status) && status != STATUS_NOT_FOUND)
+    {
+        return status;
+    }
+
+    if (status == STATUS_NOT_FOUND)
+    {
+        status = CreateStreamContext(Data, FltObjects, StreamContext);
+        if (NT_SUCCESS(status))
+        {
+            status = FltGetStreamContext(FltObjects->Instance, FltObjects->FileObject, (PFLT_CONTEXT*)StreamContext);
+        }
+    }
+    
+    return status;
+}

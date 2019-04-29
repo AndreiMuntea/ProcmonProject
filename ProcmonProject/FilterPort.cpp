@@ -125,6 +125,15 @@ FilterPort::HandleMessage(
     case KmUmShared::MessageCode::msgRegistryRenameKey:
         status = HandleMessageNotification<KmUmShared::RegistryRenameKeyMessage>(InputData);
         break;
+    case KmUmShared::MessageCode::msgFileCreate:
+        status = HandleMessageNotification<KmUmShared::FileCreateMessage>(InputData);
+        break;
+    case KmUmShared::MessageCode::msgFileClose:
+        status = HandleMessageNotification<KmUmShared::FileCloseMessage>(InputData);
+        break;
+    case KmUmShared::MessageCode::msgFileCleanup:
+        status = HandleMessageNotification<KmUmShared::FileCleanupMessage>(InputData);
+        break;
     default:
         status = ERROR_NOT_FOUND;
         break;

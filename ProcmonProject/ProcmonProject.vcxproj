@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\FltPortFileMessage.hpp" />
     <ClInclude Include="..\Common\FltPortMessage.hpp" />
     <ClInclude Include="..\Common\FltPortModuleMessage.hpp" />
     <ClInclude Include="..\Common\FltPortProcessMessage.hpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="trace.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\FltPortFileMessage.cpp" />
     <ClCompile Include="..\Common\FltPortMessage.cpp" />
     <ClCompile Include="..\Common\FltPortModuleMessage.cpp" />
     <ClCompile Include="..\Common\FltPortProcessMessage.cpp" />

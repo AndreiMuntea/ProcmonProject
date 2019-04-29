@@ -98,6 +98,16 @@ Cpp::Stream & KmUmShared::operator>>(Cpp::Stream & Stream, RegistrySetValueMessa
     return RegistrySetValueMessage.Deserialize(Stream);
 }
 
+Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const RegistryDeleteKeyMessage & RegistryDeleteKeyMessage)
+{
+    return RegistryDeleteKeyMessage.Serialize(Stream);
+}
+
+Cpp::Stream & KmUmShared::operator>>(Cpp::Stream & Stream, RegistryDeleteKeyMessage & RegistryDeleteKeyMessage)
+{
+    return RegistryDeleteKeyMessage.Deserialize(Stream);
+}
+
 Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const RegistryDeleteKeyValueMessage & RegistryDeleteKeyValueMessage)
 {
     return RegistryDeleteKeyValueMessage.Serialize(Stream);
@@ -129,5 +139,15 @@ KmUmShared::RegistryDeleteKeyValueMessage::RegistryDeleteKeyValueMessage(
     unsigned __int32 ValueNameBufferSize,
     long Status
 ) : RegistryTemplate2StringMessage{ MessageCode::msgRegistryDeleteValue, Timestamp, ProcessId, KeyNameBuffer, KeyNameBufferSize, ValueNameBuffer, ValueNameBufferSize, Status }
+{
+}
+
+KmUmShared::RegistryDeleteKeyMessage::RegistryDeleteKeyMessage(
+    unsigned __int64 Timestamp,
+    unsigned __int32 ProcessId,
+    const unsigned __int8 * KeyNameBuffer,
+    unsigned __int32 KeyNameBufferSize,
+    long Status
+) : RegistryTemplate1StringMessage{ MessageCode::msgRegistryDeleteKey, Timestamp, ProcessId, KeyNameBuffer, KeyNameBufferSize, Status }
 {
 }

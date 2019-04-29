@@ -101,6 +101,22 @@ namespace KmUmShared
         friend Cpp::Stream& operator>>(Cpp::Stream& Stream, RegistrySetValueMessage& RegistrySetValueMessage);
     };
 
+    class RegistryDeleteKeyMessage : public RegistryTemplate1StringMessage
+    {
+    public:
+        RegistryDeleteKeyMessage() = default;
+        RegistryDeleteKeyMessage(
+            unsigned __int64 Timestamp,
+            unsigned __int32 ProcessId,
+            const unsigned __int8* KeyNameBuffer,
+            unsigned __int32 KeyNameBufferSize,
+            long Status
+        );
+
+        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const RegistryDeleteKeyMessage& RegistryDeleteKeyMessage);
+        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, RegistryDeleteKeyMessage& RegistryDeleteKeyMessage);
+    };
+
     class RegistryDeleteKeyValueMessage : public RegistryTemplate2StringMessage
     {
     public:

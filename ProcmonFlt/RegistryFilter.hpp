@@ -60,6 +60,12 @@ namespace Minifilter
         );
 
         static void 
+        RegistryHandlePreOperationKey(
+            _In_ PVOID Object,
+            _Inout_ PVOID* CallContext
+        );
+
+        static void 
         RegistryHandlePreOperationKeyValue(
             _In_ PVOID Object,
             _In_ PCUNICODE_STRING Value,

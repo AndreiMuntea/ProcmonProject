@@ -102,3 +102,15 @@ std::wostream& operator<<(std::wostream& Stream, KmUmShared::RegistryDeleteKeyVa
 
     return Stream;
 }
+
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::RegistryDeleteKeyMessage& RegistryDeleteKeyMessage)
+{
+    Stream << "[RegistryDeleteMessage]" << std::endl
+        << "\t> [Timestamp] " << RegistryDeleteKeyMessage.timestamp << std::endl
+        << "\t> [Process ID] " << RegistryDeleteKeyMessage.processId << std::endl
+        << "\t> [Key Name] " << RegistryDeleteKeyMessage.string1 << std::endl
+        << "\t> [Status] " << RegistryDeleteKeyMessage.status << std::endl
+        << std::endl;
+
+    return Stream;
+}

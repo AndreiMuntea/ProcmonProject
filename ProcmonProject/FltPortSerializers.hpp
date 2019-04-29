@@ -20,5 +20,6 @@ std::wostream& operator<<(std::wostream& Stream, KmUmShared::ModuleMessage& Modu
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::RegistryCreateMessage& RegistryCreateMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::RegistrySetValueMessage& RegistrySetValueMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::RegistryDeleteKeyValueMessage& RegistryDeleteKeyValueMessage);
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::RegistryDeleteKeyMessage& RegistryDeleteKeyMessage);
 
 #endif //__FLT_PORT_SERIALIZERS_HPP__

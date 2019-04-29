@@ -400,3 +400,70 @@ Minifilter::FileFilter::PostWriteSafeCallback(
     NotifyEvent<KmUmShared::FileWriteMessage>(Data, FltObjects);
     return FLT_POSTOP_FINISHED_PROCESSING;
 }
+
+FLT_PREOP_CALLBACK_STATUS FLTAPI
+Minifilter::FileFilter::PreSetInformationCallback(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _Outptr_result_maybenull_ PVOID *CompletionContext
+)
+{
+    UNREFERENCED_PARAMETER(FltObjects);
+    UNREFERENCED_PARAMETER(CompletionContext);
+
+    if (IsSystemAction(Data))
+    {
+        return FLT_PREOP_SUCCESS_NO_CALLBACK;
+    }
+
+    FILE_STREAM_CONTEXT* context = nullptr;
+    auto status = GetSetStreamContext(Data, FltObjects, &context);
+    if (!NT_SUCCESS(status))
+    {
+        return FLT_PREOP_SUCCESS_NO_CALLBACK;
+    }
+
+    FltReleaseContext(context);
+    return FLT_PREOP_SUCCESS_WITH_CALLBACK;
+}
+
+FLT_POSTOP_CALLBACK_STATUS FLTAPI
+Minifilter::FileFilter::PostSetInformationCallback(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _In_opt_ PVOID CompletionContext,
+    _In_ FLT_POST_OPERATION_FLAGS Flags
+)
+{
+    UNREFERENCED_PARAMETER(CompletionContext);
+    FLT_POSTOP_CALLBACK_STATUS callbackStatus = FLT_POSTOP_FINISHED_PROCESSING;
+
+    if (FlagOn(Flags, FLTFL_POST_OPERATION_DRAINING))
+    {
+        return callbackStatus;
+    }
+
+    FltDoCompletionProcessingWhenSafe(Data, FltObjects, CompletionContext, Flags, PostSetInformationSafeCallback, &callbackStatus);
+    return callbackStatus;
+}
+
+FLT_POSTOP_CALLBACK_STATUS FLTAPI
+Minifilter::FileFilter::PostSetInformationSafeCallback(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ PCFLT_RELATED_OBJECTS FltObjects,
+    _In_opt_ PVOID CompletionContext,
+    _In_ FLT_POST_OPERATION_FLAGS Flags
+)
+{
+    UNREFERENCED_PARAMETER(Flags);
+    UNREFERENCED_PARAMETER(FltObjects);
+    UNREFERENCED_PARAMETER(CompletionContext);
+
+    if (IsSystemAction(Data))
+    {
+        return FLT_POSTOP_FINISHED_PROCESSING;
+    }
+
+    NotifyEvent<KmUmShared::FileSetInformationMessage>(Data, FltObjects);
+    return FLT_POSTOP_FINISHED_PROCESSING;
+}

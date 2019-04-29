@@ -23,6 +23,7 @@ namespace KmUmShared
         msgFileCleanup = 13,
         msgFileRead = 14,
         msgFileWrite = 15,
+        msgFileSetInformation = 16,
         msgMaxValue,
     };
 

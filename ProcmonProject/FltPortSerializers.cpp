@@ -193,3 +193,15 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::FileWriteMessage 
         << std::endl;
     return Stream;
 }
+
+
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileSetInformationMessage& FileSetInformationMessage)
+{
+    Stream << "[FileSetInformationMessage]" << std::endl
+        << "\t> [Timestamp] " << FileSetInformationMessage.timestamp << std::endl
+        << "\t> [Process ID] " << FileSetInformationMessage.processId << std::endl
+        << "\t> [File Name] " << FileSetInformationMessage.string1 << std::endl
+        << "\t> [Status] " << FileSetInformationMessage.status << std::endl
+        << std::endl;
+    return Stream;
+}

@@ -140,6 +140,9 @@ FilterPort::HandleMessage(
     case KmUmShared::MessageCode::msgFileWrite:
         status = HandleMessageNotification<KmUmShared::FileWriteMessage>(InputData);
         break;
+    case KmUmShared::MessageCode::msgFileSetInformation:
+        status = HandleMessageNotification<KmUmShared::FileSetInformationMessage>(InputData);
+        break;
     default:
         status = ERROR_NOT_FOUND;
         break;

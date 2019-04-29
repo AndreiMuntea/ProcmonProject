@@ -48,6 +48,14 @@ static CONST FLT_OPERATION_REGISTRATION Callbacks[] =
     //    nullptr
     //},
 
+    {
+        IRP_MJ_SET_INFORMATION,
+        0,
+        Minifilter::FileFilter::PreSetInformationCallback,
+        Minifilter::FileFilter::PostSetInformationCallback,
+        nullptr
+    },
+
     { IRP_MJ_OPERATION_END }
 };
 

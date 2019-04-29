@@ -124,6 +124,24 @@ namespace KmUmShared
         friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const FileWriteMessage& FileWriteMessage);
         friend Cpp::Stream& operator >> (Cpp::Stream& Stream, FileWriteMessage& FileWriteMessage);
     };
+
+    class FileSetInformationMessage : public FileMessage
+    {
+    public:
+        FileSetInformationMessage(
+            unsigned __int64 Timestamp,
+            unsigned __int32 ProcessId,
+            const unsigned __int8* String1Buffer,
+            unsigned __int32 String1BufferSize,
+            long Status
+        );
+
+        FileSetInformationMessage() = default;
+        virtual ~FileSetInformationMessage() = default;
+
+        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const FileSetInformationMessage& FileSetInformationMessage);
+        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, FileSetInformationMessage& FileSetInformationMessage);
+    };
 }
 
 #endif // __FLT_PORT_FILE_MESSAGE_HPP__

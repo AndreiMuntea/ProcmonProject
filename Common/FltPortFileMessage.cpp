@@ -96,6 +96,16 @@ Cpp::Stream & KmUmShared::operator >> (Cpp::Stream & Stream, FileWriteMessage & 
     return FileWriteMessage.Deserialize(Stream);
 }
 
+Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const FileSetInformationMessage & FileWriteMessage)
+{
+    return FileWriteMessage.Serialize(Stream);
+}
+
+Cpp::Stream & KmUmShared::operator >> (Cpp::Stream & Stream, FileSetInformationMessage & FileSetInformationMessage)
+{
+    return FileSetInformationMessage.Deserialize(Stream);
+}
+
 KmUmShared::FileCloseMessage::FileCloseMessage(
     unsigned __int64 Timestamp,
     unsigned __int32 ProcessId,
@@ -133,5 +143,15 @@ KmUmShared::FileWriteMessage::FileWriteMessage(
     unsigned __int32 String1BufferSize,
     long Status
 ) : FileMessage(MessageCode::msgFileWrite, Timestamp, ProcessId, String1Buffer, String1BufferSize, Status) 
+{
+}
+
+KmUmShared::FileSetInformationMessage::FileSetInformationMessage(
+    unsigned __int64 Timestamp,
+    unsigned __int32 ProcessId,
+    const unsigned __int8 * String1Buffer,
+    unsigned __int32 String1BufferSize,
+    long Status
+) : FileMessage(MessageCode::msgFileSetInformation, Timestamp, ProcessId, String1Buffer, String1BufferSize, Status)
 {
 }

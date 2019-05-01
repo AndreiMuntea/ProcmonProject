@@ -1,6 +1,11 @@
 #include "ConfigurationManager.hpp"
 
-NTSTATUS 
+Minifilter::ConfigurationManager::ConfigurationManager()
+{
+    Validate();
+}
+
+NTSTATUS
 Minifilter::ConfigurationManager::EnableFeature(
     const KmUmShared::Feature & Feature
 )

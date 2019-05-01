@@ -104,7 +104,7 @@ Cpp::Stream::Read(
 )
 {
     unsigned __int32 newCursor = this->cursor + BufferSize;
-    if (!IsValid() || newCursor < this->cursor || newCursor >= this->capacity)
+    if (!IsValid() || newCursor < this->cursor || newCursor > this->capacity)
     {
         Invalidate();
         return;

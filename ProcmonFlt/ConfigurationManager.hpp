@@ -11,7 +11,7 @@ namespace Minifilter
     class ConfigurationManager : public Cpp::CppNonPagedObject<'GMC#'>
     {
     public:
-        ConfigurationManager() = default;
+        ConfigurationManager();
         virtual ~ConfigurationManager() = default;
 
         NTSTATUS EnableFeature(const KmUmShared::Feature& Feature);

@@ -42,10 +42,9 @@ namespace KmUmShared
         CommandHeader(const CommandCode& CommandCode);
         virtual ~CommandHeader() = default;
 
+        virtual void Serialize(Cpp::Stream& Stream) const;
+        virtual void Deserialize(Cpp::Stream& Stream);
 
-        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const CommandHeader& CommandHeader);
-        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, CommandHeader& CommandHeader);
-    
     public:
         CommandCode commandCode = CommandCode::commandMaxIndex;
     };
@@ -56,9 +55,8 @@ namespace KmUmShared
         CommandReply() = default;
         virtual ~CommandReply() = default;
 
-
-        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const CommandReply& CommandReply);
-        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, CommandReply& CommandReply);
+        virtual void Serialize(Cpp::Stream& Stream) const;
+        virtual void Deserialize(Cpp::Stream& Stream);
 
     public:
     };
@@ -70,12 +68,10 @@ namespace KmUmShared
         CommandUpdateFeature(const CommandCode& CommandCode, const Feature& Feature);
         virtual ~CommandUpdateFeature() = default;
 
-
-        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const CommandUpdateFeature& CommandUpdateFeature);
-        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, CommandUpdateFeature& CommandUpdateFeature);
+        virtual void Serialize(Cpp::Stream& Stream) const override;
+        virtual void Deserialize(Cpp::Stream& Stream) override;
 
     public:
-        CommandCode commandCode = CommandCode::commandMaxIndex;
         Feature feature = Feature::featureMaxIndex;
     };
 
@@ -86,8 +82,8 @@ namespace KmUmShared
         CommandReplyUpdateFeature(const unsigned __int64& FeaturesConfiguration);
         virtual ~CommandReplyUpdateFeature() = default;
 
-        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const CommandReplyUpdateFeature& CommandReplyUpdateFeature);
-        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, CommandReplyUpdateFeature& CommandReplyUpdateFeature);
+        virtual void Serialize(Cpp::Stream& Stream) const override;
+        virtual void Deserialize(Cpp::Stream& Stream) override;
 
     public:
         unsigned __int64 featuresConfiguration = 0;

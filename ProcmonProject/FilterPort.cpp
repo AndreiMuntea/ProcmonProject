@@ -188,8 +188,8 @@ FilterPort::Send(
     Cpp::Stream inputStream;
     Cpp::Stream outputStream;
 
-    inputStream << *Command;
-    outputStream << *Reply;
+    Command->Serialize(inputStream);
+    Reply->Serialize(outputStream);
 
     if (!inputStream.IsValid() || !outputStream.IsValid())
     {
@@ -207,7 +207,7 @@ FilterPort::Send(
         &bytesReturned
     );
 
-    outputStream >> *Reply;
+    Reply->Deserialize(outputStream);
     if (result != S_OK || !outputStream.IsValid() || bytesReturned != outputStream.GetSize())
     {
         std::wcout << "FilterSendMessage failure" << std::endl;

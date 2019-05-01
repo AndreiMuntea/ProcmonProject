@@ -235,7 +235,7 @@ OnUpdateFeatureMessageReceived(
     KmUmShared::CommandUpdateFeature command;
     KmUmShared::CommandReplyUpdateFeature reply;
 
-    InputStream >> command;
+    command.Deserialize(InputStream);
     if (!InputStream.IsValid() || command.feature >= KmUmShared::Feature::featureMaxIndex)
     {
         return STATUS_INVALID_DEVICE_REQUEST;
@@ -245,7 +245,7 @@ OnUpdateFeatureMessageReceived(
                            : gDrvData.ConfigurationManager->DisableFeature(command.feature);
 
     reply.featuresConfiguration = gDrvData.ConfigurationManager->GetCurrentConfiguration();
-    OutputStream << reply;
+    reply.Serialize(OutputStream);
 
     return status;
 }
@@ -268,8 +268,8 @@ OnMessageReceived(
     Cpp::ShallowStream inputStream((unsigned __int8*)InputBuffer, InputBufferLength);
     Cpp::Stream outputStream;
 
-    inputStream >> commandHeader;
-
+    
+    commandHeader.Deserialize(inputStream);
     if (!inputStream.IsValid() || commandHeader.commandCode >= KmUmShared::CommandCode::commandMaxIndex)
     {
         return STATUS_INVALID_DEVICE_REQUEST;
@@ -287,7 +287,7 @@ OnMessageReceived(
         return STATUS_NOT_SUPPORTED;
     }
 
-    if (!NT_SUCCESS(status) || !inputStream.IsValid() || !outputStream.IsValid() || outputStream.GetSize() >= OutputBufferLength)
+    if (!NT_SUCCESS(status) || !inputStream.IsValid() || !outputStream.IsValid() || outputStream.GetSize() > OutputBufferLength)
     {
         return STATUS_INVALID_DEVICE_REQUEST;
     }

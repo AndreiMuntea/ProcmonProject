@@ -9,6 +9,7 @@
 #include <thread>
 #include <Windows.h>
 #include <fltUser.h>
+#include <fstream>
 #include <CppShallowStream.hpp>
 
 class FilterPort
@@ -43,6 +44,7 @@ private:
         Cpp::ShallowStream & InputData
     );
 
+    std::wofstream log;
     bool isConnected = false;
     std::wstring portName;
     std::unique_ptr<std::thread> listenerThread = nullptr;
@@ -61,7 +63,7 @@ inline NTSTATUS FilterPort::HandleMessageNotification(Cpp::ShallowStream & Input
         return ERROR_INVALID_PARAMETER;
     }
 
-    std::wcout << message;
+    log << message;
     return ERROR_SUCCESS;
 }
 

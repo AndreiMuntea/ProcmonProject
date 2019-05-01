@@ -235,20 +235,17 @@ void CommandInterpreter::UpdateFeatureCommand(bool Enable)
         return;
     }
 
-    KmUmShared::CommandUpdateFeature command;
-    KmUmShared::CommandReplyUpdateFeature reply;
+    auto command = std::make_shared<KmUmShared::CommandUpdateFeature>();
+    auto reply = std::make_shared<KmUmShared::CommandReplyUpdateFeature>();
 
-    command.commandCode = (Enable) ? KmUmShared::CommandCode::commandEnableFeature : KmUmShared::CommandCode::commandDisableFeature;
-    command.feature = static_cast<KmUmShared::Feature>(feature);
+    command->commandCode = (Enable) ? KmUmShared::CommandCode::commandEnableFeature 
+                                   : KmUmShared::CommandCode::commandDisableFeature;
+    command->feature = static_cast<KmUmShared::Feature>(feature);
 
-    auto status = gGlobalData.FltPort->Send(
-        std::make_shared<KmUmShared::CommandUpdateFeature>(command), 
-        std::make_shared<KmUmShared::CommandReplyUpdateFeature>(reply)
-    );
-
+    auto status = gGlobalData.FltPort->Send(command, reply);
     if (status == ERROR_SUCCESS)
     {
-        std::cout << "Current features configuration: " << reply.featuresConfiguration << std::endl;
+        std::cout << "Current features configuration: " << reply->featuresConfiguration << std::endl;
     }
     else
     {

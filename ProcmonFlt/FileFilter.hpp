@@ -153,7 +153,7 @@ namespace Minifilter
         static bool 
         IsActionMonitored(
             _Inout_ PFLT_CALLBACK_DATA Data,
-            _In_ const Feature& FeatureToCheck
+            _In_ const KmUmShared::Feature& FeatureToCheck
         );
 
         static NTSTATUS 

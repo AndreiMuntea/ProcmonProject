@@ -78,12 +78,12 @@ Minifilter::ModuleFilter::IsActionMonitored(
     _In_ HANDLE ProcessId
 )
 {
-    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorStarted))
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorStarted))
     {
         return false;
     }
 
-    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorImageLoaded))
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorImageLoaded))
     {
         return false;
     }

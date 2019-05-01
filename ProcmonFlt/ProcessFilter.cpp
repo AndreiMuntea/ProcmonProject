@@ -62,17 +62,17 @@ Minifilter::ProcessFilter::IsActionMonitored(
     _Inout_opt_ PPS_CREATE_NOTIFY_INFO CreateInfo
 )
 {
-    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorStarted))
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorStarted))
     {
         return false;
     }
 
-    if (CreateInfo && !gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorProcessCreate))
+    if (CreateInfo && !gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorProcessCreate))
     {
         return false;
     }
 
-    if (!CreateInfo && !gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorProcessTerminate))
+    if (!CreateInfo && !gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorProcessTerminate))
     {
         return false;
     }

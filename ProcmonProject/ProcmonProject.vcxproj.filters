@@ -58,6 +58,12 @@
     <Filter Include="Source Files\CommShared\Notifications">
       <UniqueIdentifier>{010098e4-7e05-47e0-9c27-a31ef532c2cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\CommShared\Commands">
+      <UniqueIdentifier>{35acdd6d-732f-40d1-a102-be58eccaaf8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CommShared\Commands">
+      <UniqueIdentifier>{1c8a35b8-7402-47c1-a825-b8fd4658e532}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommandInterpreter.hpp">
@@ -114,6 +120,9 @@
     <ClInclude Include="..\Common\FltPortThreadMessage.hpp">
       <Filter>Header Files\CommShared\Notifications</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\FltPortCommand.hpp">
+      <Filter>Header Files\CommShared\Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -166,6 +175,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\FltPortThreadMessage.cpp">
       <Filter>Source Files\CommShared\Notifications</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortCommand.cpp">
+      <Filter>Source Files\CommShared\Commands</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

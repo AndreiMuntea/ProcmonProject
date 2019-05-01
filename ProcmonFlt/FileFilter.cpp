@@ -15,8 +15,8 @@ Minifilter::FileFilter::PreCreateCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    return IsActionMonitored(Data, Feature::featureMonitorFileCreate)   ? FLT_PREOP_SUCCESS_WITH_CALLBACK 
-                                                                        : FLT_PREOP_SUCCESS_NO_CALLBACK;
+    return IsActionMonitored(Data, KmUmShared::Feature::featureMonitorFileCreate)   ? FLT_PREOP_SUCCESS_WITH_CALLBACK
+                                                                                    : FLT_PREOP_SUCCESS_NO_CALLBACK;
 }
 
 FLT_POSTOP_CALLBACK_STATUS FLTAPI
@@ -47,7 +47,7 @@ Minifilter::FileFilter::PreCloseCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    if (!IsActionMonitored(Data, Feature::featureMonitorFileClose))
+    if (!IsActionMonitored(Data, KmUmShared::Feature::featureMonitorFileClose))
     {
         return FLT_PREOP_SUCCESS_NO_CALLBACK;
     }
@@ -85,7 +85,7 @@ Minifilter::FileFilter::PreCleanupCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    if (!IsActionMonitored(Data, Feature::featureMonitorFileCleanup))
+    if (!IsActionMonitored(Data, KmUmShared::Feature::featureMonitorFileCleanup))
     {
         return FLT_PREOP_SUCCESS_NO_CALLBACK;
     }
@@ -154,12 +154,12 @@ Minifilter::FileFilter::FileContextCleanup(
 bool
 Minifilter::FileFilter::IsActionMonitored(
     _Inout_ PFLT_CALLBACK_DATA Data,
-    _In_ const Feature& FeatureToCheck
+    _In_ const KmUmShared::Feature& FeatureToCheck
 )
 {
     auto processId = FltGetRequestorProcessIdEx(Data);
 
-    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorStarted))
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorStarted))
     {
         return false;
     }
@@ -291,7 +291,7 @@ Minifilter::FileFilter::PreReadCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    if (!IsActionMonitored(Data, Feature::featureMonitorFileRead))
+    if (!IsActionMonitored(Data, KmUmShared::Feature::featureMonitorFileRead))
     {
         return FLT_PREOP_SUCCESS_NO_CALLBACK;
     }
@@ -352,7 +352,7 @@ Minifilter::FileFilter::PreWriteCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    if (!IsActionMonitored(Data, Feature::featureMonitorFileWrite))
+    if (!IsActionMonitored(Data, KmUmShared::Feature::featureMonitorFileWrite))
     {
         return FLT_PREOP_SUCCESS_NO_CALLBACK;
     }
@@ -413,7 +413,7 @@ Minifilter::FileFilter::PreSetInformationCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    if (!IsActionMonitored(Data, Feature::featureMonitorFileSetInformation))
+    if (!IsActionMonitored(Data, KmUmShared::Feature::featureMonitorFileSetInformation))
     {
         return FLT_PREOP_SUCCESS_NO_CALLBACK;
     }

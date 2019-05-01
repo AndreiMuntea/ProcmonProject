@@ -27,6 +27,9 @@ private:
 
     void ProtectProcessCommand();
 
+    void UpdateFeatureCommand(bool Enable);
+
+    void PrintAvailableFeatures();
     std::unordered_map<std::string, Command> availableCommands;
 };
 

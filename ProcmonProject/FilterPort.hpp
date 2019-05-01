@@ -2,6 +2,7 @@
 #define __FILTER_PORT_HPP__
 
 #include "FltPortSerializers.hpp"
+#include "../Common/FltPortCommand.hpp"
 
 #include <memory>
 #include <string>
@@ -18,6 +19,11 @@ public:
     );
 
     ~FilterPort();
+
+    NTSTATUS Send(
+        _In_ std::shared_ptr<KmUmShared::CommandHeader> Command,
+        _In_ std::shared_ptr<KmUmShared::CommandReply> Reply
+    );
 
     void Disconnect();
     bool IsConnected();

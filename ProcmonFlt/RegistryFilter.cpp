@@ -33,7 +33,7 @@ Minifilter::RegistryFilter::IsActionMonitored(
 {
     auto currentPid = PsGetCurrentProcessId();
 
-    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorStarted))
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorStarted))
     {
         return false;
     }
@@ -61,22 +61,22 @@ Minifilter::RegistryFilter::IsRegistryOperationTypeAllowed(
     case(RegNtPostCreateKey):
     case(RegNtPreCreateKeyEx):
     case(RegNtPostCreateKeyEx):
-        return gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorRegistryCreateKey);
+        return gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorRegistryCreateKey);
     case(RegNtPreSetValueKey):
     case(RegNtPostSetValueKey):
-        return gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorRegistrySetValue);
+        return gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorRegistrySetValue);
     case (RegNtPreDeleteKey):
     case (RegNtPostDeleteKey):
-        return gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorRegistryDeleteKey);
+        return gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorRegistryDeleteKey);
     case (RegNtPreDeleteValueKey):
     case (RegNtPostDeleteValueKey):
-        return gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorRegistryDeleteKeyValue);
+        return gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorRegistryDeleteKeyValue);
     case (RegNtPreLoadKey):
     case (RegNtPostLoadKey):
-        return gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorRegistryRenameKey);
+        return gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorRegistryRenameKey);
     case (RegNtPreRenameKey):
     case (RegNtPostRenameKey):
-        return gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorRegistryRenameKey);
+        return gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorRegistryRenameKey);
     default:
         return false;
     }

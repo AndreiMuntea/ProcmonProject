@@ -2,31 +2,11 @@
 #define __CONFIGURATION_MANAGER_HPP__
 
 #include "cpp_allocator_object.hpp"
+#include "../Common/FltPortCommand.hpp"
 
 namespace Minifilter
 {
-    enum class Feature
-    {
-        featureMonitorStarted = 0,
-        featureMonitorProcessCreate,
-        featureMonitorProcessTerminate,
-        featureMonitorThreadCreate,
-        featureMonitorThreadTerminate,
-        featureMonitorImageLoaded,
-        featureMonitorRegistryCreateKey,
-        featureMonitorRegistrySetValue,
-        featureMonitorRegistryDeleteKey,
-        featureMonitorRegistryDeleteKeyValue,
-        featureMonitorRegistryLoadKey,
-        featureMonitorRegistryRenameKey,
-        featureMonitorFileCreate,
-        featureMonitorFileClose,
-        featureMonitorFileCleanup,
-        featureMonitorFileRead,
-        featureMonitorFileWrite,
-        featureMonitorFileSetInformation,
-        featureMaxIndex
-    };
+
 
     class ConfigurationManager : public Cpp::CppNonPagedObject<'GMC#'>
     {
@@ -34,13 +14,13 @@ namespace Minifilter
         ConfigurationManager() = default;
         virtual ~ConfigurationManager() = default;
 
-        NTSTATUS EnableFeature(const Feature& Feature);
-        NTSTATUS DisableFeature(const Feature& Feature);
-        bool IsFeatureEnabled(const Feature& Feature) const;
+        NTSTATUS EnableFeature(const KmUmShared::Feature& Feature);
+        NTSTATUS DisableFeature(const KmUmShared::Feature& Feature);
+        bool IsFeatureEnabled(const KmUmShared::Feature& Feature) const;
         LONG64 GetCurrentConfiguration() const;
 
     private:
-        LONG64 GetFeatureIndex(const Feature& Feature) const;
+        LONG64 GetFeatureIndex(const KmUmShared::Feature& Feature) const;
 
         volatile LONG64 features = 0;
     };

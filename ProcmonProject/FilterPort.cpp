@@ -178,3 +178,41 @@ FilterPort::~FilterPort()
     listenerThread->join();
     listenerThread.reset(nullptr);
 }
+
+NTSTATUS
+FilterPort::Send(
+    _In_ std::shared_ptr<KmUmShared::CommandHeader> Command,
+    _In_ std::shared_ptr<KmUmShared::CommandReply> Reply
+)
+{
+    Cpp::Stream inputStream;
+    Cpp::Stream outputStream;
+
+    inputStream << *Command;
+    outputStream << *Reply;
+
+    if (!inputStream.IsValid() || !outputStream.IsValid())
+    {
+        std::cout << "Stream is not valid" << std::endl;
+        return STATUS_ASSERTION_FAILURE;
+    }
+
+    DWORD bytesReturned = 0;
+    auto result = FilterSendMessage(
+        this->driverPort,
+        (LPVOID)inputStream.GetRawData(),
+        inputStream.GetSize(),
+        (LPVOID)outputStream.GetRawData(),
+        outputStream.GetSize(),
+        &bytesReturned
+    );
+
+    outputStream >> *Reply;
+    if (result != S_OK || !outputStream.IsValid() || bytesReturned != outputStream.GetSize())
+    {
+        std::wcout << "FilterSendMessage failure" << std::endl;
+        return STATUS_ASSERTION_FAILURE;
+    }
+
+    return ERROR_SUCCESS;
+}

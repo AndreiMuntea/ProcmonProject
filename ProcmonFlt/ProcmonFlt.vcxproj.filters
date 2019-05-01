@@ -62,6 +62,12 @@
     <Filter Include="Source Files\Communication\Notifications">
       <UniqueIdentifier>{ea03acb5-1f26-4b51-bc52-e22ae6313ee4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Communication\Commands">
+      <UniqueIdentifier>{52c454b2-d9a3-4266-aac0-00e398f63540}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Communication\Commands">
+      <UniqueIdentifier>{8a510610-2f13-4fec-bdbe-ec65ab25e8e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Inf Include="ProcmonFlt.inf">
@@ -155,6 +161,9 @@
     <ClInclude Include="..\Common\FltPortRegistryMessage.hpp">
       <Filter>Header Files\Communication\Notifications</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\FltPortCommand.hpp">
+      <Filter>Header Files\Communication\Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Minifilter.cpp">
@@ -216,6 +225,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\FltPortRegistryMessage.cpp">
       <Filter>Source Files\Communication\Notifications</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortCommand.cpp">
+      <Filter>Source Files\Communication\Commands</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

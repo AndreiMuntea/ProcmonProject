@@ -2,10 +2,10 @@
 
 NTSTATUS 
 Minifilter::ConfigurationManager::EnableFeature(
-    const Feature & Feature
+    const KmUmShared::Feature & Feature
 )
 {
-    if (Feature >= Feature::featureMaxIndex)
+    if (Feature >= KmUmShared::Feature::featureMaxIndex)
     {
         return STATUS_DEVICE_FEATURE_NOT_SUPPORTED;
     }
@@ -16,10 +16,10 @@ Minifilter::ConfigurationManager::EnableFeature(
 
 NTSTATUS 
 Minifilter::ConfigurationManager::DisableFeature(
-    const Feature & Feature
+    const KmUmShared::Feature & Feature
 )
 {
-    if (Feature >= Feature::featureMaxIndex)
+    if (Feature >= KmUmShared::Feature::featureMaxIndex)
     {
         return STATUS_DEVICE_FEATURE_NOT_SUPPORTED;
     }
@@ -30,10 +30,10 @@ Minifilter::ConfigurationManager::DisableFeature(
 
 bool 
 Minifilter::ConfigurationManager::IsFeatureEnabled(
-    const Feature & Feature
+    const KmUmShared::Feature & Feature
 ) const
 {
-    if (Feature >= Feature::featureMaxIndex)
+    if (Feature >= KmUmShared::Feature::featureMaxIndex)
     {
         return false;
     }
@@ -49,7 +49,7 @@ Minifilter::ConfigurationManager::GetCurrentConfiguration() const
 
 LONG64 
 Minifilter::ConfigurationManager::GetFeatureIndex(
-    const Feature & Feature
+    const KmUmShared::Feature & Feature
 ) const
 {
     auto index = static_cast<LONG64>(Feature);

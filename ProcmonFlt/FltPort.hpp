@@ -9,6 +9,15 @@
 
 namespace Minifilter
 {
+    typedef NTSTATUS FUNC_OnMessageNotifyCallback(
+        _In_reads_bytes_opt_(InputBufferLength) PVOID InputBuffer,
+        _In_ ULONG InputBufferLength,
+        _Out_writes_bytes_to_opt_(OutputBufferLength, *ReturnOutputBufferLength) PVOID OutputBuffer,
+        _In_ ULONG OutputBufferLength,
+        _Out_ PULONG ReturnOutputBufferLength
+    );
+    typedef FUNC_OnMessageNotifyCallback *PFUNC_OnMessageNotifyCallback;
+
     class FltPortDataPackage : public Cpp::CppPagedObject<'TLF#'>
     {
         friend class FltPort;
@@ -30,7 +39,8 @@ namespace Minifilter
     public:
         FltPort(
             _In_ PFLT_FILTER Filter,
-            _In_ PUNICODE_STRING PortName
+            _In_ PUNICODE_STRING PortName,
+            _In_ PFUNC_OnMessageNotifyCallback OnMessageNotify
         );
 
         FltPort(const FltPort& Other) = delete;
@@ -48,6 +58,7 @@ namespace Minifilter
         static void DataPackageCleanupCallback(PVOID Context);
         static void DataPackageCallback(PVOID Context);
 
+        PFUNC_OnMessageNotifyCallback onMessageNotify = nullptr;
         PFLT_FILTER filter = nullptr;
         PFLT_PORT clientPort = nullptr;
         PFLT_PORT serverPort = nullptr;

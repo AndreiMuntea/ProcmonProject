@@ -5,9 +5,11 @@
 #include "ProcessUtils.hpp"
 #include "Ioctl.hpp"
 #include "RemoteThread.hpp"
+#include "../Common/FltPortCommand.hpp"
 
 #include <iostream>
 #include <functional>
+#include <memory>
 
 CommandInterpreter::CommandInterpreter()
 {
@@ -199,4 +201,68 @@ CommandInterpreter::ProtectProcessCommand()
     std::cin >> pid;
 
     IoctlSendIoctl((DWORD)THIRD_IOCTL_CODE, &pid, sizeof(unsigned __int32));
+}
+
+void CommandInterpreter::UpdateFeatureCommand(bool Enable)
+{
+    if (!gGlobalData.FltPort || !gGlobalData.FltPort->IsConnected())
+    {
+        std::cout << "Disconnected FLT port!" << std::endl;
+        return;
+    }
+
+    PrintAvailableFeatures();
+
+    unsigned __int32 feature = 0;
+    std::cout << "What feature do you want to update : ";
+    std::cin >> feature;
+
+    if (feature > static_cast<unsigned __int32>(KmUmShared::Feature::featureMaxIndex))
+    {
+        std::cout << "Invalid feature index!" << std::endl;
+        return;
+    }
+
+    KmUmShared::CommandUpdateFeature command;
+    KmUmShared::CommandReplyUpdateFeature reply;
+
+    command.commandCode = (Enable) ? KmUmShared::CommandCode::commandEnableFeature : KmUmShared::CommandCode::commandDisableFeature;
+    command.feature = static_cast<KmUmShared::Feature>(feature);
+
+    auto status = gGlobalData.FltPort->Send(
+        std::make_shared<KmUmShared::CommandUpdateFeature>(command), 
+        std::make_shared<KmUmShared::CommandReplyUpdateFeature>(reply)
+    );
+
+    if (status == ERROR_SUCCESS)
+    {
+        std::cout << "Current features configuration: " << reply.featuresConfiguration << std::endl;
+    }
+    else
+    {
+        std::cout << "Couldn't perform operation" << std::endl;
+    }
+}
+
+void CommandInterpreter::PrintAvailableFeatures()
+{
+    std::cout << "\t> Available features:" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorStarted) << " - featureMonitorStarted" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorProcessCreate) << " - featureMonitorProcessCreate" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorProcessTerminate) << " - featureMonitorProcessTerminate" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorThreadCreate) << " - featureMonitorThreadCreate" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorThreadTerminate) << " - featureMonitorThreadTerminate" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorImageLoaded) << " - featureMonitorImageLoaded" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorRegistryCreateKey) << " - featureMonitorRegistryCreateKey" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorRegistrySetValue) << " - featureMonitorRegistrySetValue" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorRegistryDeleteKey) << " - featureMonitorRegistryDeleteKey" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorRegistryDeleteKeyValue) << " - featureMonitorRegistryDeleteKeyValue" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorRegistryLoadKey) << " - featureMonitorRegistryLoadKey" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorRegistryRenameKey) << " - featureMonitorRegistryRenameKey" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorFileCreate) << " - featureMonitorFileCreate" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorFileClose) << " - featureMonitorFileClose" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorFileCleanup) << " - featureMonitorFileCleanup" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorFileRead) << " - featureMonitorFileRead" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorFileWrite) << " - featureMonitorFileWrite" << std::endl;
+    std::cout << "\t\t> " << static_cast<int>(KmUmShared::Feature::featureMonitorFileSetInformation) << " - featureMonitorFileSetInformation" << std::endl;
 }

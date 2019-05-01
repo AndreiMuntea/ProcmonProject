@@ -7,6 +7,9 @@
 #include "cpp_init.hpp"
 #include "GlobalData.hpp"
 
+#include <CppStream.hpp>
+#include <CppShallowStream.hpp>
+
 EXTERN_C_START
 
 #ifdef ALLOC_PRAGMA
@@ -51,7 +54,7 @@ DriverEntry(
     }
 
     // Create a new communication port
-    gDrvData.CommunicationPort.Update(new Minifilter::FltPort(gDrvData.FilterHandle, &gDrvData.CommunicationPortName));
+    gDrvData.CommunicationPort.Update(new Minifilter::FltPort(gDrvData.FilterHandle, &gDrvData.CommunicationPortName, OnMessageReceived));
     if (!gDrvData.CommunicationPort.IsValid() || !gDrvData.CommunicationPort->IsValid())
     {
         ::FltUnregisterFilter(gDrvData.FilterHandle);
@@ -131,7 +134,7 @@ DriverUnload(
     WPP_CLEANUP(gDrvData.DriverObject);
 
     // Stop monitoring
-    gDrvData.ConfigurationManager->DisableFeature(Minifilter::Feature::featureMonitorStarted);
+    gDrvData.ConfigurationManager->DisableFeature(KmUmShared::Feature::featureMonitorStarted);
 
     // Wait for running callbacks to complete
     ::ExWaitForRundownProtectionRelease(&gDrvData.RundownProtection);
@@ -222,6 +225,31 @@ InstanceTeardownComplete(
     MyDriverLogTrace("We are now in instance teardown complete routine!");
 }
 
+NTSTATUS
+OnUpdateFeatureMessageReceived(
+    _In_ bool Enable,
+    _Inout_ Cpp::ShallowStream& InputStream,
+    _Inout_ Cpp::Stream& OutputStream
+)
+{
+    KmUmShared::CommandUpdateFeature command;
+    KmUmShared::CommandReplyUpdateFeature reply;
+
+    InputStream >> command;
+    if (!InputStream.IsValid() || command.feature >= KmUmShared::Feature::featureMaxIndex)
+    {
+        return STATUS_INVALID_DEVICE_REQUEST;
+    }
+
+    auto status = (Enable) ? gDrvData.ConfigurationManager->EnableFeature(command.feature)
+                           : gDrvData.ConfigurationManager->DisableFeature(command.feature);
+
+    reply.featuresConfiguration = gDrvData.ConfigurationManager->GetCurrentConfiguration();
+    OutputStream << reply;
+
+    return status;
+}
+
 NTSTATUS 
 OnMessageReceived(
     _In_reads_bytes_opt_(InputBufferLength) PVOID InputBuffer,
@@ -231,14 +259,41 @@ OnMessageReceived(
     _Out_ PULONG ReturnOutputBufferLength
 )
 {
-    UNREFERENCED_PARAMETER(InputBuffer);
-    UNREFERENCED_PARAMETER(InputBufferLength);
-    UNREFERENCED_PARAMETER(OutputBuffer);
-    UNREFERENCED_PARAMETER(OutputBufferLength);
+    MyDriverLogTrace("We are now in OnMessageReceived routine!");
 
     *ReturnOutputBufferLength = 0;
+    KmUmShared::CommandHeader commandHeader;
+    NTSTATUS status = STATUS_UNSUCCESSFUL;
 
-    MyDriverLogTrace("We are now in OnMessageReceived routine!");
+    Cpp::ShallowStream inputStream((unsigned __int8*)InputBuffer, InputBufferLength);
+    Cpp::Stream outputStream;
+
+    inputStream >> commandHeader;
+
+    if (!inputStream.IsValid() || commandHeader.commandCode >= KmUmShared::CommandCode::commandMaxIndex)
+    {
+        return STATUS_INVALID_DEVICE_REQUEST;
+    }
+
+    switch (commandHeader.commandCode)
+    {
+    case KmUmShared::CommandCode::commandEnableFeature:
+        status = OnUpdateFeatureMessageReceived(true, inputStream, outputStream);
+        break;
+    case KmUmShared::CommandCode::commandDisableFeature:
+        status = OnUpdateFeatureMessageReceived(false, inputStream, outputStream);
+        break;
+    default:
+        return STATUS_NOT_SUPPORTED;
+    }
+
+    if (!NT_SUCCESS(status) || !inputStream.IsValid() || !outputStream.IsValid() || outputStream.GetSize() >= OutputBufferLength)
+    {
+        return STATUS_INVALID_DEVICE_REQUEST;
+    }
+
+    RtlCopyMemory(OutputBuffer, outputStream.GetRawData(), outputStream.GetSize());
+    *ReturnOutputBufferLength = outputStream.GetSize();
     
     return STATUS_SUCCESS;
 }

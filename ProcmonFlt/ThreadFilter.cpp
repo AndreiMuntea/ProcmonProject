@@ -77,17 +77,17 @@ Minifilter::ThreadFilter::IsActionMonitored(
     _In_ BOOLEAN Create
 )
 {
-    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorStarted))
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorStarted))
     {
         return false;
     }
 
-    if (Create && !gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorThreadCreate))
+    if (Create && !gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorThreadCreate))
     {
         return false;
     }
 
-    if (!Create && !gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorThreadTerminate))
+    if (!Create && !gDrvData.ConfigurationManager->IsFeatureEnabled(KmUmShared::Feature::featureMonitorThreadTerminate))
     {
         return false;
     }

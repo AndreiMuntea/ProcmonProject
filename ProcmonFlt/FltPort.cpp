@@ -8,9 +8,11 @@
 
 Minifilter::FltPort::FltPort(
     _In_ PFLT_FILTER Filter,
-    _In_ PUNICODE_STRING PortName
+    _In_ PUNICODE_STRING PortName,
+    _In_ PFUNC_OnMessageNotifyCallback OnMessageNotify
 ) : filter{ Filter },
-    threadpool{10}
+    threadpool{10},
+    onMessageNotify{OnMessageNotify}
 {
     OBJECT_ATTRIBUTES objAttr = { 0 };
     PSECURITY_DESCRIPTOR securityDescriptor = nullptr;
@@ -252,21 +254,16 @@ Minifilter::FltPort::MessageNotifyCallback(
     _Out_ PULONG ReturnOutputBufferLength
 )
 {
-    UNREFERENCED_PARAMETER(InputBuffer);
-    UNREFERENCED_PARAMETER(InputBufferLength);
-    UNREFERENCED_PARAMETER(OutputBuffer);
-    UNREFERENCED_PARAMETER(OutputBufferLength);
-    UNREFERENCED_PARAMETER(ReturnOutputBufferLength);
-
     MyDriverLogTrace("We are in MessageNotifyCallback");
 
     FltPort* fltPort = static_cast<FltPort*>(PortCookie);
     if (fltPort)
     {
-
+        Cpp::ExclusiveLockguard guard(&fltPort->lock);
+        return fltPort->onMessageNotify(InputBuffer, InputBufferLength, OutputBuffer, OutputBufferLength, ReturnOutputBufferLength);
     }
 
-    return STATUS_SUCCESS;
+    return STATUS_UNSUCCESSFUL;
 }
 
 Minifilter::FltPortDataPackage::FltPortDataPackage(

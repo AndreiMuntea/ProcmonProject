@@ -17,6 +17,12 @@ namespace Minifilter
             _In_ HANDLE ProcessId,
             _In_ PIMAGE_INFO ImageInfo
         );
+
+    private:
+        static bool
+        IsActionMonitored(
+            _In_ HANDLE ProcessId
+        );
     };
 }
 

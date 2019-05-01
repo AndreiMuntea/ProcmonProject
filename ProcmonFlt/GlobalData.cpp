@@ -104,7 +104,6 @@ void GdrvInitGlobalData(_In_ PDRIVER_OBJECT DriverObject)
     gDrvData.CommunicationPortName = gFltPortName;
     gDrvData.Altitude = RTL_CONSTANT_STRING(L"370030");
     gDrvData.Cookie = { 0 };
-    gDrvData.MonitoringStarted = false;
 
     ExInitializeRundownProtection(&gDrvData.RundownProtection);
 }
@@ -119,12 +118,12 @@ void GdrvUninitGlobalData()
     gDrvData.CommunicationPort.Update(nullptr);
     gDrvData.CommunicationPortName = { 0,0,nullptr };
 
+    gDrvData.ConfigurationManager.Update(nullptr);
+
     gDrvData.Altitude = { 0,0,nullptr };
     gDrvData.Cookie = { 0 };
 
     gDrvData.FilterHandle = nullptr;
     gDrvData.DriverObject = nullptr;
     gDrvData.FilterRegistration = { 0 };
-
-    gDrvData.MonitoringStarted = false;
 }

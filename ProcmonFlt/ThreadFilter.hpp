@@ -17,6 +17,13 @@ namespace Minifilter
             _In_ HANDLE ThreadId,
             _In_ BOOLEAN Create
         );
+
+    private:
+        static bool 
+        IsActionMonitored(
+            _In_ HANDLE ProcessId,
+            _In_ BOOLEAN Create
+        );
     };
 }
 

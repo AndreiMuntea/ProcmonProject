@@ -41,6 +41,15 @@ DriverEntry(
         goto Exit;
     }
 
+    // Create configuration manager
+    gDrvData.ConfigurationManager.Update(new Minifilter::ConfigurationManager());
+    if (!gDrvData.ConfigurationManager.IsValid() || !gDrvData.ConfigurationManager->IsValid())
+    {
+        ::FltUnregisterFilter(gDrvData.FilterHandle);
+        MyDriverLogCritical("Failed to initialize ConfigurationManager");
+        goto Exit;
+    }
+
     // Create a new communication port
     gDrvData.CommunicationPort.Update(new Minifilter::FltPort(gDrvData.FilterHandle, &gDrvData.CommunicationPortName));
     if (!gDrvData.CommunicationPort.IsValid() || !gDrvData.CommunicationPort->IsValid())
@@ -50,45 +59,45 @@ DriverEntry(
         goto Exit;
     }
 
-    //// Create Process filter
-    //gDrvData.ProcessFilter.Update(new Minifilter::ProcessFilter());
-    //if (!gDrvData.ProcessFilter.IsValid() || !gDrvData.ProcessFilter->IsValid())
-    //{
-    //    gDrvData.CommunicationPort.Update(nullptr);
-    //    ::FltUnregisterFilter(gDrvData.FilterHandle);
-    //    MyDriverLogCritical("Failed to initialize ProcessFilter");
-    //    goto Exit;
-    //}
+    // Create Process filter
+    gDrvData.ProcessFilter.Update(new Minifilter::ProcessFilter());
+    if (!gDrvData.ProcessFilter.IsValid() || !gDrvData.ProcessFilter->IsValid())
+    {
+        gDrvData.CommunicationPort.Update(nullptr);
+        ::FltUnregisterFilter(gDrvData.FilterHandle);
+        MyDriverLogCritical("Failed to initialize ProcessFilter");
+        goto Exit;
+    }
 
-    //// Create Thread filter
-    //gDrvData.ThreadFilter.Update(new Minifilter::ThreadFilter());
-    //if (!gDrvData.ThreadFilter.IsValid() || !gDrvData.ThreadFilter->IsValid())
-    //{
-    //    gDrvData.CommunicationPort.Update(nullptr);
-    //    ::FltUnregisterFilter(gDrvData.FilterHandle);
-    //    MyDriverLogCritical("Failed to initialize ThreadFilter");
-    //    goto Exit;
-    //}
+    // Create Thread filter
+    gDrvData.ThreadFilter.Update(new Minifilter::ThreadFilter());
+    if (!gDrvData.ThreadFilter.IsValid() || !gDrvData.ThreadFilter->IsValid())
+    {
+        gDrvData.CommunicationPort.Update(nullptr);
+        ::FltUnregisterFilter(gDrvData.FilterHandle);
+        MyDriverLogCritical("Failed to initialize ThreadFilter");
+        goto Exit;
+    }
 
-    //// Create Module filter
-    //gDrvData.ModuleFilter.Update(new Minifilter::ModuleFilter());
-    //if (!gDrvData.ModuleFilter.IsValid() || !gDrvData.ModuleFilter->IsValid())
-    //{
-    //    gDrvData.CommunicationPort.Update(nullptr);
-    //    ::FltUnregisterFilter(gDrvData.FilterHandle);
-    //    MyDriverLogCritical("Failed to initialize ModuleFilter");
-    //    goto Exit;
-    //}
+    // Create Module filter
+    gDrvData.ModuleFilter.Update(new Minifilter::ModuleFilter());
+    if (!gDrvData.ModuleFilter.IsValid() || !gDrvData.ModuleFilter->IsValid())
+    {
+        gDrvData.CommunicationPort.Update(nullptr);
+        ::FltUnregisterFilter(gDrvData.FilterHandle);
+        MyDriverLogCritical("Failed to initialize ModuleFilter");
+        goto Exit;
+    }
 
     // Create Registry Filter
-    //gDrvData.RegistryFilter.Update(new Minifilter::RegistryFilter());
-    //if (!gDrvData.RegistryFilter.IsValid() || !gDrvData.RegistryFilter->IsValid())
-    //{
-    //    gDrvData.CommunicationPort.Update(nullptr);
-    //    ::FltUnregisterFilter(gDrvData.FilterHandle);
-    //    MyDriverLogCritical("Failed to initialize RegistryFilter");
-    //    goto Exit;
-    //}
+    gDrvData.RegistryFilter.Update(new Minifilter::RegistryFilter());
+    if (!gDrvData.RegistryFilter.IsValid() || !gDrvData.RegistryFilter->IsValid())
+    {
+        gDrvData.CommunicationPort.Update(nullptr);
+        ::FltUnregisterFilter(gDrvData.FilterHandle);
+        MyDriverLogCritical("Failed to initialize RegistryFilter");
+        goto Exit;
+    }
 
     // Start filtering
     status = ::FltStartFiltering(gDrvData.FilterHandle);
@@ -99,9 +108,6 @@ DriverEntry(
         MyDriverLogCritical("::FltStartFiltering failed with status 0x%x", status);
         goto Exit;
     }
-
-    // Start monitoring
-    gDrvData.MonitoringStarted = true;
 
 Exit:
     if (!NT_SUCCESS(status))
@@ -124,12 +130,12 @@ DriverUnload(
     MyDriverLogTrace("We are now in driver unload routine!");
     WPP_CLEANUP(gDrvData.DriverObject);
 
+    // Stop monitoring
+    gDrvData.ConfigurationManager->DisableFeature(Minifilter::Feature::featureMonitorStarted);
+
     // Wait for running callbacks to complete
     ::ExWaitForRundownProtectionRelease(&gDrvData.RundownProtection);
     ::ExRundownCompleted(&gDrvData.RundownProtection);
-
-    // Stop monitoring
-    gDrvData.MonitoringStarted = false;
 
     // Release filters
     gDrvData.ThreadFilter.Update(nullptr);

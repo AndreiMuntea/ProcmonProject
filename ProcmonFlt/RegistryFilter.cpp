@@ -3,6 +3,8 @@
 #include "RegistryFilter.tmh"
 
 #include "GlobalData.hpp"
+#include "ProcessUtils.hpp"
+
 #include <CppSemantics.hpp>
 #include "../Common/FltPortRegistryMessage.hpp"
 
@@ -24,7 +26,63 @@ Minifilter::RegistryFilter::~RegistryFilter()
     NT_ASSERT(NT_SUCCESS(status));
 }
 
-NTSTATUS 
+bool 
+Minifilter::RegistryFilter::IsActionMonitored(
+    _In_ REG_NOTIFY_CLASS RegistryOperationType
+)
+{
+    auto currentPid = PsGetCurrentProcessId();
+
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorStarted))
+    {
+        return false;
+    }
+
+    if (!IsRegistryOperationTypeAllowed(RegistryOperationType))
+    {
+        return false;
+    }
+
+    if (ProcessUtils::IsSystemOrIdleProcess(currentPid))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool 
+Minifilter::RegistryFilter::IsRegistryOperationTypeAllowed(
+    _In_ REG_NOTIFY_CLASS RegistryOperationType
+)
+{
+    switch (RegistryOperationType)
+    {
+    case(RegNtPostCreateKey):
+    case(RegNtPreCreateKeyEx):
+    case(RegNtPostCreateKeyEx):
+        return gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorRegistryCreateKey);
+    case(RegNtPreSetValueKey):
+    case(RegNtPostSetValueKey):
+        return gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorRegistrySetValue);
+    case (RegNtPreDeleteKey):
+    case (RegNtPostDeleteKey):
+        return gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorRegistryDeleteKey);
+    case (RegNtPreDeleteValueKey):
+    case (RegNtPostDeleteValueKey):
+        return gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorRegistryDeleteKeyValue);
+    case (RegNtPreLoadKey):
+    case (RegNtPostLoadKey):
+        return gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorRegistryRenameKey);
+    case (RegNtPreRenameKey):
+    case (RegNtPostRenameKey):
+        return gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorRegistryRenameKey);
+    default:
+        return false;
+    }
+}
+
+NTSTATUS
 Minifilter::RegistryFilter::RegistrySolveKeyName(
     _In_ PVOID Object,
     _Inout_ Cpp::String& KeyName
@@ -143,7 +201,7 @@ Minifilter::RegistryFilter::RegistryHandlePreOperationKeyValue(
 NTSTATUS 
 Minifilter::RegistryFilter::RegistryNotifyRoutine(
     _In_ PVOID CallbackContext,
-    _In_opt_ PVOID Argument1,
+    _In_ PVOID Argument1,
     _In_opt_ PVOID Argument2
 )
 {
@@ -156,12 +214,19 @@ Minifilter::RegistryFilter::RegistryNotifyRoutine(
         return STATUS_SUCCESS;
     }
 
-    unsigned __int32 processId = HandleToULong(PsGetCurrentProcessId());
+    REG_NOTIFY_CLASS notifyClass = (REG_NOTIFY_CLASS)(SIZE_T)Argument1;
+    if (!IsActionMonitored(notifyClass) || !Argument2)
+    {
+        ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
+        return STATUS_SUCCESS;
+    }
+
+    HANDLE currentPid = PsGetCurrentProcessId();
+    unsigned __int32 processId = HandleToULong(currentPid);
     unsigned __int64 timestamp = 0;
 
     KeQuerySystemTime(&timestamp);
 
-    REG_NOTIFY_CLASS notifyClass = (REG_NOTIFY_CLASS)(SIZE_T)Argument1;
     switch (notifyClass)
     {
         case(RegNtPostCreateKey):

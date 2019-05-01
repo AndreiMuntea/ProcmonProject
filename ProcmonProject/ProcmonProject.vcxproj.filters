@@ -52,6 +52,12 @@
     <Filter Include="Source Files\CommShared\Private">
       <UniqueIdentifier>{c591c79b-bd9d-44ef-8f24-929922f314a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\CommShared\Notifications">
+      <UniqueIdentifier>{7c39b0b0-fded-4998-8e68-945c4817ae0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CommShared\Notifications">
+      <UniqueIdentifier>{010098e4-7e05-47e0-9c27-a31ef532c2cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommandInterpreter.hpp">
@@ -87,26 +93,26 @@
     <ClInclude Include="FilterPort.hpp">
       <Filter>Header Files\Km Utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\FltPortMessage.hpp">
-      <Filter>Header Files\CommShared</Filter>
-    </ClInclude>
     <ClInclude Include="FltPortSerializers.hpp">
       <Filter>Header Files\CommShared\Private</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\FltPortProcessMessage.hpp">
-      <Filter>Header Files\CommShared</Filter>
+    <ClInclude Include="..\Common\FltPortFileMessage.hpp">
+      <Filter>Header Files\CommShared\Notifications</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\FltPortThreadMessage.hpp">
-      <Filter>Header Files\CommShared</Filter>
+    <ClInclude Include="..\Common\FltPortMessage.hpp">
+      <Filter>Header Files\CommShared\Notifications</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\FltPortModuleMessage.hpp">
-      <Filter>Header Files\CommShared</Filter>
+      <Filter>Header Files\CommShared\Notifications</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortProcessMessage.hpp">
+      <Filter>Header Files\CommShared\Notifications</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\FltPortRegistryMessage.hpp">
-      <Filter>Header Files\CommShared</Filter>
+      <Filter>Header Files\CommShared\Notifications</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\FltPortFileMessage.hpp">
-      <Filter>Header Files\CommShared</Filter>
+    <ClInclude Include="..\Common\FltPortThreadMessage.hpp">
+      <Filter>Header Files\CommShared\Notifications</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -140,26 +146,26 @@
     <ClCompile Include="cpp_externals.cpp">
       <Filter>Source Files\Definitions</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\FltPortMessage.cpp">
-      <Filter>Source Files\CommShared</Filter>
-    </ClCompile>
     <ClCompile Include="FltPortSerializers.cpp">
       <Filter>Source Files\CommShared\Private</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\FltPortProcessMessage.cpp">
-      <Filter>Source Files\CommShared</Filter>
+    <ClCompile Include="..\Common\FltPortFileMessage.cpp">
+      <Filter>Source Files\CommShared\Notifications</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\FltPortThreadMessage.cpp">
-      <Filter>Source Files\CommShared</Filter>
+    <ClCompile Include="..\Common\FltPortMessage.cpp">
+      <Filter>Source Files\CommShared\Notifications</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\FltPortModuleMessage.cpp">
-      <Filter>Source Files\CommShared</Filter>
+      <Filter>Source Files\CommShared\Notifications</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortProcessMessage.cpp">
+      <Filter>Source Files\CommShared\Notifications</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\FltPortRegistryMessage.cpp">
-      <Filter>Source Files\CommShared</Filter>
+      <Filter>Source Files\CommShared\Notifications</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\FltPortFileMessage.cpp">
-      <Filter>Source Files\CommShared</Filter>
+    <ClCompile Include="..\Common\FltPortThreadMessage.cpp">
+      <Filter>Source Files\CommShared\Notifications</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

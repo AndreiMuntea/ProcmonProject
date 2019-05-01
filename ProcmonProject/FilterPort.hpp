@@ -20,6 +20,7 @@ public:
     ~FilterPort();
 
     void Disconnect();
+    bool IsConnected();
 
 private:
     void CloseConnectionPort();
@@ -36,6 +37,7 @@ private:
         Cpp::ShallowStream & InputData
     );
 
+    bool isConnected = false;
     std::wstring portName;
     std::unique_ptr<std::thread> listenerThread = nullptr;
     HANDLE driverPort = INVALID_HANDLE_VALUE;

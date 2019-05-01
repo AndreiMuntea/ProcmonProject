@@ -18,6 +18,7 @@ FilterPort::FilterPort(const std::wstring & PortName)
     }
 
     listenerThread.reset(new std::thread([this]() {this->Listen(); }));
+    isConnected = true;
 }
 
 void FilterPort::Disconnect()
@@ -32,6 +33,11 @@ void FilterPort::Disconnect()
     CloseConnectionPort();
 }
 
+bool FilterPort::IsConnected()
+{
+    return isConnected;
+}
+
 void FilterPort::CloseConnectionPort()
 {
     if (INVALID_HANDLE_VALUE != driverPort)
@@ -39,6 +45,8 @@ void FilterPort::CloseConnectionPort()
         CloseHandle(driverPort);
         driverPort = INVALID_HANDLE_VALUE;
     }
+
+    isConnected = false;
 }
 
 void FilterPort::Listen()
@@ -73,6 +81,8 @@ void FilterPort::Listen()
             break;
         }
     }
+
+    this->Disconnect();
 }
 
 NTSTATUS

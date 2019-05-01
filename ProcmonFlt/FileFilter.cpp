@@ -3,6 +3,7 @@
 #include "FileFilter.tmh"
 
 #include "GlobalData.hpp"
+#include "ProcessUtils.hpp"
 
 FLT_PREOP_CALLBACK_STATUS FLTAPI 
 Minifilter::FileFilter::PreCreateCallback(
@@ -14,8 +15,8 @@ Minifilter::FileFilter::PreCreateCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    return IsSystemAction(Data) ? FLT_PREOP_SUCCESS_NO_CALLBACK
-                                : FLT_PREOP_SUCCESS_WITH_CALLBACK;
+    return IsActionMonitored(Data, Feature::featureMonitorFileCreate)   ? FLT_PREOP_SUCCESS_WITH_CALLBACK 
+                                                                        : FLT_PREOP_SUCCESS_NO_CALLBACK;
 }
 
 FLT_POSTOP_CALLBACK_STATUS FLTAPI
@@ -46,7 +47,7 @@ Minifilter::FileFilter::PreCloseCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    if (IsSystemAction(Data))
+    if (!IsActionMonitored(Data, Feature::featureMonitorFileClose))
     {
         return FLT_PREOP_SUCCESS_NO_CALLBACK;
     }
@@ -84,7 +85,7 @@ Minifilter::FileFilter::PreCleanupCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    if (IsSystemAction(Data))
+    if (!IsActionMonitored(Data, Feature::featureMonitorFileCleanup))
     {
         return FLT_PREOP_SUCCESS_NO_CALLBACK;
     }
@@ -132,11 +133,6 @@ Minifilter::FileFilter::PostCleanupSafeCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    if (IsSystemAction(Data))
-    {
-        return FLT_POSTOP_FINISHED_PROCESSING;
-    }
-
     NotifyEvent<KmUmShared::FileCleanupMessage>(Data, FltObjects);
     return FLT_POSTOP_FINISHED_PROCESSING;
 }
@@ -151,21 +147,39 @@ Minifilter::FileFilter::FileContextCleanup(
     if (ContextType == FLT_STREAM_CONTEXT && context->FileName.Buffer)
     {
         ExFreePoolWithTag(context->FileName.Buffer, 'TFF#');
+        context->FileName = { 0,0, nullptr };
     }
 }
 
 bool
-Minifilter::FileFilter::IsSystemAction(
-    _Inout_ PFLT_CALLBACK_DATA Data
+Minifilter::FileFilter::IsActionMonitored(
+    _Inout_ PFLT_CALLBACK_DATA Data,
+    _In_ const Feature& FeatureToCheck
 )
 {
     auto processId = FltGetRequestorProcessIdEx(Data);
-    if (processId == (HANDLE)(4) || processId == (HANDLE)(0))
+
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorStarted))
     {
-        return true;
+        return false;
     }
 
-    return false;
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(FeatureToCheck))
+    {
+        return false;
+    }
+
+    if (ProcessUtils::IsSystemOrIdleProcess(processId))
+    {
+        return false;
+    }
+
+    if (Data->RequestorMode == KernelMode)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 NTSTATUS
@@ -277,7 +291,7 @@ Minifilter::FileFilter::PreReadCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    if (IsSystemAction(Data))
+    if (!IsActionMonitored(Data, Feature::featureMonitorFileRead))
     {
         return FLT_PREOP_SUCCESS_NO_CALLBACK;
     }
@@ -322,13 +336,7 @@ Minifilter::FileFilter::PostReadSafeCallback(
 )
 {
     UNREFERENCED_PARAMETER(Flags);
-    UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
-
-    if (IsSystemAction(Data))
-    {
-        return FLT_POSTOP_FINISHED_PROCESSING;
-    }
 
     NotifyEvent<KmUmShared::FileReadMessage>(Data, FltObjects);
     return FLT_POSTOP_FINISHED_PROCESSING;
@@ -344,7 +352,7 @@ Minifilter::FileFilter::PreWriteCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    if (IsSystemAction(Data))
+    if (!IsActionMonitored(Data, Feature::featureMonitorFileWrite))
     {
         return FLT_PREOP_SUCCESS_NO_CALLBACK;
     }
@@ -389,13 +397,7 @@ Minifilter::FileFilter::PostWriteSafeCallback(
 )
 {
     UNREFERENCED_PARAMETER(Flags);
-    UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
-
-    if (IsSystemAction(Data))
-    {
-        return FLT_POSTOP_FINISHED_PROCESSING;
-    }
 
     NotifyEvent<KmUmShared::FileWriteMessage>(Data, FltObjects);
     return FLT_POSTOP_FINISHED_PROCESSING;
@@ -411,7 +413,7 @@ Minifilter::FileFilter::PreSetInformationCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    if (IsSystemAction(Data))
+    if (!IsActionMonitored(Data, Feature::featureMonitorFileSetInformation))
     {
         return FLT_PREOP_SUCCESS_NO_CALLBACK;
     }
@@ -456,13 +458,7 @@ Minifilter::FileFilter::PostSetInformationSafeCallback(
 )
 {
     UNREFERENCED_PARAMETER(Flags);
-    UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
-
-    if (IsSystemAction(Data))
-    {
-        return FLT_POSTOP_FINISHED_PROCESSING;
-    }
 
     NotifyEvent<KmUmShared::FileSetInformationMessage>(Data, FltObjects);
     return FLT_POSTOP_FINISHED_PROCESSING;

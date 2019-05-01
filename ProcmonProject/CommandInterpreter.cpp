@@ -167,7 +167,7 @@ CommandInterpreter::StopThreadPoolCommand()
 
 void CommandInterpreter::ConnectFltPortCommand()
 {
-    if (gGlobalData.FltPort)
+    if (gGlobalData.FltPort && gGlobalData.FltPort->IsConnected())
     {
         std::cout << "FltPort is already connected. Please disconnect it first" << std::endl;
         ConsoleAppLogWarning("FltPort is already connected");
@@ -179,7 +179,7 @@ void CommandInterpreter::ConnectFltPortCommand()
 
 void CommandInterpreter::DisconnectFltPortCommand()
 {
-    if (!gGlobalData.FltPort)
+    if (!gGlobalData.FltPort || !gGlobalData.FltPort->IsConnected())
     {
         std::cout << "FltPort is not connected. Please connect it first" << std::endl;
         ConsoleAppLogWarning("FltPort is not connected");

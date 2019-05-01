@@ -5,6 +5,7 @@
 #include "GlobalData.hpp"
 
 #include "../Common/FltPortProcessMessage.hpp"
+#include "ProcessUtils.hpp"
 
 #include <CppSemantics.hpp>
 
@@ -41,6 +42,12 @@ Minifilter::ProcessFilter::ProcessCreateNotifyRoutine(
     {
         MyDriverLogWarning("ExAcquireRundownProtection failed at ProcessCreateNotifyRoutine");
         return;
+    }    
+    
+    if (!IsActionMonitored(ProcessId, CreateInfo))
+    {
+        ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
+        return;
     }
 
     (CreateInfo != nullptr) ? HandleProcessCreate(Process, ProcessId, CreateInfo)
@@ -49,7 +56,36 @@ Minifilter::ProcessFilter::ProcessCreateNotifyRoutine(
     ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
 }
 
-void 
+bool 
+Minifilter::ProcessFilter::IsActionMonitored(
+    _In_ HANDLE ProcessId,
+    _Inout_opt_ PPS_CREATE_NOTIFY_INFO CreateInfo
+)
+{
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorStarted))
+    {
+        return false;
+    }
+
+    if (CreateInfo && !gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorProcessCreate))
+    {
+        return false;
+    }
+
+    if (!CreateInfo && !gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorProcessTerminate))
+    {
+        return false;
+    }
+
+    if (ProcessUtils::IsSystemOrIdleProcess(ProcessId))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void
 Minifilter::ProcessFilter::HandleProcessCreate(
     _Inout_ PEPROCESS Process,
     _In_ HANDLE ProcessId,

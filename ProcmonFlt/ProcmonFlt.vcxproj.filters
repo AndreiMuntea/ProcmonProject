@@ -23,9 +23,6 @@
     <Filter Include="Source Files\definitions">
       <UniqueIdentifier>{a851c9a5-adf9-40e9-907f-de865f65d5d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Km Objects">
-      <UniqueIdentifier>{6cd57aec-c8f9-4f3c-9d95-8c7754f3a06f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Cpp Support">
       <UniqueIdentifier>{3512f866-a7c8-4fd1-b728-7196f45eeba9}</UniqueIdentifier>
     </Filter>
@@ -34,9 +31,6 @@
     </Filter>
     <Filter Include="Header Files\Cpp Support\objects">
       <UniqueIdentifier>{5fb39a53-c8ca-4ee6-864e-80e0982afa77}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Km Objects">
-      <UniqueIdentifier>{da311dad-2183-4bda-adbf-801690f3f85e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Communication">
       <UniqueIdentifier>{771e975f-cb8f-4c9e-b5b5-24216fb6b0b3}</UniqueIdentifier>
@@ -55,6 +49,18 @@
     </Filter>
     <Filter Include="Source Files\Cpp Support\structures">
       <UniqueIdentifier>{991d3e95-eff8-402f-b632-392c384af0fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Functionality">
+      <UniqueIdentifier>{6cd57aec-c8f9-4f3c-9d95-8c7754f3a06f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Functionality">
+      <UniqueIdentifier>{da311dad-2183-4bda-adbf-801690f3f85e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Communication\Notifications">
+      <UniqueIdentifier>{e608ad50-4e3a-4587-9071-e76fb6915671}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Communication\Notifications">
+      <UniqueIdentifier>{ea03acb5-1f26-4b51-bc52-e22ae6313ee4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -87,7 +93,7 @@
       <Filter>Header Files\Cpp Support</Filter>
     </ClInclude>
     <ClInclude Include="FltPort.hpp">
-      <Filter>Header Files\Km Objects</Filter>
+      <Filter>Header Files\Functionality</Filter>
     </ClInclude>
     <ClInclude Include="cpp_allocator_object.hpp">
       <Filter>Header Files\Cpp Support\objects</Filter>
@@ -101,9 +107,6 @@
     <ClInclude Include="ProcessFilter.hpp">
       <Filter>Header Files\Filters</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\FltPortMessage.hpp">
-      <Filter>Header Files\Communication</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadPool.hpp">
       <Filter>Header Files\Cpp Support\structures</Filter>
     </ClInclude>
@@ -116,23 +119,11 @@
     <ClInclude Include="Queue.hpp">
       <Filter>Header Files\Cpp Support\structures</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\FltPortProcessMessage.hpp">
-      <Filter>Header Files\Communication</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadFilter.hpp">
       <Filter>Header Files\Filters</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\FltPortThreadMessage.hpp">
-      <Filter>Header Files\Communication</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\FltPortModuleMessage.hpp">
-      <Filter>Header Files\Communication</Filter>
-    </ClInclude>
     <ClInclude Include="ModuleFilter.hpp">
       <Filter>Header Files\Filters</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\FltPortRegistryMessage.hpp">
-      <Filter>Header Files\Communication</Filter>
     </ClInclude>
     <ClInclude Include="RegistryFilter.hpp">
       <Filter>Header Files\Filters</Filter>
@@ -140,8 +131,29 @@
     <ClInclude Include="FileFilter.hpp">
       <Filter>Header Files\Filters</Filter>
     </ClInclude>
+    <ClInclude Include="ProcessUtils.hpp">
+      <Filter>Header Files\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationManager.hpp">
+      <Filter>Header Files\Functionality</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortThreadMessage.hpp">
+      <Filter>Header Files\Communication\Notifications</Filter>
+    </ClInclude>
     <ClInclude Include="..\Common\FltPortFileMessage.hpp">
-      <Filter>Header Files\Communication</Filter>
+      <Filter>Header Files\Communication\Notifications</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortMessage.hpp">
+      <Filter>Header Files\Communication\Notifications</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortModuleMessage.hpp">
+      <Filter>Header Files\Communication\Notifications</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortProcessMessage.hpp">
+      <Filter>Header Files\Communication\Notifications</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\FltPortRegistryMessage.hpp">
+      <Filter>Header Files\Communication\Notifications</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -161,34 +173,19 @@
       <Filter>Source Files\Cpp Support</Filter>
     </ClCompile>
     <ClCompile Include="FltPort.cpp">
-      <Filter>Source Files\Km Objects</Filter>
+      <Filter>Source Files\Functionality</Filter>
     </ClCompile>
     <ClCompile Include="ProcessFilter.cpp">
       <Filter>Source Files\Filters</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\FltPortMessage.cpp">
-      <Filter>Source Files\Communication</Filter>
-    </ClCompile>
     <ClCompile Include="ThreadPool.cpp">
       <Filter>Source Files\Cpp Support\structures</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\FltPortProcessMessage.cpp">
-      <Filter>Source Files\Communication</Filter>
     </ClCompile>
     <ClCompile Include="ThreadFilter.cpp">
       <Filter>Source Files\Filters</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\FltPortThreadMessage.cpp">
-      <Filter>Source Files\Communication</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\FltPortModuleMessage.cpp">
-      <Filter>Source Files\Communication</Filter>
-    </ClCompile>
     <ClCompile Include="ModuleFilter.cpp">
       <Filter>Source Files\Filters</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\FltPortRegistryMessage.cpp">
-      <Filter>Source Files\Communication</Filter>
     </ClCompile>
     <ClCompile Include="RegistryFilter.cpp">
       <Filter>Source Files\Filters</Filter>
@@ -196,8 +193,29 @@
     <ClCompile Include="FileFilter.cpp">
       <Filter>Source Files\Filters</Filter>
     </ClCompile>
+    <ClCompile Include="ProcessUtils.cpp">
+      <Filter>Source Files\Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationManager.cpp">
+      <Filter>Source Files\Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortThreadMessage.cpp">
+      <Filter>Source Files\Communication\Notifications</Filter>
+    </ClCompile>
     <ClCompile Include="..\Common\FltPortFileMessage.cpp">
-      <Filter>Source Files\Communication</Filter>
+      <Filter>Source Files\Communication\Notifications</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortMessage.cpp">
+      <Filter>Source Files\Communication\Notifications</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortModuleMessage.cpp">
+      <Filter>Source Files\Communication\Notifications</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortProcessMessage.cpp">
+      <Filter>Source Files\Communication\Notifications</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortRegistryMessage.cpp">
+      <Filter>Source Files\Communication\Notifications</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

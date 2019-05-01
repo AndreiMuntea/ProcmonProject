@@ -21,6 +21,12 @@ namespace Minifilter
         );
 
     private:
+        static bool 
+        IsActionMonitored(
+            _In_ HANDLE ProcessId,
+            _Inout_opt_ PPS_CREATE_NOTIFY_INFO CreateInfo
+        );
+
         static void 
         HandleProcessCreate(
             _Inout_ PEPROCESS Process,

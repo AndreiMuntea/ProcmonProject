@@ -6,6 +6,7 @@
 #include <CppSemantics.hpp>
 
 #include "../Common/FltPortFileMessage.hpp"
+#include "ConfigurationManager.hpp"
 
 namespace Minifilter
 {
@@ -150,8 +151,9 @@ namespace Minifilter
 
     private:   
         static bool 
-        IsSystemAction(
-            _Inout_ PFLT_CALLBACK_DATA Data
+        IsActionMonitored(
+            _Inout_ PFLT_CALLBACK_DATA Data,
+            _In_ const Feature& FeatureToCheck
         );
 
         static NTSTATUS 

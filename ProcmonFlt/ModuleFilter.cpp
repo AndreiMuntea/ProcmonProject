@@ -4,6 +4,8 @@
 
 #include "GlobalData.hpp"
 #include "../Common/FltPortModuleMessage.hpp"
+#include "ProcessUtils.hpp"
+
 #include <CppSemantics.hpp>
 
 Minifilter::ModuleFilter::ModuleFilter()
@@ -39,7 +41,19 @@ void Minifilter::ModuleFilter::LoadImageNotifyRoutine(
     {
         MyDriverLogWarning("ExAcquireRundownProtection failed at LoadImageNotifyRoutine");
         return;
-    }    
+    }   
+
+    if (!IsActionMonitored(ProcessId))
+    {
+        ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
+        return;
+    }
+    
+    if (!FullImageName || !FullImageName->Buffer)
+    {
+        ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
+        return;
+    }
     
     unsigned __int32 processId = HandleToULong(ProcessId);
     unsigned __int64 imageBase = (SIZE_T)ImageInfo->ImageBase;
@@ -57,4 +71,27 @@ void Minifilter::ModuleFilter::LoadImageNotifyRoutine(
     }
 
     ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
+}
+
+bool 
+Minifilter::ModuleFilter::IsActionMonitored(
+    _In_ HANDLE ProcessId
+)
+{
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorStarted))
+    {
+        return false;
+    }
+
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorImageLoaded))
+    {
+        return false;
+    }
+
+    if (ProcessUtils::IsSystemOrIdleProcess(ProcessId))
+    {
+        return false;
+    }
+
+    return true;
 }

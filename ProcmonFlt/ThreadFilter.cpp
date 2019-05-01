@@ -4,6 +4,7 @@
 
 #include "GlobalData.hpp"
 #include "../Common/FltPortThreadMessage.hpp"
+#include "ProcessUtils.hpp"
 
 #include <CppSemantics.hpp>
 
@@ -43,6 +44,12 @@ Minifilter::ThreadFilter::CreateThreadNotifyRoutine(
         return;
     }
 
+    if (!IsActionMonitored(ProcessId, Create))
+    {
+        ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
+        return;
+    }
+
     unsigned __int32 processId = 0;
     unsigned __int32 threadId = 0;
     unsigned __int64 timestamp = 0;
@@ -62,4 +69,33 @@ Minifilter::ThreadFilter::CreateThreadNotifyRoutine(
     }
 
     ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
+}
+
+bool 
+Minifilter::ThreadFilter::IsActionMonitored(
+    _In_ HANDLE ProcessId,
+    _In_ BOOLEAN Create
+)
+{
+    if (!gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorStarted))
+    {
+        return false;
+    }
+
+    if (Create && !gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorThreadCreate))
+    {
+        return false;
+    }
+
+    if (!Create && !gDrvData.ConfigurationManager->IsFeatureEnabled(Feature::featureMonitorThreadTerminate))
+    {
+        return false;
+    }
+
+    if (ProcessUtils::IsSystemOrIdleProcess(ProcessId))
+    {
+        return false;
+    }
+
+    return true;
 }

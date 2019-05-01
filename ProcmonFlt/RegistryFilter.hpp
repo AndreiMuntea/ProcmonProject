@@ -40,6 +40,13 @@ namespace Minifilter
         virtual ~RegistryFilter();
 
     private:
+        static bool IsActionMonitored(
+            _In_ REG_NOTIFY_CLASS RegistryOperationType
+        );
+
+        static bool IsRegistryOperationTypeAllowed(
+            _In_ REG_NOTIFY_CLASS RegistryOperationType
+        );
         
         static NTSTATUS
         RegistrySolveKeyName(
@@ -75,7 +82,7 @@ namespace Minifilter
         static NTSTATUS
         RegistryNotifyRoutine(
             _In_ PVOID CallbackContext,
-            _In_opt_ PVOID Argument1,
+            _In_ PVOID Argument1,
             _In_opt_ PVOID Argument2
         );
 

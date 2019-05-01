@@ -87,6 +87,18 @@ CommandInterpreter::CommandInterpreter()
 
     availableCommands.emplace(
         std::piecewise_construct,
+        std::make_tuple("EnableFeature"),
+        std::make_tuple("Sends EnableFeature to '\\MyCommunicationPort'", [this]() { this->UpdateFeatureCommand(true); })
+    );
+
+    availableCommands.emplace(
+        std::piecewise_construct,
+        std::make_tuple("DisableFeature"),
+        std::make_tuple("Sends DisableFeature to '\\MyCommunicationPort'", [this]() { this->UpdateFeatureCommand(false); })
+    );
+
+    availableCommands.emplace(
+        std::piecewise_construct,
         std::make_tuple("Exit"),
         std::make_tuple("Performs a clean exit of the application", [this]() {this->ExitCommand(); })
     );

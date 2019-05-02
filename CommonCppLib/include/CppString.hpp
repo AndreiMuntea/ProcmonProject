@@ -27,6 +27,9 @@ namespace Cpp
         friend Stream& operator<<(Stream& Stream, const String& String);
         friend Stream& operator>>(Stream& Stream, String& String);
 
+        unsigned __int32 
+        Count(unsigned __int8 Character) const;
+
         unsigned __int8* GetNakedPointer();
         unsigned __int32 GetSize() const;
 

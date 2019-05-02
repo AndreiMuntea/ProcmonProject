@@ -88,6 +88,5 @@ Minifilter::ModuleFilter::IsActionMonitored(
     {
         return false;
     }
-
     return true;
 }

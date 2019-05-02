@@ -104,7 +104,21 @@ Cpp::String& Cpp::String::operator+=(const String & Other)
     return *this;
 }
 
-unsigned __int8* 
+unsigned __int32 
+Cpp::String::Count(unsigned __int8 Character) const
+{
+    unsigned __int32 counter = 0;
+    for (unsigned __int32 i = 0; i < this->size; ++i)
+    {
+        if (this->buffer[i] == Character)
+        {
+            ++counter;
+        }
+    }
+    return counter;
+}
+
+unsigned __int8*
 Cpp::String::GetNakedPointer()
 {
     return this->buffer;

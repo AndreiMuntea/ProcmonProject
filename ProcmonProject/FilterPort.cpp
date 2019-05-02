@@ -52,12 +52,8 @@ void FilterPort::CloseConnectionPort()
 
 void FilterPort::Listen()
 {
-    OVERLAPPED overlapped = { 0 };
-    DWORD dwBytesWritten = 0;
-
-    overlapped.hEvent = CreateEvent(nullptr, false, false, nullptr);
-
-    if (!overlapped.hEvent)
+    auto hEvent = CreateEventW(nullptr, true, false, nullptr);
+    if (!hEvent)
     {
         std::wcout << "CreateEvent failed with GLE = " << GetLastError() << std::endl;
         ConsoleAppLogError("CreateEvent failed GLE = 0x%d", GetLastError());
@@ -67,8 +63,13 @@ void FilterPort::Listen()
     while (true)
     {
         unsigned __int8 input[4096] = { 0 };
-        auto result = FilterGetMessage(this->driverPort, (PFILTER_MESSAGE_HEADER)(input), sizeof(input), &overlapped);
+        DWORD dwBytesWritten = 0;
+        OVERLAPPED overlapped = { 0 };
 
+        ResetEvent(hEvent);
+        overlapped.hEvent = hEvent;
+
+        auto result = FilterGetMessage(this->driverPort, (PFILTER_MESSAGE_HEADER)(input), sizeof(input), &overlapped);
         if (ERROR_IO_PENDING == (result & 0x7FFF))
         {
             WaitForSingleObject(overlapped.hEvent, INFINITE);
@@ -105,7 +106,7 @@ void FilterPort::Listen()
         }
     }
 
-    CloseHandle(overlapped.hEvent);
+    CloseHandle(hEvent);
     this->Disconnect();
 }
 

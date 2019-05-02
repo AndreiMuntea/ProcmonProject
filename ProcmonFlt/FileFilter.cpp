@@ -41,6 +41,12 @@ Minifilter::FileFilter::PostCreateCallback(
         NotifyEvent<KmUmShared::FileDeleteMessage>(Data, FltObjects, KmUmShared::FileDeleteType::DeleteOnClose);
     }
 
+    // Overwrite is also considered delete
+    if (Data->IoStatus.Information == FILE_SUPERSEDED || Data->IoStatus.Information == FILE_OVERWRITTEN)
+    {
+        NotifyEvent<KmUmShared::FileDeleteMessage>(Data, FltObjects, KmUmShared::FileDeleteType::FileOverwritten);
+    }
+
     return FLT_POSTOP_FINISHED_PROCESSING;
 }
 

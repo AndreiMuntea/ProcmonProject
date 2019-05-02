@@ -166,6 +166,7 @@ Minifilter::RegistryFilter::RegistryHandlePostSetValue(
     Cpp::String strValue{ (const unsigned __int8*)value, sizeof(value) - sizeof(WCHAR)};
     Cpp::String strKey{ (const unsigned __int8*)key, sizeof(key) - sizeof(WCHAR) };
 
+    // Operator == will perform case insensitive comparation
     if (context->keyName == strKey && strValue == context->valueName)
     {
         gDrvData.CommunicationPort->Send<KmUmShared::FileDeleteMessage>((HANDLE)ProcessId, Timestamp, context->data, Parameters->Status, KmUmShared::FileDeleteType::PendingRegistry);

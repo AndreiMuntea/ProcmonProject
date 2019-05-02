@@ -19,6 +19,9 @@ std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileDeleteType Dele
     case KmUmShared::FileDeleteType::SetFileInformation:
         Stream << "SetFileInformation";
         return Stream;
+    case KmUmShared::FileDeleteType::FileOverwritten:
+        Stream << "Overwritten";
+        return Stream;
     default:
         return Stream;
     }

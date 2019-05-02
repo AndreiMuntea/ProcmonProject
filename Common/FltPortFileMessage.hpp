@@ -124,7 +124,8 @@ namespace KmUmShared
     {
         DeleteOnClose = 0,
         SetFileInformation,
-        PendingRegistry
+        PendingRegistry,
+        FileOverwritten
     };
     class FileDeleteMessage : public FileMessage
     {

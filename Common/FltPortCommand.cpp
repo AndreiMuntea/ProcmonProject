@@ -53,12 +53,12 @@ void KmUmShared::CommandUpdateFeature::Deserialize(Cpp::Stream & Stream)
 
 void KmUmShared::CommandReply::Serialize(Cpp::Stream & Stream) const
 {
-    Stream;
+    Stream << this->dummy;
 }
 
 void KmUmShared::CommandReply::Deserialize(Cpp::Stream & Stream)
 {
-    Stream;
+    Stream >> this->dummy;
 }
 
 KmUmShared::CommandUpdateBlacklistFolder::CommandUpdateBlacklistFolder(

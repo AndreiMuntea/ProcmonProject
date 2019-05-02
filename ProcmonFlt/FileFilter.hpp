@@ -170,8 +170,8 @@ namespace Minifilter
 
         static void
         GetDirectoryName(
-            _In_ Cpp::String& FullFileName,
-            _Inout_ Cpp::String& Directory
+            _In_ UNICODE_STRING* FileName,
+            _Inout_ UNICODE_STRING* DirectoryName
         );
 
         static NTSTATUS

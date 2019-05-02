@@ -13,10 +13,10 @@ namespace Minifilter
     {
         friend class BlackList;
     public:
-        BlackListPath(const Cpp::String& Path);
+        BlackListPath(UNICODE_STRING* Path);
         virtual ~BlackListPath();
     private:
-        Cpp::String path;
+        UNICODE_STRING path = { 0,0,nullptr };
     };
     class BlackList : public Cpp::CppNonPagedObject<'KLB#'>
     {
@@ -24,12 +24,12 @@ namespace Minifilter
         BlackList();
         virtual ~BlackList() = default;
 
-        bool IsBlackListed(const Cpp::String& Path);
-        NTSTATUS Blacklist(const Cpp::String& Path);
-        NTSTATUS Whitelist(const Cpp::String& Path);
+        bool IsBlackListed(UNICODE_STRING * Path);
+        NTSTATUS Blacklist(UNICODE_STRING * Path);
+        NTSTATUS Whitelist(UNICODE_STRING * Path);
 
     private:
-        BlackListPath* GetBlacklistedPath(const Cpp::String& Path);
+        BlackListPath* GetBlacklistedPath(UNICODE_STRING * Path);
 
         Cpp::LinkedList<BlackListPath> blackListedPaths;
         Cpp::Pushlock lock;

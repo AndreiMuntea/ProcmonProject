@@ -250,15 +250,15 @@ std::wstring PuNtPathToDosPath(const std::wstring & NtPath)
         dosPath.pop_back();
     }
 
-    // C: or D:
+    // e.g C: or D:
     auto driveLetter = NtPath.substr(0, 2);
-    if (!QueryDosDeviceW(driveLetter.c_str(), deviceName, sizeof(deviceName) / sizeof(WCHAR)))
+    if (!QueryDosDeviceW(driveLetter.c_str(), deviceName, sizeof(deviceName) / sizeof(WCHAR) - sizeof(WCHAR)))
     {
         throw std::exception("QueryDosDeviceW failed!");
     }
 
-    std::wstring device{ deviceName, sizeof(deviceName) };
-    std::wcout << "Found dos device for " << driveLetter << device << std::endl;
+    std::wstring device{ deviceName, static_cast<size_t>(lstrlenW(deviceName)) };
+    std::wcout << "Found dos device for " << driveLetter << " -- " << device << std::endl;
 
     return device + dosPath;
 }

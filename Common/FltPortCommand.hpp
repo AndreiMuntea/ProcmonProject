@@ -61,7 +61,8 @@ namespace KmUmShared
         virtual void Serialize(Cpp::Stream& Stream) const;
         virtual void Deserialize(Cpp::Stream& Stream);
 
-    public:
+    private:
+        unsigned __int8 dummy = 0;
     };
 
     class CommandUpdateFeature : public CommandHeader

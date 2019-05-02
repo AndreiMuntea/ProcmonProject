@@ -1,13 +1,30 @@
 #include "BlackList.hpp"
 #include "cpp_lockguard.hpp"
 
-Minifilter::BlackListPath::BlackListPath(const Cpp::String& Path) :
-    path{Path}
+
+
+Minifilter::BlackListPath::BlackListPath(UNICODE_STRING * Path)
 {
+    if (Path->Buffer)
+    {
+        path.Buffer = (PWCHAR)ExAllocatePoolWithTag(NonPagedPool, Path->Length, 'KLB#');
+    }
+
+    if (path.Buffer)
+    {
+        RtlCopyMemory(path.Buffer, Path->Buffer, Path->Length);
+        path.Length = Path->Length;
+        path.MaximumLength = Path->MaximumLength;
+    }
+
 }
 
 Minifilter::BlackListPath::~BlackListPath()
 {
+    if (path.Buffer)
+    {
+        ExFreePoolWithTag(path.Buffer, 'KLB#');
+    }
 }
 
 Minifilter::BlackList::BlackList()
@@ -15,7 +32,7 @@ Minifilter::BlackList::BlackList()
     Validate();
 }
 
-bool Minifilter::BlackList::IsBlackListed(const Cpp::String& Path)
+bool Minifilter::BlackList::IsBlackListed(UNICODE_STRING * Path)
 {
     Cpp::SharedLockguard guard{ &this->lock };
     auto path = GetBlacklistedPath(Path);
@@ -24,11 +41,11 @@ bool Minifilter::BlackList::IsBlackListed(const Cpp::String& Path)
                              : false;
 }
 
-Minifilter::BlackListPath * Minifilter::BlackList::GetBlacklistedPath(const Cpp::String& Path)
+Minifilter::BlackListPath * Minifilter::BlackList::GetBlacklistedPath(UNICODE_STRING * Path)
 {
     for (auto it = this->blackListedPaths.begin(); it != this->blackListedPaths.end(); ++it)
     {
-        if (it.GetRawPointer()->path == Path)
+        if (RtlCompareUnicodeString(&it.GetRawPointer()->path, Path, TRUE) == 0)
         {
             return it.GetRawPointer();
         }
@@ -37,10 +54,10 @@ Minifilter::BlackListPath * Minifilter::BlackList::GetBlacklistedPath(const Cpp:
     return nullptr;
 }
 
-NTSTATUS Minifilter::BlackList::Blacklist(const Cpp::String& Path)
+NTSTATUS Minifilter::BlackList::Blacklist(UNICODE_STRING * Path)
 {
     auto path = new BlackListPath{ Path };
-    if (!path || !path->path.IsValid())
+    if (!path || !path->path.Buffer)
     {
         return STATUS_INSUFFICIENT_RESOURCES;
     }
@@ -56,12 +73,13 @@ NTSTATUS Minifilter::BlackList::Blacklist(const Cpp::String& Path)
     return STATUS_SUCCESS;
 }
 
-NTSTATUS Minifilter::BlackList::Whitelist(const Cpp::String& Path)
+NTSTATUS Minifilter::BlackList::Whitelist(UNICODE_STRING * Path)
 {
     Cpp::ExclusiveLockguard guard{ &this->lock };
     auto path = GetBlacklistedPath(Path);
     if (path)
     {
+        this->blackListedPaths.RemoveEntry(path);
         delete path;
         return STATUS_SUCCESS;
     }

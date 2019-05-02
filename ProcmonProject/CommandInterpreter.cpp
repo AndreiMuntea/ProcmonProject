@@ -281,8 +281,8 @@ void CommandInterpreter::UpdateBlacklistedFolder(bool Blacklist)
     }
 
     std::wstring path;
-    std::wcout << "What path do you want to update : ";
-    std::wcin >> path;
+    std::wcout << "What path do you want to update : " << std::endl;
+    std::getline(std::wcin, path);
 
     auto dosPath = PuNtPathToDosPath(path);
 
@@ -291,7 +291,7 @@ void CommandInterpreter::UpdateBlacklistedFolder(bool Blacklist)
 
     command->commandCode = (Blacklist)  ? KmUmShared::CommandCode::commandProtectFolder
                                         : KmUmShared::CommandCode::commandUnprotectFolder;
-    command->folder = Cpp::String{ (const unsigned __int8*)path.c_str(), static_cast<unsigned __int32>(path.size()) * sizeof(WCHAR) };
+    command->folder = Cpp::String{ (const unsigned __int8*)dosPath.c_str(), static_cast<unsigned __int32>(dosPath.size()) * sizeof(WCHAR) };
 
     auto status = gGlobalData.FltPort->Send(command, reply);
     if (status == ERROR_SUCCESS)

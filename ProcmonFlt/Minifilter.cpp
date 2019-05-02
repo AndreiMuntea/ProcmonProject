@@ -284,8 +284,12 @@ OnUpdateBlacklistedPathCommandReceived(
         return STATUS_INVALID_DEVICE_REQUEST;
     }
 
-    auto status = (Blacklist) ? gDrvData.BlackList->Blacklist(command.folder)
-                              : gDrvData.BlackList->Whitelist(command.folder);
+    auto size = static_cast<USHORT>(command.folder.GetSize());
+    auto buffer = (PWCHAR)command.folder.GetNakedPointer();
+    UNICODE_STRING folder{size, size, buffer};
+
+    auto status = (Blacklist) ? gDrvData.BlackList->Blacklist(&folder)
+                              : gDrvData.BlackList->Whitelist(&folder);
     return status;
 }
 

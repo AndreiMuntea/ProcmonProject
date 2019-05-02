@@ -240,7 +240,7 @@ FilterPort::Send(
     );
 
     Reply->Deserialize(outputStream);
-    if (result != S_OK || !outputStream.IsValid() || bytesReturned != outputStream.GetSize())
+    if (result != S_OK || !outputStream.IsValid())
     {
         std::wcout << "FilterSendMessage failure" << std::endl;
         return STATUS_ASSERTION_FAILURE;

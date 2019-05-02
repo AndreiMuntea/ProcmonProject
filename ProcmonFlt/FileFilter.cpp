@@ -197,16 +197,15 @@ Minifilter::FileFilter::IsActionMonitored(
 
 bool Minifilter::FileFilter::IsPathBlacklisted(_In_ UNICODE_STRING * FileName)
 {
-    Cpp::String directory;
-    Cpp::String fileName{ (const unsigned __int8*)FileName->Buffer, FileName->Length };
+    UNICODE_STRING directory = { 0,0, nullptr };
 
-    GetDirectoryName(fileName, directory);
-    if (!directory.IsValid())
+    GetDirectoryName(FileName, &directory);
+    if (!directory.Buffer)
     {
         return false;
     }
 
-    return gDrvData.BlackList->IsBlackListed(directory);
+    return gDrvData.BlackList->IsBlackListed(&directory);
 }
 
 NTSTATUS
@@ -249,22 +248,17 @@ Minifilter::FileFilter::GetFileName(
 
 void 
 Minifilter::FileFilter::GetDirectoryName(
-    _In_ Cpp::String& FullFileName,
-    _Inout_ Cpp::String& Directory
+    _In_ UNICODE_STRING* FileName,
+    _Inout_ UNICODE_STRING* DirectoryName
 )
 {
-    if (!FullFileName.IsValid() || FullFileName.GetSize() == 0 || !FullFileName.GetNakedPointer())
-    {
-        Directory.Invalidate();
-        return;
-    }
+    *DirectoryName = { 0,0,nullptr };
 
-    auto buffer = FullFileName.GetNakedPointer();
-    LONG64 size = FullFileName.GetSize() - 1;
+    LONG64 size = FileName->Length / sizeof(WCHAR) - 1;
 
     for (; size >= 0; --size)
     {
-        if (buffer[size] == '\\')
+        if (FileName->Buffer[size] == L'\\')
         {
             break;
         }
@@ -272,11 +266,12 @@ Minifilter::FileFilter::GetDirectoryName(
 
     if (--size < 0)
     {
-        Directory.Invalidate();
         return;
     }
     
-    Directory = Cpp::String(buffer, static_cast<unsigned __int32>(size));
+    DirectoryName->Buffer = FileName->Buffer;
+    DirectoryName->Length = static_cast<USHORT>(size + 1) * sizeof(WCHAR);
+    DirectoryName->MaximumLength = static_cast<USHORT>(size + 1) * sizeof(WCHAR);
 }
 
 NTSTATUS
@@ -420,6 +415,7 @@ Minifilter::FileFilter::PreWriteCallback(
 
     if (IsPathBlacklisted(&context->FileName))
     {
+        Data->IoStatus.Status = STATUS_ACCESS_DENIED;
         FltReleaseContext(context);
         return FLT_PREOP_COMPLETE;
     }

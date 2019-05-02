@@ -198,6 +198,11 @@ Minifilter::FltPort::MessageNotifyCallback(
 )
 {
     MyDriverLogTrace("We are in MessageNotifyCallback");
+    
+    if (!OutputBuffer || !InputBuffer)
+    {
+        return STATUS_INVALID_PARAMETER;
+    }
 
     FltPort* fltPort = static_cast<FltPort*>(PortCookie);
     if (fltPort)
@@ -206,5 +211,5 @@ Minifilter::FltPort::MessageNotifyCallback(
         return fltPort->onMessageNotify(InputBuffer, InputBufferLength, OutputBuffer, OutputBufferLength, ReturnOutputBufferLength);
     }
 
-    return STATUS_UNSUCCESSFUL;
+    return STATUS_INVALID_PARAMETER;
 }

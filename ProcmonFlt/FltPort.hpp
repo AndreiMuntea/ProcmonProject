@@ -15,7 +15,7 @@ namespace Minifilter
     typedef NTSTATUS FUNC_OnMessageNotifyCallback(
         _In_reads_bytes_opt_(InputBufferLength) PVOID InputBuffer,
         _In_ ULONG InputBufferLength,
-        _Out_writes_bytes_to_opt_(OutputBufferLength, *ReturnOutputBufferLength) PVOID OutputBuffer,
+        _Out_writes_bytes_to_(OutputBufferLength, *ReturnOutputBufferLength) PVOID OutputBuffer,
         _In_ ULONG OutputBufferLength,
         _Out_ PULONG ReturnOutputBufferLength
     );

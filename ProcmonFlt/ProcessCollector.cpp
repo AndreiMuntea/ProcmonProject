@@ -5,9 +5,9 @@
 #include "cpp_lockguard.hpp"
 
 Minifilter::Process::Process(
-    const unsigned __int64 & StartTimestamp, 
-    const Cpp::String & ProcessName, 
-    HANDLE ProcessId
+    _In_ const unsigned __int64& StartTimestamp,
+    _In_ const Cpp::String& ProcessName,
+    _In_ HANDLE ProcessId
 ) : startTimestamp{StartTimestamp},
     processId{ProcessId},
     processName{ProcessName}

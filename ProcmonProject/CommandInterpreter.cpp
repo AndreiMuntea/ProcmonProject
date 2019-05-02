@@ -99,6 +99,12 @@ CommandInterpreter::CommandInterpreter()
 
     availableCommands.emplace(
         std::piecewise_construct,
+        std::make_tuple("DeleteAtReboot"),
+        std::make_tuple("Creates a dummyfile and schedule it to be deleted at reboot", PuDeleteFileAtReboot)
+    );
+
+    availableCommands.emplace(
+        std::piecewise_construct,
         std::make_tuple("Exit"),
         std::make_tuple("Performs a clean exit of the application", [this]() {this->ExitCommand(); })
     );

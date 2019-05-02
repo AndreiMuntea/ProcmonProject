@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <experimental/filesystem>
 
 
 static void
@@ -212,4 +213,18 @@ PuDumpActiveProcessesZwQuerySystemInformation()
     }
 
     delete[] processes;
+}
+
+void PuDeleteFileAtReboot()
+{
+    std::wstring fileName = std::wstring(std::experimental::filesystem::current_path().c_str()) + L"dummy_file_to_be_deleted.123.txt";
+    
+    // create file;
+    std::ofstream stream{ fileName };
+    stream.close();
+
+    if (!MoveFileExW(fileName.c_str(), nullptr, MOVEFILE_DELAY_UNTIL_REBOOT))
+    {
+        std::wcout << "MoveFileExW failed with GLE=" << GetLastError() << std::endl;
+    }
 }

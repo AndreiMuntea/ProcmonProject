@@ -71,14 +71,18 @@ inline NTSTATUS FilterPort::HandleMessageNotification(
         return ERROR_INVALID_PARAMETER;
     }
 
-    if (GetCurrentProcessId() != (SIZE_T)(ProcessId))
+    // ignore writes from this process (logs)
+    if (GetCurrentProcessId() == (SIZE_T)ProcessId && std::is_same<T, KmUmShared::FileWriteMessage>::value)
     {
-        log << message
-            << "\t> [Process Id] " << HandleToULong(ProcessId) << std::endl
-            << "\t> [Process Name] " << ProcessName << std::endl
-            << "\t> [Timestamp] " << Timestamp << std::endl
-            << std::endl;
+        return ERROR_SUCCESS;
     }
+
+    log << message
+        << "\t> [Process Id] " << HandleToULong(ProcessId) << std::endl
+        << "\t> [Process Name] " << ProcessName << std::endl
+        << "\t> [Timestamp] " << Timestamp << std::endl
+        << std::endl;
+
 
     return ERROR_SUCCESS;
 }

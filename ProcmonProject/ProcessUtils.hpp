@@ -10,5 +10,7 @@ PuDumpActiveProcessesPsapi();
 void 
 PuDumpActiveProcessesZwQuerySystemInformation();
 
+void
+PuDeleteFileAtReboot();
 
 #endif //__PROCESS_UTILS_HPP__

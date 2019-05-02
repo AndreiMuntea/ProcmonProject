@@ -44,6 +44,15 @@ DriverEntry(
         goto Exit;
     }
 
+    // Create Process Colector
+    gDrvData.ProcessColector.Update(new Minifilter::ProcessCollector());
+    if (!gDrvData.ProcessColector.IsValid() || !gDrvData.ProcessColector->IsValid())
+    {
+        ::FltUnregisterFilter(gDrvData.FilterHandle);
+        MyDriverLogCritical("Failed to initialize ProcessColector");
+        goto Exit;
+    }
+
     // Create configuration manager
     gDrvData.ConfigurationManager.Update(new Minifilter::ConfigurationManager());
     if (!gDrvData.ConfigurationManager.IsValid() || !gDrvData.ConfigurationManager->IsValid())
@@ -54,7 +63,7 @@ DriverEntry(
     }
 
     // Create a new communication port
-    gDrvData.CommunicationPort.Update(new Minifilter::FltPort(gDrvData.FilterHandle, &gDrvData.CommunicationPortName, OnMessageReceived));
+    gDrvData.CommunicationPort.Update(new Minifilter::FltPort(gDrvData.FilterHandle, &gDrvData.CommunicationPortName, OnMessageReceived, gDrvData.ProcessColector.GetRawPointer()));
     if (!gDrvData.CommunicationPort.IsValid() || !gDrvData.CommunicationPort->IsValid())
     {
         ::FltUnregisterFilter(gDrvData.FilterHandle);

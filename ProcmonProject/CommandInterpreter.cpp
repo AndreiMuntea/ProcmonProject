@@ -239,7 +239,7 @@ void CommandInterpreter::UpdateFeatureCommand(bool Enable)
     auto reply = std::make_shared<KmUmShared::CommandReplyUpdateFeature>();
 
     command->commandCode = (Enable) ? KmUmShared::CommandCode::commandEnableFeature 
-                                   : KmUmShared::CommandCode::commandDisableFeature;
+                                    : KmUmShared::CommandCode::commandDisableFeature;
     command->feature = static_cast<KmUmShared::Feature>(feature);
 
     auto status = gGlobalData.FltPort->Send(command, reply);

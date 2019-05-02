@@ -55,16 +55,12 @@ void Minifilter::ModuleFilter::LoadImageNotifyRoutine(
         return;
     }
     
-    unsigned __int32 processId = HandleToULong(ProcessId);
-    unsigned __int64 imageBase = (SIZE_T)ImageInfo->ImageBase;
-    unsigned __int64 imageSize = ImageInfo->ImageSize;
-    unsigned __int64 timestamp = 0;
-    Cpp::Stream stream;
+    Cpp::String imageName{ (const unsigned __int8*)FullImageName->Buffer, FullImageName->Length };
 
+    unsigned __int64 timestamp = 0;
     KeQuerySystemTime(&timestamp);
     
-    stream << KmUmShared::ModuleMessage(processId, timestamp, imageBase, imageSize, (const unsigned __int8*)FullImageName->Buffer, FullImageName->Length);
-    auto status = gDrvData.CommunicationPort->Send(Cpp::Forward<Cpp::Stream>(stream));
+    auto status = gDrvData.CommunicationPort->Send<KmUmShared::ModuleMessage>(ProcessId, timestamp, (SIZE_T)ImageInfo->ImageBase, ImageInfo->ImageSize, imageName);
     if (!NT_SUCCESS(status))
     {
         MyDriverLogWarning("Send image notify message failed with status 0x%x", status);

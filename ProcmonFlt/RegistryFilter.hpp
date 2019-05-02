@@ -117,10 +117,9 @@ namespace Minifilter
         auto context = (RegistryKeyContext*)(Parameters->CallContext);
         if (context)
         {
-            Cpp::Stream stream;
-            stream << T{ Timestamp, ProcessId, context->keyName.GetNakedPointer(), context->keyName.GetSize(), Parameters->Status };
-            gDrvData.CommunicationPort->Send(Cpp::Forward<Cpp::Stream>(stream));
+            Cpp::String key{ context->keyName.GetNakedPointer(), context->keyName.GetSize() };
 
+            gDrvData.CommunicationPort->Send<T>((HANDLE)ProcessId, Timestamp, key, Parameters->Status);
             delete context;
             Parameters->CallContext = nullptr;
         }
@@ -136,10 +135,11 @@ namespace Minifilter
         auto context = (RegistryKeyValueContext*)(Parameters->CallContext);
         if (context)
         {
-            Cpp::Stream stream;
-            stream << T{ Timestamp, ProcessId, context->keyName.GetNakedPointer(),context->keyName.GetSize(), context->valueName.GetNakedPointer(), context->valueName.GetSize(), Parameters->Status };
-            gDrvData.CommunicationPort->Send(Cpp::Forward<Cpp::Stream>(stream));
-            
+            Cpp::String key{ context->keyName.GetNakedPointer(), context->keyName.GetSize() };
+            Cpp::String value{ context->valueName.GetNakedPointer(), context->valueName.GetSize() };
+
+            gDrvData.CommunicationPort->Send<T>((HANDLE)ProcessId, Timestamp, key, value, Parameters->Status);
+
             delete context;
             Parameters->CallContext = nullptr;
         }

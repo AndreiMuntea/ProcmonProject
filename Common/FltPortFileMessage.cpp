@@ -2,47 +2,30 @@
 
 KmUmShared::FileMessage::FileMessage(
     MessageCode MessageCode,
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8* String1Buffer,
-    unsigned __int32 String1BufferSize,
+    Cpp::String& String1,
     long Status
 ) : messageCode{MessageCode},
-    timestamp{Timestamp},
-    processId{ProcessId},
-    string1{String1Buffer, String1BufferSize},
+    string1{String1},
     status{Status}
 {
 }
 
 Cpp::Stream & KmUmShared::FileMessage::Serialize(Cpp::Stream & Stream) const
 {
-    Stream << FilterMessageHeader{ messageCode }
-        << string1
-        << timestamp
-        << processId
-        << status;
-
+    Stream << FilterMessageHeader{ messageCode } << string1 << status;
     return Stream;
 }
 
 Cpp::Stream & KmUmShared::FileMessage::Deserialize(Cpp::Stream & Stream)
 {
-    Stream >> string1
-        >> timestamp
-        >> processId
-        >> status;
-
+    Stream >> string1 >> status;
     return Stream;
 }
 
 KmUmShared::FileCreateMessage::FileCreateMessage(
-    unsigned __int64 Timestamp, 
-    unsigned __int32 ProcessId, 
-    const unsigned __int8 * String1Buffer, 
-    unsigned __int32 String1BufferSize,
+    Cpp::String& String1,
     long Status
-) : FileMessage(MessageCode::msgFileCreate, Timestamp, ProcessId, String1Buffer, String1BufferSize, Status)
+) : FileMessage(MessageCode::msgFileCreate, String1, Status)
 {
 }
 
@@ -107,51 +90,36 @@ Cpp::Stream & KmUmShared::operator >> (Cpp::Stream & Stream, FileSetInformationM
 }
 
 KmUmShared::FileCloseMessage::FileCloseMessage(
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8 * String1Buffer,
-    unsigned __int32 String1BufferSize,
+    Cpp::String& String1,
     long Status
-) : FileMessage(MessageCode::msgFileClose, Timestamp, ProcessId, String1Buffer, String1BufferSize, Status) 
+) : FileMessage(MessageCode::msgFileClose, String1, Status) 
 {
 }
 
 KmUmShared::FileCleanupMessage::FileCleanupMessage(
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8 * String1Buffer,
-    unsigned __int32 String1BufferSize,
+    Cpp::String& String1,
     long Status
-) : FileMessage(MessageCode::msgFileCleanup, Timestamp, ProcessId, String1Buffer, String1BufferSize, Status) 
+) : FileMessage(MessageCode::msgFileCleanup, String1, Status) 
 {
 }
 
 KmUmShared::FileReadMessage::FileReadMessage(
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8 * String1Buffer,
-    unsigned __int32 String1BufferSize,
+    Cpp::String& String1,
     long Status
-) : FileMessage(MessageCode::msgFileRead, Timestamp, ProcessId, String1Buffer, String1BufferSize, Status) 
+) : FileMessage(MessageCode::msgFileRead, String1, Status) 
 {
 }
 
 KmUmShared::FileWriteMessage::FileWriteMessage(
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8 * String1Buffer,
-    unsigned __int32 String1BufferSize,
+    Cpp::String& String1,
     long Status
-) : FileMessage(MessageCode::msgFileWrite, Timestamp, ProcessId, String1Buffer, String1BufferSize, Status) 
+) : FileMessage(MessageCode::msgFileWrite, String1, Status) 
 {
 }
 
 KmUmShared::FileSetInformationMessage::FileSetInformationMessage(
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8 * String1Buffer,
-    unsigned __int32 String1BufferSize,
+    Cpp::String& String1,
     long Status
-) : FileMessage(MessageCode::msgFileSetInformation, Timestamp, ProcessId, String1Buffer, String1BufferSize, Status)
+) : FileMessage(MessageCode::msgFileSetInformation, String1, Status)
 {
 }

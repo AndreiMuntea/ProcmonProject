@@ -262,6 +262,7 @@
     <ClInclude Include="LinkedList.hpp" />
     <ClInclude Include="LinkedListEntry.hpp" />
     <ClInclude Include="ModuleFilter.hpp" />
+    <ClInclude Include="ProcessCollector.hpp" />
     <ClInclude Include="ProcessFilter.hpp" />
     <ClInclude Include="ProcessUtils.hpp" />
     <ClInclude Include="Queue.hpp" />
@@ -287,6 +288,7 @@
     <ClCompile Include="GlobalData.cpp" />
     <ClCompile Include="Minifilter.cpp" />
     <ClCompile Include="ModuleFilter.cpp" />
+    <ClCompile Include="ProcessCollector.cpp" />
     <ClCompile Include="ProcessFilter.cpp" />
     <ClCompile Include="ProcessUtils.cpp" />
     <ClCompile Include="RegistryFilter.cpp" />

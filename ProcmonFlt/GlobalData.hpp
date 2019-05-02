@@ -10,6 +10,7 @@
 #include "ModuleFilter.hpp"
 #include "RegistryFilter.hpp"
 #include "ConfigurationManager.hpp"
+#include "ProcessCollector.hpp"
 
 typedef struct _GLOBAL_DATA
 {
@@ -26,6 +27,8 @@ typedef struct _GLOBAL_DATA
     Cpp::UniquePointer<Minifilter::ThreadFilter> ThreadFilter;
     Cpp::UniquePointer<Minifilter::ModuleFilter> ModuleFilter;
     Cpp::UniquePointer<Minifilter::RegistryFilter> RegistryFilter;
+
+    Cpp::UniquePointer<Minifilter::ProcessCollector> ProcessColector;
     Cpp::UniquePointer<Minifilter::ConfigurationManager> ConfigurationManager;
 
     EX_RUNDOWN_REF RundownProtection;

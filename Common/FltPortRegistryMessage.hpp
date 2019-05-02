@@ -15,10 +15,7 @@ namespace KmUmShared
         
         RegistryTemplate1StringMessage(
             MessageCode MessageCode,
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* String1Buffer,
-            unsigned __int32 String1BufferSize,
+            Cpp::String& String1,
             long Status
         );
 
@@ -29,8 +26,6 @@ namespace KmUmShared
 
     public:
         Cpp::String string1;
-        unsigned __int64 timestamp = 0;
-        unsigned __int32 processId = 0;
         long status = 0;
     private:
         MessageCode messageCode;
@@ -43,12 +38,8 @@ namespace KmUmShared
 
         RegistryTemplate2StringMessage(
             MessageCode MessageCode,
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* String1Buffer,
-            unsigned __int32 String1BufferSize,
-            const unsigned __int8* String2Buffer,
-            unsigned __int32 String2BufferSize,
+            Cpp::String& String1,
+            Cpp::String& String2,
             long Status
         );
 
@@ -60,8 +51,6 @@ namespace KmUmShared
     public:
         Cpp::String string1;
         Cpp::String string2;
-        unsigned __int64 timestamp = 0;
-        unsigned __int32 processId = 0;
         long status = 0;
     private:
         MessageCode messageCode;
@@ -72,10 +61,7 @@ namespace KmUmShared
     public:
         RegistryCreateMessage() = default;
         RegistryCreateMessage(
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* KeyNameBuffer,
-            unsigned __int32 KeyNameBufferSize,
+            Cpp::String& String1,
             long Status
         );
 
@@ -88,12 +74,8 @@ namespace KmUmShared
     public:
         RegistrySetValueMessage() = default;
         RegistrySetValueMessage(
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* KeyNameBuffer,
-            unsigned __int32 KeyNameBufferSize,
-            const unsigned __int8* ValueNameBuffer,
-            unsigned __int32 ValueNameBufferSize,
+            Cpp::String& String1,
+            Cpp::String& String2,
             long Status
         );
 
@@ -106,10 +88,7 @@ namespace KmUmShared
     public:
         RegistryDeleteKeyMessage() = default;
         RegistryDeleteKeyMessage(
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* KeyNameBuffer,
-            unsigned __int32 KeyNameBufferSize,
+            Cpp::String& String1,
             long Status
         );
 
@@ -122,12 +101,8 @@ namespace KmUmShared
     public:
         RegistryDeleteKeyValueMessage() = default;
         RegistryDeleteKeyValueMessage(
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* KeyNameBuffer,
-            unsigned __int32 KeyNameBufferSize,
-            const unsigned __int8* ValueNameBuffer,
-            unsigned __int32 ValueNameBufferSize,
+            Cpp::String& String1,
+            Cpp::String& String2,
             long Status
         );
 
@@ -140,10 +115,7 @@ namespace KmUmShared
     public:
         RegistryLoadKeyMessage() = default;
         RegistryLoadKeyMessage(
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* KeyNameBuffer,
-            unsigned __int32 KeyNameBufferSize,
+            Cpp::String& String1,
             long Status
         );
 
@@ -156,12 +128,8 @@ namespace KmUmShared
     public:
         RegistryRenameKeyMessage() = default;
         RegistryRenameKeyMessage(
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* KeyNameBuffer,
-            unsigned __int32 KeyNameBufferSize,
-            const unsigned __int8* ValueNameBuffer,
-            unsigned __int32 ValueNameBufferSize,
+            Cpp::String& String1,
+            Cpp::String& String2,
             long Status
         );
 

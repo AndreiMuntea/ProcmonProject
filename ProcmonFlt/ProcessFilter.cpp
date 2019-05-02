@@ -44,12 +44,6 @@ Minifilter::ProcessFilter::ProcessCreateNotifyRoutine(
         return;
     }    
     
-    if (!IsActionMonitored(ProcessId, CreateInfo))
-    {
-        ::ExReleaseRundownProtection(&gDrvData.RundownProtection);
-        return;
-    }
-
     (CreateInfo != nullptr) ? HandleProcessCreate(Process, ProcessId, CreateInfo)
                             : HandleProcessTerminate(Process, ProcessId);
 
@@ -94,34 +88,36 @@ Minifilter::ProcessFilter::HandleProcessCreate(
 {
     UNREFERENCED_PARAMETER(Process);
 
-    unsigned __int64 timestamp = 0;
-    unsigned __int32 parentId = 0;
-    unsigned __int32 processId = 0;
-    const unsigned __int8* imagePath = nullptr;
-    unsigned __int32 imagePathSize = 0;
-    const unsigned __int8* commandLine = nullptr;
-    unsigned __int32 commandLineSize = 0;
+    Cpp::String imagePath;
+    Cpp::String commandLine;
 
+    unsigned __int64 timestamp = 0;
     KeQuerySystemTime(&timestamp);
-    processId = HandleToULong(ProcessId);
-    parentId = HandleToULong(CreateInfo->ParentProcessId);
 
     if (CreateInfo->ImageFileName)
     {
-        imagePath = (const unsigned __int8*)CreateInfo->ImageFileName->Buffer;
-        imagePathSize = CreateInfo->ImageFileName->Length;
+        imagePath = Cpp::String{ (const unsigned __int8*)CreateInfo->ImageFileName->Buffer, CreateInfo->ImageFileName->Length };
     }
 
     if (CreateInfo->CommandLine)
     {
-        commandLine = (const unsigned __int8*)CreateInfo->CommandLine->Buffer;
-        commandLineSize = CreateInfo->CommandLine->Length;
+        commandLine = Cpp::String{ (const unsigned __int8*)CreateInfo->CommandLine->Buffer, CreateInfo->CommandLine->Length };
     }
 
-    Cpp::Stream stream;
-    stream << KmUmShared::ProcessCreateMessage{ timestamp, parentId, processId, imagePath, imagePathSize, commandLine, commandLineSize };
+    gDrvData.ProcessColector->AddProcess(timestamp, imagePath , ProcessId);
 
-    auto status = gDrvData.CommunicationPort->Send(Cpp::Forward<Cpp::Stream>(stream));
+    if (!IsActionMonitored(ProcessId, CreateInfo))
+    {
+        return;
+    }
+
+    auto status = gDrvData.CommunicationPort->Send<KmUmShared::ProcessCreateMessage>(
+        ProcessId, 
+        timestamp, 
+        HandleToULong(CreateInfo->ParentProcessId), 
+        commandLine
+    );
+
     if (!NT_SUCCESS(status))
     {
         MyDriverLogWarning("Send process create message failed with status 0x%x", status);
@@ -137,15 +133,14 @@ Minifilter::ProcessFilter::HandleProcessTerminate(
     UNREFERENCED_PARAMETER(Process);
 
     unsigned __int64 timestamp = 0;
-    unsigned __int32 processId = 0;
-
     KeQuerySystemTime(&timestamp);
-    processId = HandleToULong(ProcessId);
 
-    Cpp::Stream stream;
-    stream << KmUmShared::ProcessTerminateMessage{ timestamp, processId};
+    if (!IsActionMonitored(ProcessId, nullptr))
+    {
+        return;
+    }
 
-    auto status = gDrvData.CommunicationPort->Send(Cpp::Forward<Cpp::Stream>(stream));
+    auto status = gDrvData.CommunicationPort->Send<KmUmShared::ProcessTerminateMessage>(ProcessId,timestamp);
     if (!NT_SUCCESS(status))
     {
         MyDriverLogWarning("Send process create message failed with status 0x%x", status);

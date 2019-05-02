@@ -1,17 +1,12 @@
 #include "FltPortModuleMessage.hpp"
 
 KmUmShared::ModuleMessage::ModuleMessage(
-    unsigned __int32 ProcessId,
-    unsigned __int64 Timestamp,
     unsigned __int64 ImageBase,
     unsigned __int64 ImageSize,
-    const unsigned __int8* ImageName,
-    unsigned __int32 ImageNameSize
-) : processId{ProcessId},
-    timestamp{Timestamp},
-    imageBase{ImageBase},
+    const Cpp::String& ImageName
+) : imageBase{ImageBase},
     imageSize{ImageSize},
-    imageName{ImageName, ImageNameSize}
+    imageName{ ImageName }
 {
 
 }
@@ -19,8 +14,6 @@ KmUmShared::ModuleMessage::ModuleMessage(
 Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const ModuleMessage & ModuleMessage)
 {
     Stream << KmUmShared::FilterMessageHeader{ MessageCode::msgModuleLoaded }
-        << ModuleMessage.processId
-        << ModuleMessage.timestamp
         << ModuleMessage.imageName
         << ModuleMessage.imageBase
         << ModuleMessage.imageSize;
@@ -30,9 +23,7 @@ Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const ModuleMessage &
 
 Cpp::Stream & KmUmShared::operator >> (Cpp::Stream & Stream, ModuleMessage & ModuleMessage)
 {
-    Stream >> ModuleMessage.processId
-        >> ModuleMessage.timestamp
-        >> ModuleMessage.imageName
+    Stream >> ModuleMessage.imageName
         >> ModuleMessage.imageBase
         >> ModuleMessage.imageSize;
 

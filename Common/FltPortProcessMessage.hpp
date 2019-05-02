@@ -13,23 +13,15 @@ namespace KmUmShared
         virtual ~ProcessCreateMessage() = default;
 
         ProcessCreateMessage(
-            _In_ unsigned __int64 Timestamp,
-            _In_ unsigned __int32 ParentPid,
-            _In_ unsigned __int32 ProcessId,
-            _In_opt_ const unsigned __int8* ImagePath, 
-            _In_ unsigned __int32 ImagePathSize,
-            _In_opt_ const unsigned __int8* CommandLine,
-            _In_ unsigned __int32 CommandLineSize
+            unsigned __int64 ParentId,
+            Cpp::String& CommandLine
         );
 
         friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const ProcessCreateMessage& ProcessCreateMessage);
         friend Cpp::Stream& operator>>(Cpp::Stream& Stream, ProcessCreateMessage& ProcessCreateMessage);
 
     public:
-        unsigned __int64 timestamp = 0;
-        unsigned __int32 processId = 0;
-        unsigned __int32 parentPid = 0;
-        Cpp::String imagePath;
+        unsigned __int64 parentId = 0;
         Cpp::String commandLine;
     };
 
@@ -39,17 +31,8 @@ namespace KmUmShared
         ProcessTerminateMessage() = default;
         virtual ~ProcessTerminateMessage() = default;
 
-        ProcessTerminateMessage(
-            _In_ unsigned __int64 Timestamp,
-            _In_ unsigned __int32 ProcessId
-        );
-
-        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const ProcessTerminateMessage& ProcessCreateMessage);
-        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, ProcessTerminateMessage& ProcessCreateMessage);
-
-    public:
-        unsigned __int64 timestamp = 0;
-        unsigned __int32 processId = 0;
+        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const ProcessTerminateMessage& ProcessTerminateMessage);
+        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, ProcessTerminateMessage& ProcessTerminateMessage);
     };
 }
 

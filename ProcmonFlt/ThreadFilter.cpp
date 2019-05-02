@@ -50,19 +50,19 @@ Minifilter::ThreadFilter::CreateThreadNotifyRoutine(
         return;
     }
 
-    unsigned __int32 processId = 0;
-    unsigned __int32 threadId = 0;
+    NTSTATUS status = STATUS_UNSUCCESSFUL;
     unsigned __int64 timestamp = 0;
-    Cpp::Stream stream;
-    
     KeQuerySystemTime(&timestamp);
-    processId = HandleToULong(ProcessId);
-    threadId = HandleToULong(ThreadId);
+    
+    if (Create)
+    {
+        status = gDrvData.CommunicationPort->Send<KmUmShared::ThreadCreateMessage>(ProcessId, timestamp, HandleToULong(ThreadId));
+    }
+    else
+    {
+        status = gDrvData.CommunicationPort->Send<KmUmShared::ThreadTerminateMessage>(ProcessId, timestamp, HandleToULong(ThreadId));
+    }
 
-    (Create) ? stream << KmUmShared::ThreadMessage(KmUmShared::MessageCode::msgThreadCreate, processId, threadId, timestamp)
-             : stream << KmUmShared::ThreadMessage(KmUmShared::MessageCode::msgThreadTerminate, processId, threadId, timestamp);
-
-    auto status = gDrvData.CommunicationPort->Send(Cpp::Forward<Cpp::Stream>(stream));
     if (!NT_SUCCESS(status))
     {
         MyDriverLogWarning("Send thread create/terminate message failed with status 0x%x", status);

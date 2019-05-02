@@ -164,6 +164,9 @@
     <ClInclude Include="..\Common\FltPortCommand.hpp">
       <Filter>Header Files\Communication\Commands</Filter>
     </ClInclude>
+    <ClInclude Include="ProcessCollector.hpp">
+      <Filter>Header Files\Functionality</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Minifilter.cpp">
@@ -228,6 +231,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\FltPortCommand.cpp">
       <Filter>Source Files\Communication\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessCollector.cpp">
+      <Filter>Source Files\Functionality</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

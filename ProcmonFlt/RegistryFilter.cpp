@@ -133,17 +133,9 @@ Minifilter::RegistryFilter::RegistryHandlePostCreateKey(
     _Inout_ PREG_POST_CREATE_KEY_INFORMATION Parameters
 )
 {
-    Cpp::Stream stream;
-    KmUmShared::RegistryCreateMessage message(
-        Timestamp, 
-        ProcessId, 
-        (const unsigned __int8*)Parameters->CompleteName->Buffer, 
-        Parameters->CompleteName->Length,
-        Parameters->Status
-    );
+    Cpp::String name{ (const unsigned __int8*)Parameters->CompleteName->Buffer, Parameters->CompleteName->Length };
 
-    stream << message;
-    auto status = gDrvData.CommunicationPort->Send(Cpp::Forward<Cpp::Stream>(stream));
+    auto status = gDrvData.CommunicationPort->Send<KmUmShared::RegistryCreateMessage>((HANDLE)ProcessId, Timestamp, name,  Parameters->Status);
     if (!NT_SUCCESS(status))
     {
         MyDriverLogWarning("Send create key message failed with status 0x%x", status);

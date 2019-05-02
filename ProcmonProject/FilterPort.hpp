@@ -41,7 +41,10 @@ private:
 
     template <class T>
     NTSTATUS HandleMessageNotification(
-        Cpp::ShallowStream & InputData
+        Cpp::ShallowStream & InputData,
+        HANDLE ProcessId,
+        Cpp::String& ProcessName,
+        unsigned __int64 Timestamp
     );
 
     std::wofstream log;
@@ -53,7 +56,12 @@ private:
 
 
 template<class T>
-inline NTSTATUS FilterPort::HandleMessageNotification(Cpp::ShallowStream & InputData)
+inline NTSTATUS FilterPort::HandleMessageNotification(
+    Cpp::ShallowStream & InputData,
+    HANDLE ProcessId,
+    Cpp::String& ProcessName,
+    unsigned __int64 Timestamp
+)
 {
     T message;
     InputData >> message;
@@ -63,7 +71,15 @@ inline NTSTATUS FilterPort::HandleMessageNotification(Cpp::ShallowStream & Input
         return ERROR_INVALID_PARAMETER;
     }
 
-    log << message;
+    if (GetCurrentProcessId() != (SIZE_T)(ProcessId))
+    {
+        log << message
+            << "\t> [Process Id] " << HandleToULong(ProcessId) << std::endl
+            << "\t> [Process Name] " << ProcessName << std::endl
+            << "\t> [Timestamp] " << Timestamp << std::endl
+            << std::endl;
+    }
+
     return ERROR_SUCCESS;
 }
 

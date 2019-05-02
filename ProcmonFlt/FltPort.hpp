@@ -2,10 +2,13 @@
 #define __FLT_PORT_HPP__
 
 #include <CppStream.hpp>
+#include <CppString.hpp>
+#include <cpp_lockguard.hpp>
 
 #include "cpp_allocator_object.hpp"
 #include "cpp_lock.hpp"
 #include "ThreadPool.hpp"
+#include "ProcessCollector.hpp"
 
 namespace Minifilter
 {
@@ -18,20 +21,25 @@ namespace Minifilter
     );
     typedef FUNC_OnMessageNotifyCallback *PFUNC_OnMessageNotifyCallback;
 
+    template <class MessageType>
     class FltPortDataPackage : public Cpp::CppPagedObject<'TLF#'>
     {
         friend class FltPort;
     public:
         FltPortDataPackage(
             FltPort* Port,
-            Cpp::Stream&& DataStream
+            HANDLE ProcessId,
+            unsigned __int64 Timestamp,
+            MessageType Message
         );
 
-        virtual ~FltPortDataPackage();
+        virtual ~FltPortDataPackage() = default;
 
     private:
-        FltPort* port = nullptr;
-        Cpp::Stream dataStream;
+        FltPort* port = nullptr;            
+        HANDLE processId;
+        unsigned __int64 timestamp;
+        MessageType message;
     };
 
     class FltPort : public Cpp::CppNonPagedObject<'TLF#'>
@@ -40,7 +48,8 @@ namespace Minifilter
         FltPort(
             _In_ PFLT_FILTER Filter,
             _In_ PUNICODE_STRING PortName,
-            _In_ PFUNC_OnMessageNotifyCallback OnMessageNotify
+            _In_ PFUNC_OnMessageNotifyCallback OnMessageNotify,
+            _In_ ProcessCollector* ProcessCollector
         );
 
         FltPort(const FltPort& Other) = delete;
@@ -49,19 +58,34 @@ namespace Minifilter
         FltPort& operator=(const FltPort& Other) = delete;
         FltPort& operator=(FltPort&& Other) = delete;
 
-        NTSTATUS Send(Cpp::Stream&& DataStream);
+        template <class MessageType, class ...Args>
+        NTSTATUS 
+        Send(
+            _In_ HANDLE ProcessId,
+            _In_ unsigned __int64 Timestamp,
+            Args... Arguments
+        );
 
         virtual ~FltPort();
 
     private:
 
+        template <class MessageType>
         static void DataPackageCleanupCallback(PVOID Context);
+
+        template <class MessageType>
         static void DataPackageCallback(PVOID Context);
+
+        static void SendStreamMessage(
+            FltPort* Port,
+            Cpp::Stream& Stream
+        );
 
         PFUNC_OnMessageNotifyCallback onMessageNotify = nullptr;
         PFLT_FILTER filter = nullptr;
         PFLT_PORT clientPort = nullptr;
         PFLT_PORT serverPort = nullptr;
+        ProcessCollector* processCollector = nullptr;
         Cpp::Pushlock lock;
         Cpp::ThreadPool threadpool;
 
@@ -92,6 +116,72 @@ namespace Minifilter
             _Out_ PULONG ReturnOutputBufferLength
         );
     };
+
+    template<class MessageType>
+    inline FltPortDataPackage<MessageType>::FltPortDataPackage(
+        FltPort * Port, 
+        HANDLE ProcessId, 
+        unsigned __int64 Timestamp, 
+        MessageType Message
+    ) : port{Port},
+        processId{ProcessId},
+        timestamp{Timestamp},
+        message{Message}
+    {
+        Validate();
+    }
+    template<class MessageType, class ...Args>
+    inline NTSTATUS FltPort::Send(HANDLE ProcessId, unsigned __int64 Timestamp, Args ...Arguments)
+    {
+        auto package = new FltPortDataPackage<MessageType>(this, ProcessId, Timestamp, MessageType{ Arguments... });
+        if (!package)
+        {
+            return STATUS_INSUFFICIENT_RESOURCES;
+        }
+        if (!package->IsValid())
+        {
+            delete package;
+            return STATUS_INSUFFICIENT_RESOURCES;
+        }
+
+        auto status = threadpool.EnqueueItem(DataPackageCallback<MessageType>, DataPackageCleanupCallback<MessageType>, package);
+        if (!NT_SUCCESS(status))
+        {
+            delete package;
+        }
+
+        return status;
+    }
+    template<class MessageType>
+    inline void FltPort::DataPackageCleanupCallback(PVOID Context)
+    {
+        auto dataPackage = (FltPortDataPackage<MessageType>*)(Context);
+        delete dataPackage;
+    }
+    template<class MessageType>
+    inline void FltPort::DataPackageCallback(PVOID Context)
+    {
+        auto dataPackage = (FltPortDataPackage<MessageType>*)(Context);
+        Cpp::String processName;
+        Cpp::Stream stream;
+
+        Cpp::SharedLockguard guard(&dataPackage->port->lock);
+        if (!dataPackage->port->clientPort)
+        {
+            goto CleanUp;
+        }
+
+        if (!dataPackage->port->processCollector->GetProcessName(dataPackage->processId, dataPackage->timestamp, processName))
+        {
+            goto CleanUp;
+        }
+
+        stream << dataPackage->processId << processName << dataPackage->timestamp << dataPackage->message;
+        SendStreamMessage(dataPackage->port, stream);
+
+    CleanUp:
+        delete dataPackage;
+    }
 }
 
 #endif //__FLT_PORT_HPP__

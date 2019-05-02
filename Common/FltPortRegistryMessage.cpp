@@ -1,80 +1,56 @@
 #include "FltPortRegistryMessage.hpp"
 
 KmUmShared::RegistryTemplate1StringMessage::RegistryTemplate1StringMessage(
-    MessageCode MessageCode, 
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8 * String1Buffer, 
-    unsigned __int32 String1BufferSize,
+    MessageCode MessageCode,
+    Cpp::String& String1,
     long Status
 ) : messageCode{ MessageCode },
-    timestamp{Timestamp},
-    processId{ProcessId},
-    string1{ String1Buffer, String1BufferSize },
+    string1{ String1 },
     status{Status}
 {
 }
 
 Cpp::Stream & KmUmShared::RegistryTemplate1StringMessage::Deserialize(Cpp::Stream & Stream)
 {
-    Stream >> string1 >> timestamp >> processId >> status;
+    Stream >> string1 >> status;
     return Stream;
 }
 
 Cpp::Stream & 
 KmUmShared::RegistryTemplate1StringMessage::Serialize(Cpp::Stream & Stream) const
 {
-    Stream << FilterMessageHeader{ messageCode }
-        << string1
-        << timestamp
-        << processId
-        << status;
-
+    Stream << FilterMessageHeader{ messageCode } << string1 << status;
     return Stream;
 }
 
 KmUmShared::RegistryTemplate2StringMessage::RegistryTemplate2StringMessage(
     MessageCode MessageCode,
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8* String1Buffer,
-    unsigned __int32 String1BufferSize,
-    const unsigned __int8* String2Buffer,
-    unsigned __int32 String2BufferSize,
+    Cpp::String& String1,
+    Cpp::String& String2,
     long Status
 ) : messageCode{MessageCode},
-    timestamp{Timestamp},
-    processId{ProcessId},
-    string1{String1Buffer, String1BufferSize},
-    string2{String2Buffer, String2BufferSize},
+    string1{String1},
+    string2{String2},
     status{Status}
 {
 }
 
 Cpp::Stream & KmUmShared::RegistryTemplate2StringMessage::Deserialize(Cpp::Stream & Stream)
 {
-    Stream >> string1 >> string2 >> timestamp >> processId >> status;
+    Stream >> string1 >> string2 >> status;
     return Stream;
 }
 
 Cpp::Stream & KmUmShared::RegistryTemplate2StringMessage::Serialize(Cpp::Stream & Stream) const
 {
-    Stream << FilterMessageHeader{ messageCode }
-        << string1
-        << string2
-        << timestamp
-        << processId
-        << status;
+    Stream << FilterMessageHeader{ messageCode } << string1<< string2 << status;
     return Stream;
 }
 
 KmUmShared::RegistryCreateMessage::RegistryCreateMessage(
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8 * KeyNameBuffer, 
-    unsigned __int32 KeyNameBufferSize,
+    Cpp::String& String1,
     long Status
-) : RegistryTemplate1StringMessage{MessageCode::msgRegistryCreate, Timestamp, ProcessId, KeyNameBuffer, KeyNameBufferSize, Status}
+) : RegistryTemplate1StringMessage{MessageCode::msgRegistryCreate, String1, Status}
 {
 }
 
@@ -139,58 +115,40 @@ Cpp::Stream & KmUmShared::operator>>(Cpp::Stream & Stream, RegistryRenameKeyMess
 }
 
 KmUmShared::RegistrySetValueMessage::RegistrySetValueMessage(
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8* KeyNameBuffer,
-    unsigned __int32 KeyNameBufferSize,
-    const unsigned __int8* ValueNameBuffer,
-    unsigned __int32 ValueNameBufferSize,
+    Cpp::String& String1,
+    Cpp::String& String2,
     long Status
-) : RegistryTemplate2StringMessage { MessageCode::msgRegistrySetValue, Timestamp, ProcessId, KeyNameBuffer, KeyNameBufferSize, ValueNameBuffer, ValueNameBufferSize, Status}
+) : RegistryTemplate2StringMessage { MessageCode::msgRegistrySetValue, String1, String2, Status}
 {
 }
 
 KmUmShared::RegistryDeleteKeyValueMessage::RegistryDeleteKeyValueMessage(
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8* KeyNameBuffer,
-    unsigned __int32 KeyNameBufferSize,
-    const unsigned __int8* ValueNameBuffer,
-    unsigned __int32 ValueNameBufferSize,
+    Cpp::String& String1,
+    Cpp::String& String2,
     long Status
-) : RegistryTemplate2StringMessage{ MessageCode::msgRegistryDeleteValue, Timestamp, ProcessId, KeyNameBuffer, KeyNameBufferSize, ValueNameBuffer, ValueNameBufferSize, Status }
+) : RegistryTemplate2StringMessage{ MessageCode::msgRegistryDeleteValue, String1, String2, Status }
 {
 }
 
 KmUmShared::RegistryDeleteKeyMessage::RegistryDeleteKeyMessage(
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8 * KeyNameBuffer,
-    unsigned __int32 KeyNameBufferSize,
+    Cpp::String& String1,
     long Status
-) : RegistryTemplate1StringMessage{ MessageCode::msgRegistryDeleteKey, Timestamp, ProcessId, KeyNameBuffer, KeyNameBufferSize, Status }
+) : RegistryTemplate1StringMessage{ MessageCode::msgRegistryDeleteKey, String1, Status }
 {
 }
 
 KmUmShared::RegistryLoadKeyMessage::RegistryLoadKeyMessage(
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8 * KeyNameBuffer,
-    unsigned __int32 KeyNameBufferSize,
+    Cpp::String& String1,
     long Status
-) : RegistryTemplate1StringMessage{ MessageCode::msgRegistryLoadKey, Timestamp, ProcessId, KeyNameBuffer, KeyNameBufferSize, Status }
+) : RegistryTemplate1StringMessage{ MessageCode::msgRegistryLoadKey, String1, Status }
 {
 
 }
 
 KmUmShared::RegistryRenameKeyMessage::RegistryRenameKeyMessage(
-    unsigned __int64 Timestamp,
-    unsigned __int32 ProcessId,
-    const unsigned __int8* KeyNameBuffer,
-    unsigned __int32 KeyNameBufferSize,
-    const unsigned __int8* ValueNameBuffer,
-    unsigned __int32 ValueNameBufferSize,
+    Cpp::String& String1,
+    Cpp::String& String2,
     long Status
-) : RegistryTemplate2StringMessage{ MessageCode::msgRegistryRenameKey, Timestamp, ProcessId, KeyNameBuffer, KeyNameBufferSize, ValueNameBuffer, ValueNameBufferSize, Status }
+) : RegistryTemplate2StringMessage{ MessageCode::msgRegistryRenameKey, String1, String2, Status }
 {
 }

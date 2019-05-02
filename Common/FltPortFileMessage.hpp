@@ -13,10 +13,7 @@ namespace KmUmShared
     public:        
         FileMessage(
             MessageCode MessageCode,
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* String1Buffer,
-            unsigned __int32 String1BufferSize,
+            Cpp::String& String1,
             long Status
         );
 
@@ -28,8 +25,6 @@ namespace KmUmShared
 
     public:
         Cpp::String string1;
-        unsigned __int64 timestamp = 0;
-        unsigned __int32 processId = 0;
         long status = 0;
     private:
         MessageCode messageCode;
@@ -39,10 +34,7 @@ namespace KmUmShared
     {
     public:
         FileCreateMessage(
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* String1Buffer,
-            unsigned __int32 String1BufferSize,
+            Cpp::String& String1,
             long Status
         );
 
@@ -57,10 +49,7 @@ namespace KmUmShared
     {
     public:
         FileCloseMessage(
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* String1Buffer,
-            unsigned __int32 String1BufferSize,
+            Cpp::String& String1,
             long Status
         );
 
@@ -75,10 +64,7 @@ namespace KmUmShared
     {
     public:
         FileCleanupMessage(
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* String1Buffer,
-            unsigned __int32 String1BufferSize,
+            Cpp::String& String1,
             long Status
         );
 
@@ -93,10 +79,7 @@ namespace KmUmShared
     {
     public:
         FileReadMessage(
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* String1Buffer,
-            unsigned __int32 String1BufferSize,
+            Cpp::String& String1,
             long Status
         );
 
@@ -111,10 +94,7 @@ namespace KmUmShared
     {
     public:
         FileWriteMessage(
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* String1Buffer,
-            unsigned __int32 String1BufferSize,
+            Cpp::String& String1,
             long Status
         );
 
@@ -129,10 +109,7 @@ namespace KmUmShared
     {
     public:
         FileSetInformationMessage(
-            unsigned __int64 Timestamp,
-            unsigned __int32 ProcessId,
-            const unsigned __int8* String1Buffer,
-            unsigned __int32 String1BufferSize,
+            Cpp::String& String1,
             long Status
         );
 

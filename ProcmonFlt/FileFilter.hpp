@@ -190,10 +190,9 @@ namespace Minifilter
     )
     {
         FILE_STREAM_CONTEXT* context = nullptr;
-        unsigned __int32 processId = HandleToULong(FltGetRequestorProcessIdEx(Data));
-        unsigned __int64 timestamp = 0;
-        Cpp::Stream stream;
+        Cpp::String file;
 
+        unsigned __int64 timestamp = 0;
         KeQuerySystemTime(&timestamp);
 
         auto status = GetSetStreamContext(Data, FltObjects, &context);
@@ -206,8 +205,8 @@ namespace Minifilter
             goto CleanUp;
         }
 
-        stream << Message{ timestamp, processId, (const unsigned __int8*)context->FileName.Buffer, context->FileName.Length, Data->IoStatus.Status };
-        gDrvData.CommunicationPort->Send(Cpp::Forward<Cpp::Stream>(stream));
+        file = Cpp::String{ (const unsigned __int8*)context->FileName.Buffer, context->FileName.Length };
+        gDrvData.CommunicationPort->Send<Message>(FltGetRequestorProcessIdEx(Data), timestamp, file, Data->IoStatus.Status);
 
     CleanUp:
         FltReleaseContext(context);

@@ -9,10 +9,12 @@
 Minifilter::FltPort::FltPort(
     _In_ PFLT_FILTER Filter,
     _In_ PUNICODE_STRING PortName,
-    _In_ PFUNC_OnMessageNotifyCallback OnMessageNotify
+    _In_ PFUNC_OnMessageNotifyCallback OnMessageNotify,
+    _In_ ProcessCollector* ProcessCollector
 ) : filter{ Filter },
     threadpool{10},
-    onMessageNotify{OnMessageNotify}
+    onMessageNotify{OnMessageNotify},
+    processCollector{ProcessCollector}
 {
     OBJECT_ATTRIBUTES objAttr = { 0 };
     PSECURITY_DESCRIPTOR securityDescriptor = nullptr;
@@ -57,29 +59,6 @@ Minifilter::FltPort::FltPort(
     Validate();
 }
 
-NTSTATUS 
-Minifilter::FltPort::Send(Cpp::Stream&& DataStream)
-{
-    FltPortDataPackage* package = new FltPortDataPackage(this, Cpp::Forward<Cpp::Stream>(DataStream));
-    if (!package)
-    {
-        return STATUS_INSUFFICIENT_RESOURCES;
-    }
-    if (!package->IsValid())
-    {
-        delete package;
-        return STATUS_INSUFFICIENT_RESOURCES;
-    }
-
-    auto status = threadpool.EnqueueItem(DataPackageCallback, DataPackageCleanupCallback, package);
-    if (!NT_SUCCESS(status))
-    {
-        MyDriverLogError("EnqueueItem failed with status 0x%x", status);
-        delete package;
-    }
-
-    return status;
-}
 
 Minifilter::FltPort::~FltPort()
 {
@@ -99,82 +78,46 @@ Minifilter::FltPort::~FltPort()
     CloseServerPort();
 }
 
-void 
-Minifilter::FltPort::DataPackageCleanupCallback(
-    PVOID Context
-)
+
+
+void Minifilter::FltPort::SendStreamMessage(FltPort *Port, Cpp::Stream & Stream)
 {
-    auto dataPackage = (FltPortDataPackage*)(Context);
-    delete dataPackage;
-}
-
-void 
-Minifilter::FltPort::DataPackageCallback(
-    PVOID Context
-)
-{
-    auto dataPackage = (FltPortDataPackage*)(Context);
-
-    LARGE_INTEGER timeout = { 0 };
-    timeout.QuadPart = -60 * 10 * 1000 * 1000; // 60 seconds
-
     NTSTATUS replyStatus = STATUS_UNSUCCESSFUL;
     ULONG replySize = sizeof(replyStatus);
+    LARGE_INTEGER timeout = { 0 };
 
-    Cpp::SharedLockguard guard(&dataPackage->port->lock);
-    if (!dataPackage->port->clientPort)
-    {
-        MyDriverLogWarning("Client is disconnected. Cannot send message");
-        goto CleanUp;
-    }
+    timeout.QuadPart = -60 * 10 * 1000 * 1000; // 60 seconds
 
-    if (!dataPackage->dataStream.IsValid() || !dataPackage->dataStream.GetRawData())
+    if (!Stream.IsValid() || !Stream.GetRawData() || Stream.GetSize() == 0 || Stream.GetSize() > MAXULONG)
     {
-        MyDriverLogError("Buffer is not valid");
-        goto CleanUp;
-    }
-
-    if (dataPackage->dataStream.GetSize() > MAXULONG || dataPackage->dataStream.GetSize() == 0)
-    {
-        MyDriverLogError("Buffer size is not valid");
-        goto CleanUp;
+        MyDriverLogError("Stream is not valid");
+        return;
     }
 
     auto status = ::FltSendMessage(
-        dataPackage->port->filter,
-        &dataPackage->port->clientPort,
-        dataPackage->dataStream.GetRawData(),
-        static_cast<ULONG>(dataPackage->dataStream.GetSize()),
+        Port->filter,
+        &Port->clientPort,
+        Stream.GetRawData(),
+        static_cast<ULONG>(Stream.GetSize()),
         &replyStatus,
         &replySize,
         &timeout
     );
 
-    if (!NT_SUCCESS(status))
-    {
-        MyDriverLogError("::FltSendMessage failed with status 0x%X", status);
-        goto CleanUp;
-    }
-
     if (status == STATUS_TIMEOUT)
     {
         MyDriverLogError("::FltSendMessage timeout");
-        goto CleanUp;
+        return;
     }
 
     if (replySize != sizeof(replyStatus))
     {
         MyDriverLogError("::FltSendMessage invalid reply size");
-        goto CleanUp;
+        return;
     }
-
-    MyDriverLogTrace("::FltSendMessage sent message");
-
-CleanUp:
-    delete dataPackage;
 }
 
-void 
+void
 Minifilter::FltPort::CloseClientPort()
 {
     if (this->clientPort)
@@ -264,18 +207,4 @@ Minifilter::FltPort::MessageNotifyCallback(
     }
 
     return STATUS_UNSUCCESSFUL;
-}
-
-Minifilter::FltPortDataPackage::FltPortDataPackage(
-    FltPort* Port,
-    Cpp::Stream&& DataStream
-) : port{Port},
-    dataStream{Cpp::Forward<Cpp::Stream>(DataStream)}
-{
-    Validate();
-}
-
-Minifilter::FltPortDataPackage::~FltPortDataPackage()
-{
-    port = nullptr;
 }

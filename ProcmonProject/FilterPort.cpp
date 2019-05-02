@@ -115,11 +115,15 @@ FilterPort::HandleMessage(
     Cpp::Stream& OutputStream
 )
 {
+    HANDLE processId = 0;
+    Cpp::String processName;
+    unsigned __int64 timestamp = 0;
     FILTER_MESSAGE_HEADER messageHeader = { 0 };
+
     KmUmShared::FilterMessageHeader filterHeader;
     NTSTATUS status = ERROR_SUCCESS;
 
-    InputData >> messageHeader >> filterHeader;
+    InputData >> messageHeader >> processId >> processName >> timestamp >> filterHeader;
     if (!InputData.IsValid())
     {
         std::wcout << "Can't read filter message header" << std::endl;
@@ -130,52 +134,52 @@ FilterPort::HandleMessage(
     switch (filterHeader.GetMessageCode())
     {
     case KmUmShared::MessageCode::msgProcessCreate:
-        status = HandleMessageNotification<KmUmShared::ProcessCreateMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::ProcessCreateMessage>(InputData, processId, processName, timestamp);
         break;    
     case KmUmShared::MessageCode::msgProcessTerminate:
-        status = HandleMessageNotification<KmUmShared::ProcessTerminateMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::ProcessTerminateMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgThreadCreate:
-        status = HandleMessageNotification<KmUmShared::ThreadCreateMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::ThreadCreateMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgThreadTerminate:
-        status = HandleMessageNotification<KmUmShared::ThreadTerminateMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::ThreadTerminateMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgModuleLoaded:
-        status = HandleMessageNotification<KmUmShared::ModuleMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::ModuleMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgRegistryCreate:
-        status = HandleMessageNotification<KmUmShared::RegistryCreateMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::RegistryCreateMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgRegistrySetValue:
-        status = HandleMessageNotification<KmUmShared::RegistrySetValueMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::RegistrySetValueMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgRegistryDeleteKey:
-        status = HandleMessageNotification<KmUmShared::RegistryDeleteKeyMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::RegistryDeleteKeyMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgRegistryDeleteValue:
-        status = HandleMessageNotification<KmUmShared::RegistryDeleteKeyValueMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::RegistryDeleteKeyValueMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgRegistryRenameKey:
-        status = HandleMessageNotification<KmUmShared::RegistryRenameKeyMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::RegistryRenameKeyMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgFileCreate:
-        status = HandleMessageNotification<KmUmShared::FileCreateMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::FileCreateMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgFileClose:
-        status = HandleMessageNotification<KmUmShared::FileCloseMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::FileCloseMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgFileCleanup:
-        status = HandleMessageNotification<KmUmShared::FileCleanupMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::FileCleanupMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgFileRead:
-        status = HandleMessageNotification<KmUmShared::FileReadMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::FileReadMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgFileWrite:
-        status = HandleMessageNotification<KmUmShared::FileWriteMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::FileWriteMessage>(InputData, processId, processName, timestamp);
         break;
     case KmUmShared::MessageCode::msgFileSetInformation:
-        status = HandleMessageNotification<KmUmShared::FileSetInformationMessage>(InputData);
+        status = HandleMessageNotification<KmUmShared::FileSetInformationMessage>(InputData, processId, processName, timestamp);
         break;
     default:
         status = ERROR_NOT_FOUND;

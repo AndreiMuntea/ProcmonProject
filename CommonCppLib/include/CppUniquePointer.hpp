@@ -23,6 +23,7 @@ namespace Cpp
         void Update(T* NewPointer = nullptr);
         bool IsValid() const;
 
+        T* GetRawPointer();
         T& operator*();
         T* operator->();
 
@@ -57,6 +58,12 @@ namespace Cpp
     inline bool UniquePointer<T, D>::IsValid() const
     {
         return rawPointer != nullptr;
+    }
+
+    template<typename T, class D>
+    inline T * UniquePointer<T, D>::GetRawPointer()
+    {
+        return rawPointer;
     }
 
     template<typename T, class D>

@@ -5,7 +5,7 @@
 
 namespace Cpp
 {
-    template <class Object>
+    template <class T>
     class LinkedList : public LinkedListEntry
     {
     public:
@@ -24,6 +24,24 @@ namespace Cpp
         bool IsListEmpty() const;
         size_t GetNoElements() const;
 
+        class Iterator
+        {
+        public:
+            Iterator(LinkedListEntry* Element) : current{ Element } {};
+            ~Iterator() { current = nullptr; }
+
+            Iterator& operator++() { current = current->flink; return *this; }
+            T* GetRawPointer() { return (T*)current; }
+
+            bool operator==(const Iterator& Other) const { return current == Other.current; }
+            bool operator!=(const Iterator& Other) const { return current != Other.current; }
+
+        private:
+            LinkedListEntry* current;
+        };
+
+        Iterator begin() { return Iterator{ this->flink }; }
+        Iterator end() { return Iterator{ this }; }
 
     private:
         void CheckListEntry(_In_ LinkedListEntry* Entry) const;
@@ -32,20 +50,20 @@ namespace Cpp
         size_t noElements = 0;
     };
 
-    template<class Object>
-    inline LinkedList<Object>::LinkedList()
+    template<class T>
+    inline LinkedList<T>::LinkedList()
     {
         Validate();
     }
 
-    template<class Object>
-    inline LinkedList<Object>::~LinkedList()
+    template<class T>
+    inline LinkedList<T>::~LinkedList()
     {
         Flush();
     }
 
-    template<class Object>
-    inline void LinkedList<Object>::InsertTail(_In_ __drv_aliasesMem LinkedListEntry* Entry)
+    template<class T>
+    inline void LinkedList<T>::InsertTail(_In_ __drv_aliasesMem LinkedListEntry* Entry)
     {
         FastFailOnCorruption(Entry);
 
@@ -58,8 +76,8 @@ namespace Cpp
         ++noElements;
     }
 
-    template<class Object>
-    inline void LinkedList<Object>::InsertHead(_In_ __drv_aliasesMem LinkedListEntry* Entry)
+    template<class T>
+    inline void LinkedList<T>::InsertHead(_In_ __drv_aliasesMem LinkedListEntry* Entry)
     {
         FastFailOnCorruption(Entry);
 
@@ -72,24 +90,24 @@ namespace Cpp
         ++noElements;
     }
 
-    template<class Object>
-    inline LinkedListEntry* LinkedList<Object>::RemoveTail()
+    template<class T>
+    inline LinkedListEntry* LinkedList<T>::RemoveTail()
     {
         auto tail = this->blink;
         RemoveEntry(tail);
         return tail;
     }
 
-    template<class Object>
-    inline LinkedListEntry* LinkedList<Object>::RemoveHead()
+    template<class T>
+    inline LinkedListEntry* LinkedList<T>::RemoveHead()
     {
         auto head = this->flink;
         RemoveEntry(head);
         return head;
     }
 
-    template<class Object>
-    inline void LinkedList<Object>::RemoveEntry(_Inout_ LinkedListEntry* Entry)
+    template<class T>
+    inline void LinkedList<T>::RemoveEntry(_Inout_ LinkedListEntry* Entry)
     {
         FastFailOnCorruption(Entry);
 
@@ -102,8 +120,8 @@ namespace Cpp
         --noElements;
     }
 
-    template<class Object>
-    inline void LinkedList<Object>::Flush()
+    template<class T>
+    inline void LinkedList<T>::Flush()
     {
         while (!IsListEmpty())
         {
@@ -112,20 +130,20 @@ namespace Cpp
         }
     }
 
-    template<class Object>
-    inline bool LinkedList<Object>::IsListEmpty() const
+    template<class T>
+    inline bool LinkedList<T>::IsListEmpty() const
     {
         return noElements == 0;
     }
 
-    template<class Object>
-    inline size_t LinkedList<Object>::GetNoElements() const
+    template<class T>
+    inline size_t LinkedList<T>::GetNoElements() const
     {
         return noElements;
     }
 
-    template<class Object>
-    inline void LinkedList<Object>::CheckListEntry(_In_ LinkedListEntry* Entry) const
+    template<class T>
+    inline void LinkedList<T>::CheckListEntry(_In_ LinkedListEntry* Entry) const
     {
         UNREFERENCED_PARAMETER(Entry);
 
@@ -133,8 +151,8 @@ namespace Cpp
         NT_ASSERT(Entry->blink->flink == Entry);
     }
 
-    template<class Object>
-    inline void LinkedList<Object>::FastFailOnCorruption(_In_ LinkedListEntry* Entry) const
+    template<class T>
+    inline void LinkedList<T>::FastFailOnCorruption(_In_ LinkedListEntry* Entry) const
     {
         CheckListEntry(Entry);
         CheckListEntry(this->flink);

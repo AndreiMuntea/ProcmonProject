@@ -120,12 +120,19 @@ namespace KmUmShared
         friend Cpp::Stream& operator>>(Cpp::Stream& Stream, FileSetInformationMessage& FileSetInformationMessage);
     };
 
+    enum class FileDeleteType
+    {
+        DeleteOnClose = 0,
+        SetFileInformation,
+        PendingRegistry
+    };
     class FileDeleteMessage : public FileMessage
     {
     public:
         FileDeleteMessage(
             Cpp::String& String1,
-            long Status
+            long Status,
+            FileDeleteType DeleteType
         );
 
         FileDeleteMessage() = default;
@@ -133,6 +140,9 @@ namespace KmUmShared
 
         friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const FileDeleteMessage& FileDeleteMessage);
         friend Cpp::Stream& operator >> (Cpp::Stream& Stream, FileDeleteMessage& FileDeleteMessage);
+
+    public:
+        FileDeleteType deleteType;
     };
 }
 

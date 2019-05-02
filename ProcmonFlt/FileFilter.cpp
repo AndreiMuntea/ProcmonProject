@@ -38,7 +38,7 @@ Minifilter::FileFilter::PostCreateCallback(
     // If file was opened with DELETE_ON_CLOSE we also notify delete operation
     if (FlagOn(Data->Iopb->Parameters.Create.Options, FILE_DELETE_ON_CLOSE))
     {
-        NotifyEvent<KmUmShared::FileDeleteMessage>(Data, FltObjects);
+        NotifyEvent<KmUmShared::FileDeleteMessage>(Data, FltObjects, KmUmShared::FileDeleteType::DeleteOnClose);
     }
 
     return FLT_POSTOP_FINISHED_PROCESSING;
@@ -476,10 +476,11 @@ Minifilter::FileFilter::PostSetInformationSafeCallback(
     case FileDispositionInformation:
         if (fileInfoBuffer->DeleteFile)
         {
-            NotifyEvent<KmUmShared::FileDeleteMessage>(Data, FltObjects);
+            NotifyEvent<KmUmShared::FileDeleteMessage>(Data, FltObjects, KmUmShared::FileDeleteType::SetFileInformation);
         }
         break;
     default:
+        // Notify generic file set information message
         NotifyEvent<KmUmShared::FileSetInformationMessage>(Data, FltObjects);
     }
 

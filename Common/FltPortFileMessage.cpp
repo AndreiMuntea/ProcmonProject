@@ -91,12 +91,18 @@ Cpp::Stream & KmUmShared::operator >> (Cpp::Stream & Stream, FileSetInformationM
 
 Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const FileDeleteMessage & FileDeleteMessage)
 {
-    return FileDeleteMessage.Serialize(Stream);
+   FileDeleteMessage.Serialize(Stream);
+   Stream << FileDeleteMessage.deleteType;
+   
+   return Stream;
 }
 
 Cpp::Stream & KmUmShared::operator >> (Cpp::Stream & Stream, FileDeleteMessage & FileDeleteMessage)
 {
-    return FileDeleteMessage.Deserialize(Stream);
+    FileDeleteMessage.Deserialize(Stream);   
+    Stream >> FileDeleteMessage.deleteType;
+
+    return Stream;
 }
 
 KmUmShared::FileCloseMessage::FileCloseMessage(
@@ -135,8 +141,10 @@ KmUmShared::FileSetInformationMessage::FileSetInformationMessage(
 }
 
 KmUmShared::FileDeleteMessage::FileDeleteMessage(
-    Cpp::String & String1, 
-    long Status
-) : FileMessage(MessageCode::msgFileDelete, String1, Status)
+    Cpp::String& String1,
+    long Status,
+    FileDeleteType DeleteType
+) : FileMessage(MessageCode::msgFileDelete, String1, Status),
+    deleteType{DeleteType}
 {
 }

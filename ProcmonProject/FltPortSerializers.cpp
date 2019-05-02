@@ -6,6 +6,24 @@ std::wostream& operator<<(std::wostream& Stream, Cpp::String& String)
     return Stream;
 }
 
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileDeleteType DeleteType)
+{
+    switch (DeleteType)
+    {
+    case KmUmShared::FileDeleteType::DeleteOnClose:
+        Stream << "DeleteOnClose";
+        return Stream;
+    case KmUmShared::FileDeleteType::PendingRegistry:
+        Stream << "PendingRegistry";
+        return Stream;
+    case KmUmShared::FileDeleteType::SetFileInformation:
+        Stream << "SetFileInformation";
+        return Stream;
+    default:
+        return Stream;
+    }
+}
+
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::ProcessCreateMessage& ProcessCreateMessage)
 {
     Stream << "[ProcessCreateMessage]" << std::endl
@@ -159,6 +177,7 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::FileDeleteMessage
 {
     Stream << "[FileDeleteMessage]" << std::endl
         << "\t> [File Name] " << FileDeleteMessage.string1 << std::endl
-        << "\t> [Status] " << FileDeleteMessage.status << std::endl;
+        << "\t> [Status] " << FileDeleteMessage.status << std::endl
+        << "\t> [DeleteType] " << FileDeleteMessage.deleteType << std::endl;
     return Stream;
 }

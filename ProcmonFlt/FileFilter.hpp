@@ -176,17 +176,19 @@ namespace Minifilter
             _Out_ FILE_STREAM_CONTEXT** StreamContext
         );
 
-        template <class Message>
+        template <class Message, class ...Args>
         static void NotifyEvent(
             _Inout_ PFLT_CALLBACK_DATA Data,
-            _In_ PCFLT_RELATED_OBJECTS FltObjects
+            _In_ PCFLT_RELATED_OBJECTS FltObjects,
+            Args... Arguments
         );
     };
 
-    template<class Message>
+    template<class Message, class ...Args>
     inline void FileFilter::NotifyEvent(
         _Inout_ PFLT_CALLBACK_DATA Data,
-        _In_ PCFLT_RELATED_OBJECTS FltObjects
+        _In_ PCFLT_RELATED_OBJECTS FltObjects,
+        Args... Arguments
     )
     {
         FILE_STREAM_CONTEXT* context = nullptr;
@@ -206,7 +208,7 @@ namespace Minifilter
         }
 
         file = Cpp::String{ (const unsigned __int8*)context->FileName.Buffer, context->FileName.Length };
-        gDrvData.CommunicationPort->Send<Message>(FltGetRequestorProcessIdEx(Data), timestamp, file, Data->IoStatus.Status);
+        gDrvData.CommunicationPort->Send<Message>(FltGetRequestorProcessIdEx(Data), timestamp, file, Data->IoStatus.Status, Arguments...);
 
     CleanUp:
         FltReleaseContext(context);

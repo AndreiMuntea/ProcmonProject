@@ -252,7 +252,7 @@ std::wstring PuNtPathToDosPath(const std::wstring & NtPath)
 
     // C: or D:
     auto driveLetter = NtPath.substr(0, 2);
-    if (!QueryDosDeviceW(driveLetter.c_str(), deviceName, sizeof(deviceName)))
+    if (!QueryDosDeviceW(driveLetter.c_str(), deviceName, sizeof(deviceName) / sizeof(WCHAR)))
     {
         throw std::exception("QueryDosDeviceW failed!");
     }

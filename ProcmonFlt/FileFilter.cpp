@@ -195,7 +195,7 @@ Minifilter::FileFilter::IsActionMonitored(
     return true;
 }
 
-bool Minifilter::FileFilter::IsPathBlacklisted(UNICODE_STRING * FileName)
+bool Minifilter::FileFilter::IsPathBlacklisted(_In_ UNICODE_STRING * FileName)
 {
     Cpp::String directory;
     Cpp::String fileName{ (const unsigned __int8*)FileName->Buffer, FileName->Length };

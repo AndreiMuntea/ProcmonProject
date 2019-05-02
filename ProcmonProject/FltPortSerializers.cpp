@@ -154,3 +154,11 @@ std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileSetInformationM
         << "\t> [Status] " << FileSetInformationMessage.status << std::endl;
     return Stream;
 }
+
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::FileDeleteMessage & FileDeleteMessage)
+{
+    Stream << "[FileDeleteMessage]" << std::endl
+        << "\t> [File Name] " << FileDeleteMessage.string1 << std::endl
+        << "\t> [Status] " << FileDeleteMessage.status << std::endl;
+    return Stream;
+}

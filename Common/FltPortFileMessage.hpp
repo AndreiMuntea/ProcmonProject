@@ -119,6 +119,21 @@ namespace KmUmShared
         friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const FileSetInformationMessage& FileSetInformationMessage);
         friend Cpp::Stream& operator>>(Cpp::Stream& Stream, FileSetInformationMessage& FileSetInformationMessage);
     };
+
+    class FileDeleteMessage : public FileMessage
+    {
+    public:
+        FileDeleteMessage(
+            Cpp::String& String1,
+            long Status
+        );
+
+        FileDeleteMessage() = default;
+        virtual ~FileDeleteMessage() = default;
+
+        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const FileDeleteMessage& FileDeleteMessage);
+        friend Cpp::Stream& operator >> (Cpp::Stream& Stream, FileDeleteMessage& FileDeleteMessage);
+    };
 }
 
 #endif // __FLT_PORT_FILE_MESSAGE_HPP__

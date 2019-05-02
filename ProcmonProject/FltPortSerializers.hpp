@@ -30,5 +30,6 @@ std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileCleanupMessage&
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileReadMessage& FileReadMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileWriteMessage& FileWriteMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileSetInformationMessage& FileSetInformationMessage);
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileDeleteMessage& FileDeleteMessage);
 
 #endif //__FLT_PORT_SERIALIZERS_HPP__

@@ -136,5 +136,6 @@ Minifilter::ProcessCollector::FindProcessUnsafe(
         return it.GetRawPointer();
     }
 
+
     return nullptr;
 }

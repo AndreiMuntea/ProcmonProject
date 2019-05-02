@@ -33,7 +33,14 @@ Minifilter::FileFilter::PostCreateCallback(
         return FLT_POSTOP_FINISHED_PROCESSING;
     }
 
-    NotifyEvent<KmUmShared::FileCreateMessage>(Data, FltObjects);
+    NotifyEvent<KmUmShared::FileCreateMessage>(Data, FltObjects);    
+    
+    // If file was opened with DELETE_ON_CLOSE we also notify delete operation
+    if (FlagOn(Data->Iopb->Parameters.Create.Options, FILE_DELETE_ON_CLOSE))
+    {
+        NotifyEvent<KmUmShared::FileDeleteMessage>(Data, FltObjects);
+    }
+
     return FLT_POSTOP_FINISHED_PROCESSING;
 }
 
@@ -460,6 +467,21 @@ Minifilter::FileFilter::PostSetInformationSafeCallback(
     UNREFERENCED_PARAMETER(Flags);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    NotifyEvent<KmUmShared::FileSetInformationMessage>(Data, FltObjects);
+
+    auto fileInfoBuffer = (FILE_DISPOSITION_INFORMATION*)Data->Iopb->Parameters.SetFileInformation.InfoBuffer;
+    auto informationClass = Data->Iopb->Parameters.SetFileInformation.FileInformationClass;
+
+    switch (informationClass)
+    {
+    case FileDispositionInformation:
+        if (fileInfoBuffer->DeleteFile)
+        {
+            NotifyEvent<KmUmShared::FileDeleteMessage>(Data, FltObjects);
+        }
+        break;
+    default:
+        NotifyEvent<KmUmShared::FileSetInformationMessage>(Data, FltObjects);
+    }
+
     return FLT_POSTOP_FINISHED_PROCESSING;
 }

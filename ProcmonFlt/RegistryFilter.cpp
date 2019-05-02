@@ -7,6 +7,7 @@
 
 #include <CppSemantics.hpp>
 #include "../Common/FltPortRegistryMessage.hpp"
+#include "../Common/FltPortFileMessage.hpp"
 
 Minifilter::RegistryFilter::RegistryFilter()
 {
@@ -143,6 +144,37 @@ Minifilter::RegistryFilter::RegistryHandlePostCreateKey(
 }
 
 void 
+Minifilter::RegistryFilter::RegistryHandlePostSetValue(
+    _In_ unsigned __int32 ProcessId,
+    _In_ unsigned __int64 Timestamp,
+    _Inout_ PREG_POST_OPERATION_INFORMATION Parameters
+)
+{
+    auto context = (RegistryKeyValueDataContext*)(Parameters->CallContext);
+    if (!context)
+    {
+        return;
+    }
+
+    // Send generic set value message
+    gDrvData.CommunicationPort->Send<KmUmShared::RegistrySetValueMessage>((HANDLE)ProcessId, Timestamp, context->keyName, context->valueName, context->data, context->dataType, Parameters->Status);
+
+    // Check for delete at reboot
+    WCHAR value[] = { L"PendingFileRenameOperations" };
+    WCHAR key[] = { L"\\REGISTRY\\MACHINE\\SYSTEM\\ControlSet001\\Control\\Session Manager" };
+
+    Cpp::String strValue{ (const unsigned __int8*)value, sizeof(value) - sizeof(WCHAR)};
+    Cpp::String strKey{ (const unsigned __int8*)key, sizeof(key) - sizeof(WCHAR) };
+
+    if (context->keyName == strKey && strValue == context->valueName)
+    {
+        gDrvData.CommunicationPort->Send<KmUmShared::FileDeleteMessage>((HANDLE)ProcessId, Timestamp, context->data, Parameters->Status, KmUmShared::FileDeleteType::PendingRegistry);
+    }
+
+    delete context;
+}
+
+void 
 Minifilter::RegistryFilter::RegistryHandlePreOperationKey(
     _In_ PVOID Object,
     _Inout_ PVOID* CallContext
@@ -183,6 +215,33 @@ Minifilter::RegistryFilter::RegistryHandlePreOperationKeyValue(
     }
 
     status = RegistryRegisterCallContext<RegistryKeyValueContext>(CallContext, Cpp::Forward<Cpp::String>(keyName), Cpp::Forward<Cpp::String>(value));
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogCritical("Failed to register registry context");
+        return;
+    }
+}
+
+void Minifilter::RegistryFilter::RegistryHandlePreOperationKeyValueData(
+    _In_ PVOID Object,
+    _In_ PCUNICODE_STRING Value,
+    _In_ PVOID Data,
+    _In_ ULONG DataSize,
+    _In_ ULONG DataType,
+    _Inout_ PVOID* CallContext
+)
+{
+    Cpp::String keyName;
+    Cpp::String value{ (const unsigned __int8*)Value->Buffer, Value->Length };
+    Cpp::String data{ (const unsigned __int8*)Data, DataSize};
+
+    auto status = RegistrySolveKeyName(Object, keyName);
+    if (!NT_SUCCESS(status) || !keyName.IsValid() || !value.IsValid() || !data.IsValid())
+    {
+        return;
+    }
+
+    status = RegistryRegisterCallContext<RegistryKeyValueDataContext>(CallContext, Cpp::Forward<Cpp::String>(keyName), Cpp::Forward<Cpp::String>(value), Cpp::Forward<Cpp::String>(data), DataType);
     if (!NT_SUCCESS(status))
     {
         MyDriverLogCritical("Failed to register registry context");
@@ -239,12 +298,12 @@ Minifilter::RegistryFilter::RegistryNotifyRoutine(
         case(RegNtPreSetValueKey):
         {
             auto parameters = (PREG_SET_VALUE_KEY_INFORMATION)Argument2;
-            RegistryHandlePreOperationKeyValue(parameters->Object, parameters->ValueName, &parameters->CallContext);
+            RegistryHandlePreOperationKeyValueData(parameters->Object, parameters->ValueName, parameters->Data, parameters->DataSize, parameters->Type, &parameters->CallContext);
             break;
         }
         case(RegNtPostSetValueKey):
         {
-            RegistryHandlePostKeyValueContextMessage<KmUmShared::RegistrySetValueMessage>(processId, timestamp, (PREG_POST_OPERATION_INFORMATION)Argument2);
+            RegistryHandlePostSetValue(processId, timestamp, (PREG_POST_OPERATION_INFORMATION)Argument2);
             break;
         }
         case (RegNtPreDeleteKey):
@@ -312,5 +371,17 @@ Minifilter::RegistryKeyValueContext::RegistryKeyValueContext(
     Cpp::String && ValueName
 ) : keyName{Cpp::Forward<Cpp::String>(KeyName)},
     valueName{Cpp::Forward<Cpp::String>(ValueName)}
+{
+}
+
+Minifilter::RegistryKeyValueDataContext::RegistryKeyValueDataContext(
+    Cpp::String && KeyName, 
+    Cpp::String && ValueName, 
+    Cpp::String && Data,
+    ULONG DataType
+) : keyName{Cpp::Forward<Cpp::String>(KeyName)},
+    valueName{Cpp::Forward<Cpp::String>(ValueName)},
+    data{Cpp::Forward<Cpp::String>(Data)},
+    dataType{DataType}
 {
 }

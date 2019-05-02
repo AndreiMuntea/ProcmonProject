@@ -151,6 +151,48 @@ Cpp::String::ReplaceBuffer(
     return true;
 }
 
+bool 
+Cpp::String::operator==(const String& Other) const
+{
+    if (!this->IsValid() || !Other.IsValid())
+    {
+        return false;
+    }
+
+    if (this->size != Other.size)
+    {
+        return false;
+    }
+
+    if (this->size == 0)
+    {
+        return true;
+    }
+
+    for (unsigned __int32 i = 0; i < this->size; ++i)
+    {
+        unsigned __int8 x = this->buffer[i];
+        unsigned __int8 y = Other.buffer[i];
+
+        if (x >= 'A' && x <= 'Z')
+        {
+            x ^= 0x20;
+        }
+
+        if (y >= 'A' && y <= 'Z')
+        {
+            y ^= 0x20;
+        }
+
+        if (x != y)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 Cpp::Stream& 
 Cpp::operator<<(
     Stream& Stream, 

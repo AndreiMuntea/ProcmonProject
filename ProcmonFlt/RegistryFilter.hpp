@@ -16,7 +16,7 @@ namespace Minifilter
     public:
         RegistryKeyContext(Cpp::String&& KeyName);
         virtual ~RegistryKeyContext() = default;
-
+        
     private:
         Cpp::String keyName;
     };
@@ -31,6 +31,21 @@ namespace Minifilter
     private:
         Cpp::String keyName;
         Cpp::String valueName;
+    };
+
+
+    class RegistryKeyValueDataContext : public Cpp::CppPagedObject<'TFR'>
+    {
+        friend class RegistryFilter;
+    public:
+        RegistryKeyValueDataContext(Cpp::String&& KeyName, Cpp::String&& ValueName, Cpp::String&& Data, ULONG DataType);
+        virtual ~RegistryKeyValueDataContext() = default;
+
+    private:
+        Cpp::String keyName;
+        Cpp::String valueName;
+        Cpp::String data;
+        ULONG dataType;
     };
 
     class RegistryFilter : public Cpp::CppNonPagedObject<'TFR#'>
@@ -67,6 +82,13 @@ namespace Minifilter
         );
 
         static void 
+        RegistryHandlePostSetValue(
+            _In_ unsigned __int32 ProcessId,
+            _In_ unsigned __int64 Timestamp,
+            _Inout_ PREG_POST_OPERATION_INFORMATION Parameters
+        );
+
+        static void 
         RegistryHandlePreOperationKey(
             _In_ PVOID Object,
             _Inout_ PVOID* CallContext
@@ -76,6 +98,16 @@ namespace Minifilter
         RegistryHandlePreOperationKeyValue(
             _In_ PVOID Object,
             _In_ PCUNICODE_STRING Value,
+            _Inout_ PVOID* CallContext
+        );
+
+        static void 
+        RegistryHandlePreOperationKeyValueData(
+            _In_ PVOID Object,
+            _In_ PCUNICODE_STRING Value,
+            _In_ PVOID Data,
+            _In_ ULONG DataSize,
+            _In_ ULONG DataType,
             _Inout_ PVOID* CallContext
         );
 
@@ -100,6 +132,13 @@ namespace Minifilter
             _Inout_ PREG_POST_OPERATION_INFORMATION Parameters
         );
 
+        template <class T>
+        static RegistryHandlePostKeyValueDataContextMessage(
+            _In_ unsigned __int32 ProcessId,
+            _In_ unsigned __int64 Timestamp,
+            _Inout_ PREG_POST_OPERATION_INFORMATION Parameters
+        );
+
         template <class Context, class ...Args>
         static NTSTATUS 
         RegistryRegisterCallContext(
@@ -117,9 +156,7 @@ namespace Minifilter
         auto context = (RegistryKeyContext*)(Parameters->CallContext);
         if (context)
         {
-            Cpp::String key{ context->keyName.GetNakedPointer(), context->keyName.GetSize() };
-
-            gDrvData.CommunicationPort->Send<T>((HANDLE)ProcessId, Timestamp, key, Parameters->Status);
+            gDrvData.CommunicationPort->Send<T>((HANDLE)ProcessId, Timestamp, context->keyName, Parameters->Status);
             delete context;
             Parameters->CallContext = nullptr;
         }
@@ -135,15 +172,29 @@ namespace Minifilter
         auto context = (RegistryKeyValueContext*)(Parameters->CallContext);
         if (context)
         {
-            Cpp::String key{ context->keyName.GetNakedPointer(), context->keyName.GetSize() };
-            Cpp::String value{ context->valueName.GetNakedPointer(), context->valueName.GetSize() };
-
-            gDrvData.CommunicationPort->Send<T>((HANDLE)ProcessId, Timestamp, key, value, Parameters->Status);
+            gDrvData.CommunicationPort->Send<T>((HANDLE)ProcessId, Timestamp, context->keyName, context->valueName, Parameters->Status);
 
             delete context;
             Parameters->CallContext = nullptr;
         }
     }
+    template<class T>
+    inline RegistryFilter::RegistryHandlePostKeyValueDataContextMessage(
+        unsigned __int32 ProcessId, 
+        unsigned __int64 Timestamp, 
+        PREG_POST_OPERATION_INFORMATION Parameters
+    )
+    {
+        auto context = (RegistryKeyValueDataContext*)(Parameters->CallContext);
+        if (context)
+        {
+            gDrvData.CommunicationPort->Send<T>((HANDLE)ProcessId, Timestamp, context->keyName, context->valueName, context->data, context->dataType, Parameters->Status);
+
+            delete context;
+            Parameters->CallContext = nullptr;
+        }
+    }
+
     template<class Context, class ...Args>
     inline NTSTATUS RegistryFilter::RegistryRegisterCallContext(
         _Out_ PVOID* CallContext,

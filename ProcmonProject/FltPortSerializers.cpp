@@ -80,6 +80,8 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::RegistrySetValueM
     Stream << "[RegistrySetValueMessage]" << std::endl
         << "\t> [Key Name] " << RegistrySetValueMessage.string1 << std::endl
         << "\t> [Value Name] " << RegistrySetValueMessage.string2 << std::endl
+        << "\t> [Data] " << RegistrySetValueMessage.string3<< std::endl
+        << "\t> [Data Type] " << RegistrySetValueMessage.dataType << std::endl
         << "\t> [Status] " << RegistrySetValueMessage.status << std::endl;
 
     return Stream;

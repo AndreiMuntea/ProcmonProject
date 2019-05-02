@@ -117,8 +117,10 @@ Cpp::Stream & KmUmShared::operator>>(Cpp::Stream & Stream, RegistryRenameKeyMess
 KmUmShared::RegistrySetValueMessage::RegistrySetValueMessage(
     Cpp::String& String1,
     Cpp::String& String2,
+    Cpp::String& String3,
+    unsigned long DataType,
     long Status
-) : RegistryTemplate2StringMessage { MessageCode::msgRegistrySetValue, String1, String2, Status}
+) : RegistryTemplate3StringMessage { MessageCode::msgRegistrySetValue, String1, String2, String3, DataType, Status}
 {
 }
 
@@ -151,4 +153,32 @@ KmUmShared::RegistryRenameKeyMessage::RegistryRenameKeyMessage(
     long Status
 ) : RegistryTemplate2StringMessage{ MessageCode::msgRegistryRenameKey, String1, String2, Status }
 {
+}
+
+KmUmShared::RegistryTemplate3StringMessage::RegistryTemplate3StringMessage(
+    MessageCode MessageCode, 
+    Cpp::String & String1, 
+    Cpp::String & String2, 
+    Cpp::String & String3, 
+    unsigned long DataType,
+    long Status
+) : messageCode{MessageCode},
+    string1{String1},
+    string2{String2},
+    string3{String3},
+    status{Status},
+    dataType{DataType}
+{
+}
+
+Cpp::Stream & KmUmShared::RegistryTemplate3StringMessage::Serialize(Cpp::Stream & Stream) const
+{
+    Stream << FilterMessageHeader{ messageCode } << string1 << string2 << string3 << status << dataType;
+    return Stream;
+}
+
+Cpp::Stream & KmUmShared::RegistryTemplate3StringMessage::Deserialize(Cpp::Stream & Stream)
+{
+    Stream >> string1 >> string2 >> string3 >> status >> dataType;
+    return Stream;
 }

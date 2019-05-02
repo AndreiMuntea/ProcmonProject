@@ -22,6 +22,7 @@ namespace Cpp
         String& operator=(String&& Other);
 
         String& operator+=(const String& Other);
+        bool operator==(const String& Other) const;
 
         friend Stream& operator<<(Stream& Stream, const String& String);
         friend Stream& operator>>(Stream& Stream, String& String);

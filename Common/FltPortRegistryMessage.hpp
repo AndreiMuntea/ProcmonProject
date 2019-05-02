@@ -56,6 +56,36 @@ namespace KmUmShared
         MessageCode messageCode;
     };
 
+    class RegistryTemplate3StringMessage
+    {
+    public:
+        RegistryTemplate3StringMessage() = default;
+
+        RegistryTemplate3StringMessage(
+            MessageCode MessageCode,
+            Cpp::String& String1,
+            Cpp::String& String2,
+            Cpp::String& String3,
+            unsigned long DataType,
+            long Status
+        );
+
+        virtual ~RegistryTemplate3StringMessage() = default;
+
+        Cpp::Stream& Serialize(Cpp::Stream& Stream) const;
+        Cpp::Stream& Deserialize(Cpp::Stream& Stream);
+
+    public:
+        Cpp::String string1;
+        Cpp::String string2;
+        Cpp::String string3;
+        unsigned long dataType = 0;
+        long status = 0;
+    private:
+        MessageCode messageCode;
+    };
+
+
     class RegistryCreateMessage : public RegistryTemplate1StringMessage
     {
     public:
@@ -69,13 +99,15 @@ namespace KmUmShared
         friend Cpp::Stream& operator>>(Cpp::Stream& Stream, RegistryCreateMessage& RegistryCreateMessage);
     };
 
-    class RegistrySetValueMessage : public RegistryTemplate2StringMessage
+    class RegistrySetValueMessage : public RegistryTemplate3StringMessage
     {
     public:
         RegistrySetValueMessage() = default;
         RegistrySetValueMessage(
             Cpp::String& String1,
             Cpp::String& String2,
+            Cpp::String& String3,
+            unsigned long DataType,
             long Status
         );
 

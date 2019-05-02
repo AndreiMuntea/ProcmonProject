@@ -156,11 +156,22 @@ namespace Minifilter
             _In_ const KmUmShared::Feature& FeatureToCheck
         );
 
+        static bool 
+        IsPathBlacklisted(
+            _In_ UNICODE_STRING* FileName
+        );
+
         static NTSTATUS 
         GetFileName(
             _Inout_ PFLT_CALLBACK_DATA Data,
             _In_ PCFLT_RELATED_OBJECTS FltObjects,
             _Inout_ UNICODE_STRING& FileName
+        );
+
+        static void
+        GetDirectoryName(
+            _In_ Cpp::String& FullFileName,
+            _Inout_ Cpp::String& Directory
         );
 
         static NTSTATUS

@@ -11,6 +11,7 @@
 #include "RegistryFilter.hpp"
 #include "ConfigurationManager.hpp"
 #include "ProcessCollector.hpp"
+#include "BlackList.hpp"
 
 typedef struct _GLOBAL_DATA
 {
@@ -30,6 +31,7 @@ typedef struct _GLOBAL_DATA
 
     Cpp::UniquePointer<Minifilter::ProcessCollector> ProcessColector;
     Cpp::UniquePointer<Minifilter::ConfigurationManager> ConfigurationManager;
+    Cpp::UniquePointer<Minifilter::BlackList> BlackList;
 
     EX_RUNDOWN_REF RundownProtection;
 }GLOBAL_DATA, *PGLOBAL_DATA;

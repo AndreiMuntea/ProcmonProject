@@ -167,6 +167,9 @@
     <ClInclude Include="ProcessCollector.hpp">
       <Filter>Header Files\Functionality</Filter>
     </ClInclude>
+    <ClInclude Include="BlackList.hpp">
+      <Filter>Header Files\Functionality</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Minifilter.cpp">
@@ -233,6 +236,9 @@
       <Filter>Source Files\Communication\Commands</Filter>
     </ClCompile>
     <ClCompile Include="ProcessCollector.cpp">
+      <Filter>Source Files\Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="BlackList.cpp">
       <Filter>Source Files\Functionality</Filter>
     </ClCompile>
   </ItemGroup>

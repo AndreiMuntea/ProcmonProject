@@ -120,6 +120,7 @@ void GdrvUninitGlobalData()
 
     gDrvData.ConfigurationManager.Update(nullptr);
     gDrvData.ProcessColector.Update(nullptr);
+    gDrvData.BlackList.Update(nullptr);
 
     gDrvData.Altitude = { 0,0,nullptr };
     gDrvData.Cookie = { 0 };

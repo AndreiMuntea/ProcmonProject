@@ -60,3 +60,22 @@ void KmUmShared::CommandReply::Deserialize(Cpp::Stream & Stream)
 {
     Stream;
 }
+
+KmUmShared::CommandUpdateBlacklistFolder::CommandUpdateBlacklistFolder(
+    const CommandCode & CommandCode, 
+    const Cpp::String & Folder
+) : CommandHeader{ CommandCode },
+    folder{Folder}
+{
+}
+
+void KmUmShared::CommandUpdateBlacklistFolder::Serialize(Cpp::Stream & Stream) const
+{
+    CommandHeader::Serialize(Stream);
+    Stream << this->folder;
+}
+
+void KmUmShared::CommandUpdateBlacklistFolder::Deserialize(Cpp::Stream & Stream)
+{
+    Stream >> this->folder;
+}

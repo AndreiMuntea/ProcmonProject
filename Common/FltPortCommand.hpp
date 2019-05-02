@@ -2,6 +2,7 @@
 #define __FLT_PORT_COMMAND_HPP__
 
 #include <CppStream.hpp>
+#include <CppString.hpp>
 
 namespace KmUmShared
 {
@@ -32,6 +33,8 @@ namespace KmUmShared
     {
         commandEnableFeature = 0,
         commandDisableFeature,
+        commandProtectFolder,
+        commandUnprotectFolder,
         commandMaxIndex
     };
 
@@ -75,6 +78,20 @@ namespace KmUmShared
         Feature feature = Feature::featureMaxIndex;
     };
 
+    class CommandUpdateBlacklistFolder : public CommandHeader
+    {
+    public:
+        CommandUpdateBlacklistFolder() = default;
+        CommandUpdateBlacklistFolder(const CommandCode& CommandCode, const Cpp::String& Folder);
+        virtual ~CommandUpdateBlacklistFolder() = default;
+
+        virtual void Serialize(Cpp::Stream& Stream) const override;
+        virtual void Deserialize(Cpp::Stream& Stream) override;
+
+    public:
+        Cpp::String folder;
+    };
+
     class CommandReplyUpdateFeature : public CommandReply
     {
     public:
@@ -88,7 +105,6 @@ namespace KmUmShared
     public:
         unsigned __int64 featuresConfiguration = 0;
     };
-
 }
 
 #endif //__FLT_PORT_COMMAND_HPP__

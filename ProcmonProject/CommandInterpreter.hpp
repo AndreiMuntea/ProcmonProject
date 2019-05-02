@@ -28,6 +28,7 @@ private:
     void ProtectProcessCommand();
 
     void UpdateFeatureCommand(bool Enable);
+    void UpdateBlacklistedFolder(bool Blacklist);
 
     void PrintAvailableFeatures();
     std::unordered_map<std::string, Command> availableCommands;

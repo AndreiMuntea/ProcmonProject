@@ -44,6 +44,15 @@ DriverEntry(
         goto Exit;
     }
 
+    // Create Blacklist
+    gDrvData.BlackList.Update(new Minifilter::BlackList());
+    if (!gDrvData.BlackList.IsValid() || !gDrvData.BlackList->IsValid())
+    {
+        ::FltUnregisterFilter(gDrvData.FilterHandle);
+        MyDriverLogCritical("Failed to initialize BlackList");
+        goto Exit;
+    }
+
     // Create Process Colector
     gDrvData.ProcessColector.Update(new Minifilter::ProcessCollector());
     if (!gDrvData.ProcessColector.IsValid() || !gDrvData.ProcessColector->IsValid())
@@ -259,6 +268,27 @@ OnUpdateFeatureMessageReceived(
     return status;
 }
 
+NTSTATUS
+OnUpdateBlacklistedPathCommandReceived(
+    _In_ bool Blacklist,
+    _Inout_ Cpp::ShallowStream& InputStream,
+    _Inout_ Cpp::Stream& OutputStream
+)
+{
+    UNREFERENCED_PARAMETER(OutputStream);
+    KmUmShared::CommandUpdateBlacklistFolder command;
+
+    command.Deserialize(InputStream);
+    if (!InputStream.IsValid() || !command.folder.IsValid())
+    {
+        return STATUS_INVALID_DEVICE_REQUEST;
+    }
+
+    auto status = (Blacklist) ? gDrvData.BlackList->Blacklist(command.folder)
+                              : gDrvData.BlackList->Whitelist(command.folder);
+    return status;
+}
+
 NTSTATUS 
 OnMessageReceived(
     _In_reads_bytes_opt_(InputBufferLength) PVOID InputBuffer,
@@ -292,6 +322,12 @@ OnMessageReceived(
     case KmUmShared::CommandCode::commandDisableFeature:
         status = OnUpdateFeatureMessageReceived(false, inputStream, outputStream);
         break;
+    case KmUmShared::CommandCode::commandProtectFolder:
+        status = OnUpdateBlacklistedPathCommandReceived(true, inputStream, outputStream);
+        break;
+    case KmUmShared::CommandCode::commandUnprotectFolder:
+        status = OnUpdateBlacklistedPathCommandReceived(false, inputStream, outputStream);
+        break;
     default:
         return STATUS_NOT_SUPPORTED;
     }
@@ -301,9 +337,12 @@ OnMessageReceived(
         return STATUS_INVALID_DEVICE_REQUEST;
     }
 
-    RtlCopyMemory(OutputBuffer, outputStream.GetRawData(), outputStream.GetSize());
-    *ReturnOutputBufferLength = outputStream.GetSize();
-    
+    if (outputStream.GetSize() != 0)
+    {
+        RtlCopyMemory(OutputBuffer, outputStream.GetRawData(), outputStream.GetSize());
+        *ReturnOutputBufferLength = outputStream.GetSize();
+    }
+
     return STATUS_SUCCESS;
 }
 

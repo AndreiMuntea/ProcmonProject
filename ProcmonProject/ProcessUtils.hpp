@@ -1,16 +1,23 @@
 #ifndef __PROCESS_UTILS_HPP__
 #define __PROCESS_UTILS_HPP__
 
-void 
+#include <string>
+
+void
 PuDumpActiveProcessesToolHelp32Snapshot();
 
-void 
+void
 PuDumpActiveProcessesPsapi();
 
-void 
+void
 PuDumpActiveProcessesZwQuerySystemInformation();
 
 void
 PuDeleteFileAtReboot();
+
+std::wstring
+PuNtPathToDosPath(
+    const std::wstring& NtPath
+);
 
 #endif //__PROCESS_UTILS_HPP__

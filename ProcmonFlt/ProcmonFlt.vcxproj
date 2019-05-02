@@ -248,6 +248,7 @@
     <ClInclude Include="..\Common\FltPortProcessMessage.hpp" />
     <ClInclude Include="..\Common\FltPortRegistryMessage.hpp" />
     <ClInclude Include="..\Common\FltPortThreadMessage.hpp" />
+    <ClInclude Include="BlackList.hpp" />
     <ClInclude Include="ConfigurationManager.hpp" />
     <ClInclude Include="cpp_allocator_object.hpp" />
     <ClInclude Include="cpp_definitions.hpp" />
@@ -279,6 +280,7 @@
     <ClCompile Include="..\Common\FltPortProcessMessage.cpp" />
     <ClCompile Include="..\Common\FltPortRegistryMessage.cpp" />
     <ClCompile Include="..\Common\FltPortThreadMessage.cpp" />
+    <ClCompile Include="BlackList.cpp" />
     <ClCompile Include="ConfigurationManager.cpp" />
     <ClCompile Include="cpp_definitions.cpp" />
     <ClCompile Include="cpp_externals.cpp" />

@@ -99,6 +99,19 @@ CommandInterpreter::CommandInterpreter()
 
     availableCommands.emplace(
         std::piecewise_construct,
+        std::make_tuple("ProtectFolder"),
+        std::make_tuple("Sends ProtectFolder to '\\MyCommunicationPort'", [this]() { this->UpdateBlacklistedFolder(true); })
+    );
+
+    availableCommands.emplace(
+        std::piecewise_construct,
+        std::make_tuple("UnprotectFolder"),
+        std::make_tuple("Sends UnprotectFolder to '\\MyCommunicationPort'", [this]() { this->UpdateBlacklistedFolder(false); })
+    );
+
+
+    availableCommands.emplace(
+        std::piecewise_construct,
         std::make_tuple("DeleteAtReboot"),
         std::make_tuple("Creates a dummyfile and schedule it to be deleted at reboot", PuDeleteFileAtReboot)
     );
@@ -256,6 +269,38 @@ void CommandInterpreter::UpdateFeatureCommand(bool Enable)
     else
     {
         std::cout << "Couldn't perform operation" << std::endl;
+    }
+}
+
+void CommandInterpreter::UpdateBlacklistedFolder(bool Blacklist)
+{
+    if (!gGlobalData.FltPort || !gGlobalData.FltPort->IsConnected())
+    {
+        std::cout << "Disconnected FLT port!" << std::endl;
+        return;
+    }
+
+    std::wstring path;
+    std::wcout << "What path do you want to update : ";
+    std::wcin >> path;
+
+    auto dosPath = PuNtPathToDosPath(path);
+
+    auto command = std::make_shared<KmUmShared::CommandUpdateBlacklistFolder>();
+    auto reply = std::make_shared<KmUmShared::CommandReply>();
+
+    command->commandCode = (Blacklist)  ? KmUmShared::CommandCode::commandProtectFolder
+                                        : KmUmShared::CommandCode::commandUnprotectFolder;
+    command->folder = Cpp::String{ (const unsigned __int8*)path.c_str(), static_cast<unsigned __int32>(path.size()) * sizeof(WCHAR) };
+
+    auto status = gGlobalData.FltPort->Send(command, reply);
+    if (status == ERROR_SUCCESS)
+    {
+        std::wcout << "Successfully updated" << std::endl;
+    }
+    else
+    {
+        std::wcout << "Couldn't perform operation" << std::endl;
     }
 }
 

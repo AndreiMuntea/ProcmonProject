@@ -195,6 +195,20 @@ Minifilter::FileFilter::IsActionMonitored(
     return true;
 }
 
+bool Minifilter::FileFilter::IsPathBlacklisted(UNICODE_STRING * FileName)
+{
+    Cpp::String directory;
+    Cpp::String fileName{ (const unsigned __int8*)FileName->Buffer, FileName->Length };
+
+    GetDirectoryName(fileName, directory);
+    if (!directory.IsValid())
+    {
+        return false;
+    }
+
+    return gDrvData.BlackList->IsBlackListed(directory);
+}
+
 NTSTATUS
 Minifilter::FileFilter::GetFileName(
     _Inout_ PFLT_CALLBACK_DATA Data,
@@ -231,6 +245,38 @@ Minifilter::FileFilter::GetFileName(
     FltReleaseFileNameInformation(fileNameInfo);
 
     return STATUS_SUCCESS;
+}
+
+void 
+Minifilter::FileFilter::GetDirectoryName(
+    _In_ Cpp::String& FullFileName,
+    _Inout_ Cpp::String& Directory
+)
+{
+    if (!FullFileName.IsValid() || FullFileName.GetSize() == 0 || !FullFileName.GetNakedPointer())
+    {
+        Directory.Invalidate();
+        return;
+    }
+
+    auto buffer = FullFileName.GetNakedPointer();
+    LONG64 size = FullFileName.GetSize() - 1;
+
+    for (; size >= 0; --size)
+    {
+        if (buffer[size] == '\\')
+        {
+            break;
+        }
+    }
+
+    if (--size < 0)
+    {
+        Directory.Invalidate();
+        return;
+    }
+    
+    Directory = Cpp::String(buffer, static_cast<unsigned __int32>(size));
 }
 
 NTSTATUS
@@ -365,15 +411,22 @@ Minifilter::FileFilter::PreWriteCallback(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
-    if (!IsActionMonitored(Data, KmUmShared::Feature::featureMonitorFileWrite))
-    {
-        return FLT_PREOP_SUCCESS_NO_CALLBACK;
-    }
-
     FILE_STREAM_CONTEXT* context = nullptr;
     auto status = GetSetStreamContext(Data, FltObjects, &context);
     if (!NT_SUCCESS(status))
     {
+        return FLT_PREOP_SUCCESS_NO_CALLBACK;
+    }
+
+    if (IsPathBlacklisted(&context->FileName))
+    {
+        FltReleaseContext(context);
+        return FLT_PREOP_COMPLETE;
+    }
+
+    if (!IsActionMonitored(Data, KmUmShared::Feature::featureMonitorFileWrite))
+    {
+        FltReleaseContext(context);
         return FLT_PREOP_SUCCESS_NO_CALLBACK;
     }
 

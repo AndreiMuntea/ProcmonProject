@@ -228,3 +228,37 @@ void PuDeleteFileAtReboot()
         std::wcout << "MoveFileExW failed with GLE=" << GetLastError() << std::endl;
     }
 }
+
+std::wstring PuNtPathToDosPath(const std::wstring & NtPath)
+{
+    WCHAR deviceName[MAX_PATH] = { 0 };
+
+    if (!std::experimental::filesystem::exists(NtPath))
+    {
+        throw std::exception("Provided path doesn't exists!");
+    }
+
+    if (!std::experimental::filesystem::is_directory(NtPath))
+    {
+        throw std::exception("Provided is not a directory!");
+    }
+
+    // Remove trailing slash
+    std::wstring dosPath = NtPath.substr(2, NtPath.size() - 2);
+    if (NtPath.back() == L'\\')
+    {
+        dosPath.pop_back();
+    }
+
+    // C: or D:
+    auto driveLetter = NtPath.substr(0, 2);
+    if (!QueryDosDeviceW(driveLetter.c_str(), deviceName, sizeof(deviceName)))
+    {
+        throw std::exception("QueryDosDeviceW failed!");
+    }
+
+    std::wstring device{ deviceName, sizeof(deviceName) };
+    std::wcout << "Found dos device for " << driveLetter << device << std::endl;
+
+    return device + dosPath;
+}

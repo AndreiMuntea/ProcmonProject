@@ -6,6 +6,7 @@
 
 #include "cpp_init.hpp"
 #include "GlobalData.hpp"
+#include "Commands.hpp"
 
 #include <CppStream.hpp>
 #include <CppShallowStream.hpp>
@@ -243,56 +244,6 @@ InstanceTeardownComplete(
     MyDriverLogTrace("We are now in instance teardown complete routine!");
 }
 
-NTSTATUS
-OnUpdateFeatureMessageReceived(
-    _In_ bool Enable,
-    _Inout_ Cpp::ShallowStream& InputStream,
-    _Inout_ Cpp::Stream& OutputStream
-)
-{
-    KmUmShared::CommandUpdateFeature command;
-    KmUmShared::CommandReplyUpdateFeature reply;
-
-    command.Deserialize(InputStream);
-    if (!InputStream.IsValid() || command.feature >= KmUmShared::Feature::featureMaxIndex)
-    {
-        return STATUS_INVALID_DEVICE_REQUEST;
-    }
-
-    auto status = (Enable) ? gDrvData.ConfigurationManager->EnableFeature(command.feature)
-                           : gDrvData.ConfigurationManager->DisableFeature(command.feature);
-
-    reply.featuresConfiguration = gDrvData.ConfigurationManager->GetCurrentConfiguration();
-    reply.Serialize(OutputStream);
-
-    return status;
-}
-
-NTSTATUS
-OnUpdateBlacklistedPathCommandReceived(
-    _In_ bool Blacklist,
-    _Inout_ Cpp::ShallowStream& InputStream,
-    _Inout_ Cpp::Stream& OutputStream
-)
-{
-    UNREFERENCED_PARAMETER(OutputStream);
-    KmUmShared::CommandUpdateBlacklistFolder command;
-
-    command.Deserialize(InputStream);
-    if (!InputStream.IsValid() || !command.folder.IsValid())
-    {
-        return STATUS_INVALID_DEVICE_REQUEST;
-    }
-
-    auto size = static_cast<USHORT>(command.folder.GetSize());
-    auto buffer = (PWCHAR)command.folder.GetNakedPointer();
-    UNICODE_STRING folder{size, size, buffer};
-
-    auto status = (Blacklist) ? gDrvData.BlackList->Blacklist(&folder)
-                              : gDrvData.BlackList->Whitelist(&folder);
-    return status;
-}
-
 NTSTATUS 
 OnMessageReceived(
     _In_reads_bytes_opt_(InputBufferLength) PVOID InputBuffer,
@@ -321,16 +272,19 @@ OnMessageReceived(
     switch (commandHeader.commandCode)
     {
     case KmUmShared::CommandCode::commandEnableFeature:
-        status = OnUpdateFeatureMessageReceived(true, inputStream, outputStream);
+        status = CommandOnUpdateFeature(true, inputStream, outputStream);
         break;
     case KmUmShared::CommandCode::commandDisableFeature:
-        status = OnUpdateFeatureMessageReceived(false, inputStream, outputStream);
+        status = CommandOnUpdateFeature(false, inputStream, outputStream);
         break;
     case KmUmShared::CommandCode::commandProtectFolder:
-        status = OnUpdateBlacklistedPathCommandReceived(true, inputStream, outputStream);
+        status = CommandOnUpdateBlacklistedPath(true, inputStream, outputStream);
         break;
     case KmUmShared::CommandCode::commandUnprotectFolder:
-        status = OnUpdateBlacklistedPathCommandReceived(false, inputStream, outputStream);
+        status = CommandOnUpdateBlacklistedPath(false, inputStream, outputStream);
+        break;
+    case KmUmShared::CommandCode::commandSetConfiguration:
+        status = CommandOnSetConfiguration(inputStream, outputStream);
         break;
     default:
         return STATUS_NOT_SUPPORTED;

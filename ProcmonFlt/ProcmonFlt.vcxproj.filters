@@ -170,6 +170,9 @@
     <ClInclude Include="BlackList.hpp">
       <Filter>Header Files\Functionality</Filter>
     </ClInclude>
+    <ClInclude Include="Commands.hpp">
+      <Filter>Header Files\Functionality</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Minifilter.cpp">
@@ -239,6 +242,9 @@
       <Filter>Source Files\Functionality</Filter>
     </ClCompile>
     <ClCompile Include="BlackList.cpp">
+      <Filter>Source Files\Functionality</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands.cpp">
       <Filter>Source Files\Functionality</Filter>
     </ClCompile>
   </ItemGroup>

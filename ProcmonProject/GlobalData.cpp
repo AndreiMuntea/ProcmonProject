@@ -10,11 +10,13 @@ GlobalData gGlobalData;
 
 GlobalData::GlobalData()
 {
+    ConfigurationRegistryKey = std::make_shared<RegistryKey>(HKEY_CURRENT_USER, L"Software\\ConfigurationKey");
     SolveImports();
 }
 
 GlobalData::~GlobalData()
 {
+    ConfigurationRegistryKey = nullptr;
     CleanImports();
 }
 

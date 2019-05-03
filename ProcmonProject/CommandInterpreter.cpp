@@ -208,6 +208,12 @@ void CommandInterpreter::ConnectFltPortCommand()
     }
 
     gGlobalData.FltPort.reset(new FilterPort(L"\\MyCommunicationPort"));
+
+    unsigned __int64 configuration = 0;
+    gGlobalData.ConfigurationRegistryKey->GetValue(configuration);
+
+    std::wcout << "Setting configuration to : " << std::hex << configuration << std::dec;
+    SetConfigurationCommand(configuration);
 }
 
 void CommandInterpreter::DisconnectFltPortCommand()
@@ -265,6 +271,7 @@ void CommandInterpreter::UpdateFeatureCommand(bool Enable)
     if (status == ERROR_SUCCESS)
     {
         std::cout << "Current features configuration: " << reply->featuresConfiguration << std::endl;
+        gGlobalData.ConfigurationRegistryKey->SetValue(reply->featuresConfiguration);
     }
     else
     {
@@ -301,6 +308,28 @@ void CommandInterpreter::UpdateBlacklistedFolder(bool Blacklist)
     else
     {
         std::wcout << "Couldn't perform operation" << std::endl;
+    }
+}
+
+void CommandInterpreter::SetConfigurationCommand(unsigned __int64 Configuration)
+{
+    if (!gGlobalData.FltPort || !gGlobalData.FltPort->IsConnected())
+    {
+        std::cout << "Disconnected FLT port!" << std::endl;
+        return;
+    }
+    auto command = std::make_shared<KmUmShared::CommandSetConfiguration>(Configuration);
+    auto reply = std::make_shared<KmUmShared::CommandReplyUpdateFeature>();
+
+    auto status = gGlobalData.FltPort->Send(command, reply);
+    if (status == ERROR_SUCCESS)
+    {
+        std::wcout << "Successfully set configuration" << std::endl; 
+        std::wcout << "Current features configuration: " << reply->featuresConfiguration << std::endl;
+    }
+    else
+    {
+        std::wcout << "Couldn't perform operation. Status = " << std::hex << status << std::dec << std::endl;
     }
 }
 

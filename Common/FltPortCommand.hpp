@@ -35,6 +35,7 @@ namespace KmUmShared
         commandDisableFeature,
         commandProtectFolder,
         commandUnprotectFolder,
+        commandSetConfiguration,
         commandMaxIndex
     };
 
@@ -91,6 +92,20 @@ namespace KmUmShared
 
     public:
         Cpp::String folder;
+    };
+
+    class CommandSetConfiguration : public CommandHeader
+    {
+    public:
+        CommandSetConfiguration() = default;
+        CommandSetConfiguration(const unsigned __int64& Configuration);
+        virtual ~CommandSetConfiguration() = default;
+
+        virtual void Serialize(Cpp::Stream& Stream) const override;
+        virtual void Deserialize(Cpp::Stream& Stream) override;
+
+    public:
+        unsigned __int64 configuration = 0;
     };
 
     class CommandReplyUpdateFeature : public CommandReply

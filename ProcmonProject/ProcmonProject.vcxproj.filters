@@ -123,6 +123,9 @@
     <ClInclude Include="..\Common\FltPortCommand.hpp">
       <Filter>Header Files\CommShared\Commands</Filter>
     </ClInclude>
+    <ClInclude Include="Registry.hpp">
+      <Filter>Header Files\Km Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -178,6 +181,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\FltPortCommand.cpp">
       <Filter>Source Files\CommShared\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Registry.cpp">
+      <Filter>Source Files\Km Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,5 +1,7 @@
 #include "ConfigurationManager.hpp"
 
+#include <intrin.h>
+
 Minifilter::ConfigurationManager::ConfigurationManager()
 {
     Validate();
@@ -50,6 +52,22 @@ LONG64
 Minifilter::ConfigurationManager::GetCurrentConfiguration() const
 {
     return features;
+}
+
+NTSTATUS Minifilter::ConfigurationManager::SetConfiguration(LONG64 Configuration)
+{
+    unsigned long index = 0;
+
+    if (_BitScanReverse64(&index, Configuration))
+    {
+        if (static_cast<KmUmShared::Feature>(index) >= KmUmShared::Feature::featureMaxIndex)
+        {
+            return STATUS_INVALID_PARAMETER;
+        }
+    }
+
+    InterlockedExchange64(&this->features, Configuration);
+    return STATUS_SUCCESS;
 }
 
 LONG64 

@@ -162,6 +162,7 @@
     <ClInclude Include="Ioctl.hpp" />
     <ClInclude Include="NtDefinitions.hpp" />
     <ClInclude Include="ProcessUtils.hpp" />
+    <ClInclude Include="Registry.hpp" />
     <ClInclude Include="RemoteThread.hpp" />
     <ClInclude Include="ThreadPool.hpp" />
     <ClInclude Include="trace.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="GlobalData.cpp" />
     <ClCompile Include="Ioctl.cpp" />
     <ClCompile Include="ProcessUtils.cpp" />
+    <ClCompile Include="Registry.cpp" />
     <ClCompile Include="RemoteThread.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="ThreadPool.cpp" />

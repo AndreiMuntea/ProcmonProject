@@ -5,6 +5,7 @@
 #include "ThreadPool.hpp"
 #include "DynamicImports.hpp"
 #include "FilterPort.hpp"
+#include "Registry.hpp"
 
 #include <memory>
 
@@ -24,6 +25,7 @@ public:
     PFUNC_ZwReadVirtualMemory ZwReadVirtualMemory = nullptr;
     PFUNC_ZwQuerySystemInformation ZwQuerySystemInformation = nullptr;
 
+    std::shared_ptr<RegistryKey> ConfigurationRegistryKey = nullptr;
 private:
     void SolveImports();
     void CleanImports();

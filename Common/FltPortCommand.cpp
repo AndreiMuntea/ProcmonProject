@@ -79,3 +79,21 @@ void KmUmShared::CommandUpdateBlacklistFolder::Deserialize(Cpp::Stream & Stream)
 {
     Stream >> this->folder;
 }
+
+KmUmShared::CommandSetConfiguration::CommandSetConfiguration(
+    const unsigned __int64 & Configuration
+) : CommandHeader{ CommandCode::commandSetConfiguration },
+    configuration{Configuration}
+{
+}
+
+void KmUmShared::CommandSetConfiguration::Serialize(Cpp::Stream & Stream) const
+{
+    CommandHeader::Serialize(Stream);
+    Stream << this->configuration;
+}
+
+void KmUmShared::CommandSetConfiguration::Deserialize(Cpp::Stream & Stream)
+{
+    Stream >> this->configuration;
+}

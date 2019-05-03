@@ -18,6 +18,7 @@ namespace Minifilter
         NTSTATUS DisableFeature(const KmUmShared::Feature& Feature);
         bool IsFeatureEnabled(const KmUmShared::Feature& Feature) const;
         LONG64 GetCurrentConfiguration() const;
+        NTSTATUS SetConfiguration(LONG64 Configuration);
 
     private:
         LONG64 GetFeatureIndex(const KmUmShared::Feature& Feature) const;

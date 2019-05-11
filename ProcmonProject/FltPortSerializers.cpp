@@ -1,10 +1,17 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include "FltPortSerializers.hpp"
 #include <WinSock2.h>
 
 std::wostream& operator<<(std::wostream& Stream, Cpp::String& String)
 {
     Stream.write((const wchar_t*)String.GetNakedPointer(), String.GetSize() / sizeof(wchar_t));
+    return Stream;
+}
+
+std::wostream & operator<<(std::wostream & Stream, Cpp::NonPagedString & NonPagedString)
+{
+    Stream.write((const wchar_t*)NonPagedString.GetNakedPointer(), NonPagedString.GetSize() / sizeof(wchar_t));
     return Stream;
 }
 
@@ -192,11 +199,12 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::FileDeleteMessage
 std::wostream & operator<<(std::wostream & Stream, KmUmShared::NetworkMessage & NetworkMessage)
 {
     Stream << "[Network activity]" << std::endl
-        << "\t> [ApplicationId ] " << NetworkMessage.applicationId << std::endl
-        << "\t> [ICMP] " << NetworkMessage.icmp << std::endl
-        << "\t> [Local Address] " << inet_ntoa(*(struct in_addr*)(&NetworkMessage.localAddress))  << std::endl
-        << "\t> [Remote Address] " << inet_ntoa(*(struct in_addr*)(&NetworkMessage.remoteAddress)) << std::endl
-        << "\t> [Local Port] " << NetworkMessage.localPort << std::endl
-        << "\t> [Remote Port] " << NetworkMessage.remoteAddress << std::endl;
+        << "\t> [Protocol] " << static_cast<unsigned __int64>(NetworkMessage.protocol) << std::endl
+        << "\t> [ICMP] " << static_cast<unsigned __int64>(NetworkMessage.icmp) << std::endl
+        << "\t> [Local Address] " << inet_ntoa(*(struct in_addr*)&NetworkMessage.localAddress) << std::endl
+        << "\t> [Remote Address] " << inet_ntoa(*(struct in_addr*)&NetworkMessage.remoteAddress) << std::endl
+        << "\t> [Local Port] " << static_cast<unsigned __int64>(NetworkMessage.localPort) << std::endl
+        << "\t> [Remote Port] " << static_cast<unsigned __int64>(NetworkMessage.remotePort) << std::endl
+        << "\t> [ApplicationId ] " << NetworkMessage.applicationId << std::endl;
     return Stream;
 }

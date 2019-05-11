@@ -19,4 +19,14 @@ namespace Cpp
     {
         RtlCopyMemory(Destination, Source, Size);
     }
+
+    void* __cdecl LibAllocNonpaged(size_t Size)
+    {
+        return ExAllocatePoolWithTag(NonPagedPool, Size, CPP_TAG_DEF);
+    }
+
+    void __cdecl LibFreeNonpaged(void* Block)
+    {
+        ExFreePoolWithTag(Block, CPP_TAG_DEF);
+    }
 }

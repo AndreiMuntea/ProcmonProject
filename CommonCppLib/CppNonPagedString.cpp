@@ -1,27 +1,26 @@
-#include "include\CppString.hpp"
+#include "include\CppNonPagedString.hpp"
 #include "include\CppAlgorithm.hpp"
 
-
-Cpp::String::String()
+Cpp::NonPagedString::NonPagedString()
 {
     Validate();
 }
 
-Cpp::String::String(
-    const unsigned __int8* Buffer, 
+Cpp::NonPagedString::NonPagedString(
+    const unsigned __int8* Buffer,
     unsigned __int32 BufferSize
 )
 {
-    ReplaceBuffer(Buffer, BufferSize) ? Validate() 
+    ReplaceBuffer(Buffer, BufferSize) ? Validate()
                                       : Invalidate();
 }
 
-Cpp::String::~String()
+Cpp::NonPagedString::~NonPagedString()
 {
     DisposeBuffer();
 }
 
-Cpp::String::String(const String& Other)
+Cpp::NonPagedString::NonPagedString(const NonPagedString& Other)
 {
     if (!Other.IsValid())
     {
@@ -33,7 +32,7 @@ Cpp::String::String(const String& Other)
                                             : Invalidate();
 }
 
-Cpp::String::String(String&& Other)
+Cpp::NonPagedString::NonPagedString(NonPagedString&& Other)
 {
     if (!Other.IsValid())
     {
@@ -48,7 +47,7 @@ Cpp::String::String(String&& Other)
     Validate();
 }
 
-Cpp::String& Cpp::String::operator=(const String& Other)
+Cpp::NonPagedString& Cpp::NonPagedString::operator=(const NonPagedString& Other)
 {
     if (!IsValid() || !Other.IsValid())
     {
@@ -61,7 +60,7 @@ Cpp::String& Cpp::String::operator=(const String& Other)
     return *this;
 }
 
-Cpp::String& Cpp::String::operator=(String&& Other)
+Cpp::NonPagedString& Cpp::NonPagedString::operator=(NonPagedString&& Other)
 {
     if (!IsValid() || !Other.IsValid())
     {
@@ -73,12 +72,12 @@ Cpp::String& Cpp::String::operator=(String&& Other)
 
     Cpp::Swap(this->buffer, Other.buffer);
     Cpp::Swap(this->size, Other.size);
-    
+
     Validate();
     return *this;
 }
 
-Cpp::String& Cpp::String::operator+=(const String & Other)
+Cpp::NonPagedString& Cpp::NonPagedString::operator+=(const NonPagedString & Other)
 {
     unsigned __int32 newSize = this->size + Other.size;
     if (newSize < this->size || !Other.IsValid())
@@ -87,7 +86,7 @@ Cpp::String& Cpp::String::operator+=(const String & Other)
         return *this;
     }
 
-    unsigned __int8* temp = (unsigned __int8*)Cpp::LibAlloc(newSize);
+    unsigned __int8* temp = (unsigned __int8*)Cpp::LibAllocNonpaged(newSize);
     if (!temp)
     {
         this->Invalidate();
@@ -104,8 +103,8 @@ Cpp::String& Cpp::String::operator+=(const String & Other)
     return *this;
 }
 
-unsigned __int32 
-Cpp::String::Count(unsigned __int8 Character) const
+unsigned __int32
+Cpp::NonPagedString::Count(unsigned __int8 Character) const
 {
     unsigned __int32 counter = 0;
     for (unsigned __int32 i = 0; i < this->size; ++i)
@@ -119,31 +118,31 @@ Cpp::String::Count(unsigned __int8 Character) const
 }
 
 unsigned __int8*
-Cpp::String::GetNakedPointer()
+Cpp::NonPagedString::GetNakedPointer()
 {
     return this->buffer;
 }
 
-unsigned __int32 
-Cpp::String::GetSize() const
+unsigned __int32
+Cpp::NonPagedString::GetSize() const
 {
     return this->size;
 }
 
 void
-Cpp::String::DisposeBuffer()
+Cpp::NonPagedString::DisposeBuffer()
 {
     if (this->buffer)
     {
-        Cpp::LibFree(this->buffer);
+        Cpp::LibFreeNonpaged(this->buffer);
         this->buffer = nullptr;
         this->size = 0;
     }
 }
 
-bool 
-Cpp::String::ReplaceBuffer(
-    const unsigned __int8* Buffer, 
+bool
+Cpp::NonPagedString::ReplaceBuffer(
+    const unsigned __int8* Buffer,
     unsigned __int32 BufferSize
 )
 {
@@ -153,7 +152,7 @@ Cpp::String::ReplaceBuffer(
         return true;
     }
 
-    this->buffer = (unsigned __int8*)Cpp::LibAlloc(BufferSize);
+    this->buffer = (unsigned __int8*)Cpp::LibAllocNonpaged(BufferSize);
     if (!this->buffer)
     {
         return false;
@@ -165,8 +164,8 @@ Cpp::String::ReplaceBuffer(
     return true;
 }
 
-bool 
-Cpp::String::operator==(const String& Other) const
+bool
+Cpp::NonPagedString::operator==(const NonPagedString& Other) const
 {
     if (!this->IsValid() || !Other.IsValid())
     {
@@ -206,58 +205,50 @@ Cpp::String::operator==(const String& Other) const
 
     return true;
 }
-
-Cpp::Stream& 
-Cpp::operator<<(
-    Stream& Stream, 
-    const String& String
-)
+Cpp::Stream & Cpp::operator<<(Stream & Stream, const NonPagedString & NonPagedString)
 {
-    if (!String.IsValid())
+    if (!NonPagedString.IsValid())
     {
         Stream.Invalidate();
         return Stream;
     }
 
-    Stream << String.size;
-    if (String.size > 0)
+    Stream << NonPagedString.size;
+    if (NonPagedString.size > 0)
     {
-        Stream.Write(String.buffer, String.size);
+        Stream.Write(NonPagedString.buffer, NonPagedString.size);
     }
 
     return Stream;
 }
 
-Cpp::Stream& Cpp::operator>>(
-    Stream& Stream, 
-    String& String
-)
+Cpp::Stream & Cpp::operator >> (Stream & Stream, NonPagedString & NonPagedString)
 {
-    String.DisposeBuffer();
+    NonPagedString.DisposeBuffer();
 
-    Stream >> String.size;
+    Stream >> NonPagedString.size;
     if (!Stream.IsValid())
     {
-        String.Invalidate();
+        NonPagedString.Invalidate();
         return Stream;
     }
 
-    String.buffer = (unsigned __int8*) Cpp::LibAlloc(String.size);
-    if (!String.buffer)
+    NonPagedString.buffer = (unsigned __int8*)Cpp::LibAllocNonpaged(NonPagedString.size);
+    if (!NonPagedString.buffer)
     {
-        String.Invalidate();
+        NonPagedString.Invalidate();
         Stream.Invalidate();
         return Stream;
     }
 
-    if (String.size > 0)
+    if (NonPagedString.size > 0)
     {
-        Stream.Read(String.buffer, String.size);
+        Stream.Read(NonPagedString.buffer, NonPagedString.size);
     }
-    
+
     if (!Stream.IsValid())
     {
-        String.Invalidate();
+        NonPagedString.Invalidate();
     }
 
     return Stream;

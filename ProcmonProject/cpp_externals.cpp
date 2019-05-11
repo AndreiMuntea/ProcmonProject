@@ -20,4 +20,14 @@ namespace Cpp
             ((unsigned __int8*)Destination)[i] = ((unsigned __int8*)Source)[i];
         }
     }
+
+    void* __cdecl LibAllocNonpaged(size_t Size)
+    {
+        return malloc(Size);
+    }
+
+    void __cdecl LibFreeNonpaged(void* Block)
+    {
+        free(Block);
+    }
 }

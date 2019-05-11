@@ -51,6 +51,9 @@
     <ClInclude Include="include\CppSemantics.hpp">
       <Filter>Header Files\Data Structures</Filter>
     </ClInclude>
+    <ClInclude Include="include\CppNonPagedString.hpp">
+      <Filter>Header Files\Data Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CppString.cpp">
@@ -60,6 +63,9 @@
       <Filter>Source Files\Data Structures</Filter>
     </ClCompile>
     <ClCompile Include="CppStream.cpp">
+      <Filter>Source Files\Data Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="CppNonPagedString.cpp">
       <Filter>Source Files\Data Structures</Filter>
     </ClCompile>
   </ItemGroup>

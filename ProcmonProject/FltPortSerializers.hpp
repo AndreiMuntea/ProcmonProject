@@ -10,10 +10,12 @@
 #include "../Common/FltPortNetworkMessage.hpp"
 
 #include <CppString.hpp>
+#include <CppNonPagedString.hpp>
 #include <sstream>
 #include <string>
 
 std::wostream& operator<<(std::wostream& Stream, Cpp::String& String);
+std::wostream& operator<<(std::wostream& Stream, Cpp::NonPagedString& NonPagedString);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::ProcessCreateMessage& ProcessCreateMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::ProcessTerminateMessage& ProcessTerminateMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::ThreadCreateMessage& ThreadCreateMessage);

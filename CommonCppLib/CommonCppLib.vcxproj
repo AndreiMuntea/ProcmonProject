@@ -125,6 +125,7 @@
     <ClInclude Include="include\CppAlgorithm.hpp" />
     <ClInclude Include="include\CppDefaultDeleter.hpp" />
     <ClInclude Include="include\CppExternals.hpp" />
+    <ClInclude Include="include\CppNonPagedString.hpp" />
     <ClInclude Include="include\CppObject.hpp" />
     <ClInclude Include="include\CppSemantics.hpp" />
     <ClInclude Include="include\CppShallowStream.hpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="include\CppUniquePointer.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CppNonPagedString.cpp" />
     <ClCompile Include="CppShallowStream.cpp" />
     <ClCompile Include="CppStream.cpp" />
     <ClCompile Include="CppString.cpp" />

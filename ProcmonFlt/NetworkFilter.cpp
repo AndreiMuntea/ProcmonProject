@@ -349,8 +349,7 @@ Minifilter::NetworkFilter::ProcessValues(
     gDrvData.CommunicationPort->Send<KmUmShared::NetworkMessage>(
         ProcessId, 
         timestamp, 
-        AppId.byteBlob->data,
-        AppId.byteBlob->size,
+        Cpp::NonPagedString{AppId.byteBlob->data,  AppId.byteBlob->size },
         LocalAddress.uint32,
         RemoteAddress.uint32,
         LocalPort.uint16,

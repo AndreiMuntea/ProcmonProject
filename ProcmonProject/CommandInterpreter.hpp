@@ -31,6 +31,8 @@ private:
     void UpdateBlacklistedFolder(bool Blacklist);
     void SetConfigurationCommand(unsigned __int64 Configuration);
 
+    void ChangeAccessToWebsite(bool Block);
+
     void PrintAvailableFeatures();
     std::unordered_map<std::string, Command> availableCommands;
 };

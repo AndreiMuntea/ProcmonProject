@@ -109,11 +109,22 @@ CommandInterpreter::CommandInterpreter()
         std::make_tuple("Sends UnprotectFolder to '\\MyCommunicationPort'", [this]() { this->UpdateBlacklistedFolder(false); })
     );
 
-
     availableCommands.emplace(
         std::piecewise_construct,
         std::make_tuple("DeleteAtReboot"),
         std::make_tuple("Creates a dummyfile and schedule it to be deleted at reboot", PuDeleteFileAtReboot)
+    );
+
+    availableCommands.emplace(
+        std::piecewise_construct,
+        std::make_tuple("BlockWebsite"),
+        std::make_tuple("Blocks access to a user input website url", [this]() {this->ChangeAccessToWebsite(true); })
+    );
+
+    availableCommands.emplace(
+        std::piecewise_construct,
+        std::make_tuple("UnBlockWebsite"),
+        std::make_tuple("Unblocks access to a user input website url", [this]() {this->ChangeAccessToWebsite(false); })
     );
 
     availableCommands.emplace(
@@ -332,6 +343,22 @@ void CommandInterpreter::SetConfigurationCommand(unsigned __int64 Configuration)
         std::wcout << "Couldn't perform operation. Status = " << std::hex << status << std::dec << std::endl;
     }
 }
+
+void CommandInterpreter::ChangeAccessToWebsite(bool Block)
+{
+    std::wstring website;
+    std::wstring application;
+
+    std::wcout << "What website do you want to update : " << std::endl;
+    std::getline(std::wcin, website);
+
+    std::wcout << "What application do you want to update : " << std::endl;
+    std::getline(std::wcin, application);
+
+    (Block) ? gGlobalData.NetworkManager->BlockAccess(website, application)
+            : gGlobalData.NetworkManager->UnblockAccess(website, application);
+}
+
 
 void CommandInterpreter::PrintAvailableFeatures()
 {

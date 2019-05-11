@@ -6,6 +6,7 @@
 #include "DynamicImports.hpp"
 #include "FilterPort.hpp"
 #include "Registry.hpp"
+#include "NetworkManager.hpp"
 
 #include <memory>
 
@@ -26,6 +27,8 @@ public:
     PFUNC_ZwQuerySystemInformation ZwQuerySystemInformation = nullptr;
 
     std::shared_ptr<RegistryKey> ConfigurationRegistryKey = nullptr;
+
+    std::shared_ptr<NetworkManager> NetworkManager = nullptr;
 private:
     void SolveImports();
     void CleanImports();

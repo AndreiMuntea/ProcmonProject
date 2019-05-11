@@ -10,13 +10,16 @@ GlobalData gGlobalData;
 
 GlobalData::GlobalData()
 {
-    ConfigurationRegistryKey = std::make_shared<RegistryKey>(HKEY_CURRENT_USER, L"Software\\ConfigurationKey");
+    ConfigurationRegistryKey = std::make_shared<::RegistryKey>(HKEY_CURRENT_USER, L"Software\\ConfigurationKey");
+    NetworkManager = std::make_shared<::NetworkManager>();
+
     SolveImports();
 }
 
 GlobalData::~GlobalData()
 {
     ConfigurationRegistryKey = nullptr;
+    NetworkManager = nullptr;
     CleanImports();
 }
 

@@ -3,7 +3,6 @@
 #include "CommandInterpreter.hpp"
 #include "GlobalData.hpp"
 
-
 #include <iostream>
 
 int main()
@@ -11,7 +10,7 @@ int main()
     WPP_INIT_TRACING(NULL);
 
     gGlobalData.CommandInterpreter.Execute("Help");
-
+    
     std::string command;
     while (gGlobalData.IsApplicationRunning)
     {

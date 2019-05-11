@@ -64,6 +64,12 @@
     <Filter Include="Header Files\CommShared\Commands">
       <UniqueIdentifier>{1c8a35b8-7402-47c1-a825-b8fd4658e532}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Networking">
+      <UniqueIdentifier>{48a80293-54ea-4a2f-a92c-843d266b99d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Networking">
+      <UniqueIdentifier>{187e386b-8eab-4bdc-8382-db40c7868f66}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommandInterpreter.hpp">
@@ -126,6 +132,9 @@
     <ClInclude Include="Registry.hpp">
       <Filter>Header Files\Km Utils</Filter>
     </ClInclude>
+    <ClInclude Include="NetworkManager.hpp">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -184,6 +193,9 @@
     </ClCompile>
     <ClCompile Include="Registry.cpp">
       <Filter>Source Files\Km Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkManager.cpp">
+      <Filter>Source Files\Networking</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

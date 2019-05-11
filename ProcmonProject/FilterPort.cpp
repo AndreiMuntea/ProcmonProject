@@ -185,6 +185,9 @@ FilterPort::HandleMessage(
     case KmUmShared::MessageCode::msgFileDelete:
         status = HandleMessageNotification<KmUmShared::FileDeleteMessage>(InputData, processId, processName, timestamp);
         break;
+    case KmUmShared::MessageCode::msgNetworkNotification:
+        status = HandleMessageNotification<KmUmShared::NetworkMessage>(InputData, processId, processName, timestamp);
+        break;
     default:
         status = ERROR_NOT_FOUND;
         break;

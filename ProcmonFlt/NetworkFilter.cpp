@@ -4,13 +4,14 @@
 
 
 #include "GlobalData.hpp"
+#include "../Common/FltPortNetworkMessage.hpp"
 
 // {BD2F8319-7363-4AF9-8FB2-D5CA63CB24A3}
-static const GUID gAuthConnectGUID =
+static const GUID gAuthConnectIpV4GUID =
 { 0xbd2f8319, 0x7363, 0x4af9,{ 0x8f, 0xb2, 0xd5, 0xca, 0x63, 0xcb, 0x24, 0xa3 } };
 
 // {AAE86F30-9BC2-4858-B9AD-FFD49D1D32F1}
-static const GUID gAuthRecvAcceptGUID =
+static const GUID gAuthRecvAcceptIpv4GUID =
 { 0xaae86f30, 0x9bc2, 0x4858,{ 0xb9, 0xad, 0xff, 0xd4, 0x9d, 0x1d, 0x32, 0xf1 } };
 
 
@@ -73,27 +74,6 @@ Minifilter::NetworkFilter::~NetworkFilter()
     this->engine.Update(nullptr);
 }
 
-void 
-Minifilter::NetworkFilter::ClassifyFn(
-    _In_ const FWPS_INCOMING_VALUES0* FixedValues,
-    _In_ const FWPS_INCOMING_METADATA_VALUES0* MetaValues,
-    _Inout_opt_ void* LayerData,
-    _In_opt_ const void* ClassifyContext,
-    _In_ const FWPS_FILTER2* Filter,
-    _In_ UINT64 FlowContext,
-    _Inout_ FWPS_CLASSIFY_OUT0* Classify
-)
-{
-    UNREFERENCED_PARAMETER(FixedValues);
-    UNREFERENCED_PARAMETER(MetaValues);
-    UNREFERENCED_PARAMETER(LayerData);
-    UNREFERENCED_PARAMETER(Filter);
-    UNREFERENCED_PARAMETER(FlowContext);
-    UNREFERENCED_PARAMETER(Classify);
-    UNREFERENCED_PARAMETER(ClassifyContext);
-
-}
-
 NTSTATUS 
 Minifilter::NetworkFilter::NotifyFn(
     _In_ FWPS_CALLOUT_NOTIFY_TYPE NotifyType, 
@@ -126,7 +106,10 @@ bool Minifilter::NetworkFilter::RegisterAuthConnectIpV4Callout()
     GUID guid = FWPM_LAYER_ALE_AUTH_CONNECT_V4;
     auto status = RegisterCallback(
         &guid,
-        &gAuthConnectGUID,
+        &gAuthConnectIpV4GUID,
+        Minifilter::NetworkFilter::ClassifyFn<FWPS_LAYER_ALE_AUTH_CONNECT_V4>,
+        Minifilter::NetworkFilter::NotifyFn,
+        Minifilter::NetworkFilter::FlowDeleteFn,
         &this->authConnectIpV4CalloutFwpsId,
         &this->authConnectIpV4CalloutFwpmId,
         &this->authConnectIpV4CalloutFilterId
@@ -140,7 +123,10 @@ bool Minifilter::NetworkFilter::RegisterAuthRecvAcceptIpV4Callout()
     GUID guid = FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4;
     auto status = RegisterCallback(
         &guid,
-        &gAuthRecvAcceptGUID,
+        &gAuthRecvAcceptIpv4GUID,
+        Minifilter::NetworkFilter::ClassifyFn<FWPS_LAYER_ALE_AUTH_RECV_ACCEPT_V4>,
+        Minifilter::NetworkFilter::NotifyFn,
+        Minifilter::NetworkFilter::FlowDeleteFn,
         &this->authRecvAcceptIpV4CalloutFwpsId,
         &this->authRecvAcceptIpV4CalloutFwpmId,
         &this->authRecvAcceptIpV4CalloutFilterId
@@ -153,6 +139,9 @@ NTSTATUS
 Minifilter::NetworkFilter::RegisterCallback(
     _In_ const GUID* LayerKey,
     _In_ const GUID* CalloutKey,
+    _In_ FWPS_CALLOUT_CLASSIFY_FN2 ClassifyFunction,
+    _In_ FWPS_CALLOUT_NOTIFY_FN2 NotifyFunction,
+    _In_ FWPS_CALLOUT_FLOW_DELETE_NOTIFY_FN0 FlowDeleteFunction,
     _Out_ UINT32* FwpsCalloutId,
     _Out_ UINT32* FwpmCalloutId,
     _Out_ UINT64* FilterId
@@ -161,7 +150,7 @@ Minifilter::NetworkFilter::RegisterCallback(
     *FwpsCalloutId = 0;
     *FwpmCalloutId = 0;
 
-    auto status = RegisterFwpsCallout(LayerKey, CalloutKey, FwpsCalloutId);
+    auto status = RegisterFwpsCallout(LayerKey, CalloutKey, ClassifyFunction, NotifyFunction, FlowDeleteFunction, FwpsCalloutId);
     if (!NT_SUCCESS(status))
     {
         MyDriverLogCritical("RegisterFwpsCallout failed with status 0x%x", status);
@@ -194,6 +183,9 @@ NTSTATUS
 Minifilter::NetworkFilter::RegisterFwpsCallout(
     _In_ const GUID* LayerKey,
     _In_ const GUID* CalloutKey,
+    _In_ FWPS_CALLOUT_CLASSIFY_FN2 ClassifyFunction,
+    _In_ FWPS_CALLOUT_NOTIFY_FN2 NotifyFunction,
+    _In_ FWPS_CALLOUT_FLOW_DELETE_NOTIFY_FN0 FlowDeleteFunction,
     _Out_ UINT32* FwpsCalloutId
 )
 {
@@ -201,9 +193,9 @@ Minifilter::NetworkFilter::RegisterFwpsCallout(
     FWPS_CALLOUT fwpsCallout = { 0 };
 
     fwpsCallout.calloutKey = *CalloutKey;
-    fwpsCallout.classifyFn = Minifilter::NetworkFilter::ClassifyFn;
-    fwpsCallout.notifyFn = Minifilter::NetworkFilter::NotifyFn;
-    fwpsCallout.flowDeleteFn = Minifilter::NetworkFilter::FlowDeleteFn;
+    fwpsCallout.classifyFn = ClassifyFunction;
+    fwpsCallout.notifyFn = NotifyFunction;
+    fwpsCallout.flowDeleteFn = FlowDeleteFunction;
 
     return ::FwpsCalloutRegister(this->deviceObject->GetDeviceObject(), &fwpsCallout, FwpsCalloutId);
 }
@@ -246,6 +238,126 @@ Minifilter::NetworkFilter::RegisterFilter(
     filter.weight.type = FWP_EMPTY;
 
     return FwpmFilterAdd(this->engine->engineHandle, &filter, nullptr, FilterId);
+}
+
+bool 
+Minifilter::NetworkFilter::GetNetworkTupleIndexesForLayer(
+    _In_ UINT16 LayerId,
+    _Out_ UINT* AppIdIndex,
+    _Out_ UINT* LocalAddressIndex,
+    _Out_ UINT* RemoteAddressIndex,
+    _Out_ UINT* LocalPortIndex,
+    _Out_ UINT* RemotePortIndex,
+    _Out_ UINT* ProtocolIndex,
+    _Out_ UINT* IcmpIndex
+)
+{
+    switch (LayerId)
+    {
+    case FWPS_LAYER_ALE_AUTH_CONNECT_V4:
+        *AppIdIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V4_ALE_APP_ID;
+        *LocalAddressIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V4_IP_LOCAL_ADDRESS;
+        *RemoteAddressIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V4_IP_REMOTE_ADDRESS;
+        *LocalPortIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V4_IP_LOCAL_PORT;
+        *RemotePortIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V4_IP_REMOTE_PORT;
+        *ProtocolIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V4_IP_PROTOCOL;
+        *IcmpIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V4_ICMP_TYPE;
+        return true;
+    case FWPS_LAYER_ALE_AUTH_RECV_ACCEPT_V4:
+        *AppIdIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V4_ALE_APP_ID;
+        *LocalAddressIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V4_IP_LOCAL_ADDRESS;
+        *RemoteAddressIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V4_IP_REMOTE_ADDRESS;
+        *LocalPortIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V4_IP_LOCAL_PORT;
+        *RemotePortIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V4_IP_REMOTE_PORT;
+        *ProtocolIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V4_IP_PROTOCOL;
+        *IcmpIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V4_ICMP_TYPE;
+        return true;
+    default:
+        *AppIdIndex = MAXUINT32;
+        *LocalAddressIndex = MAXUINT32;
+        *RemoteAddressIndex = MAXUINT32;
+        *LocalPortIndex = MAXUINT32;
+        *RemotePortIndex = MAXUINT32;
+        *ProtocolIndex = MAXUINT32;
+        *IcmpIndex = MAXUINT32;
+        NT_ASSERT(0);
+        return false;
+    }
+}
+
+void 
+Minifilter::NetworkFilter::ProcessValues(
+    _In_ FWP_VALUE0& AppId,
+    _In_ FWP_VALUE0& LocalAddress,
+    _In_ FWP_VALUE0& RemoteAddress,
+    _In_ FWP_VALUE0& LocalPort,
+    _In_ FWP_VALUE0& RemotePort,
+    _In_ FWP_VALUE0& Protocol,
+    _In_ FWP_VALUE0& Icmp,
+    _In_ HANDLE ProcessId
+)
+{
+    if (AppId.type != FWP_BYTE_BLOB_TYPE)
+    {
+        MyDriverLogError("Invalid type for application id");
+        return;
+    }
+
+    if (LocalAddress.type != FWP_UINT32 || RemoteAddress.type != FWP_UINT32)
+    {
+        MyDriverLogError("Invalid type for address");
+        return;
+    }
+
+    if (LocalPort.type != FWP_UINT16 || LocalPort.type != FWP_UINT16)
+    {
+        MyDriverLogError("Invalid type for port");
+        return;
+    }
+
+    if (Protocol.type != FWP_UINT8)
+    {
+        MyDriverLogError("Invalid type for protocol");
+        return;
+    }
+
+    if (Icmp.type != FWP_UINT16)
+    {
+        MyDriverLogError("Invalid type for ICMP");
+        return;
+    }
+
+    UNICODE_STRING appIdBlob{ 0 };
+    appIdBlob.Buffer = (PWCHAR)AppId.byteBlob->data;
+    appIdBlob.Length = static_cast<USHORT>(AppId.byteBlob->size);
+    appIdBlob.MaximumLength = static_cast<USHORT>(AppId.byteBlob->size);
+
+    MyDriverLogTrace("New data available: "
+        "AppId = %wZ LocalAddress = 0x%x RemoteAddress = 0x%x LocalPort = 0x%x RemotePort = 0x%x, Protocol = 0x%x ICMP = 0x%x",
+        &appIdBlob,
+        LocalAddress.uint32, 
+        RemoteAddress.uint32,
+        LocalPort.uint16, 
+        RemotePort.uint16,
+        Protocol.uint8,
+        Icmp.uint16
+    );
+
+    unsigned __int64 timestamp = 0;
+    KeQuerySystemTime(&timestamp);
+
+    gDrvData.CommunicationPort->Send<KmUmShared::NetworkMessage>(
+        ProcessId, 
+        timestamp, 
+        AppId.byteBlob->data,
+        AppId.byteBlob->size,
+        LocalAddress.uint32,
+        RemoteAddress.uint32,
+        LocalPort.uint16,
+        RemotePort.uint16,
+        Protocol.uint8,
+        Icmp.uint16
+    );
 }
 
 

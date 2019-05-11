@@ -1,4 +1,6 @@
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "FltPortSerializers.hpp"
+#include <WinSock2.h>
 
 std::wostream& operator<<(std::wostream& Stream, Cpp::String& String)
 {
@@ -184,5 +186,17 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::FileDeleteMessage
         << "\t> [File Name] " << FileDeleteMessage.string1 << std::endl
         << "\t> [Status] " << FileDeleteMessage.status << std::endl
         << "\t> [DeleteType] " << FileDeleteMessage.deleteType << std::endl;
+    return Stream;
+}
+
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::NetworkMessage & NetworkMessage)
+{
+    Stream << "[Network activity]" << std::endl
+        << "\t> [ApplicationId ] " << NetworkMessage.applicationId << std::endl
+        << "\t> [ICMP] " << NetworkMessage.icmp << std::endl
+        << "\t> [Local Address] " << inet_ntoa(*(struct in_addr*)(&NetworkMessage.localAddress))  << std::endl
+        << "\t> [Remote Address] " << inet_ntoa(*(struct in_addr*)(&NetworkMessage.remoteAddress)) << std::endl
+        << "\t> [Local Port] " << NetworkMessage.localPort << std::endl
+        << "\t> [Remote Port] " << NetworkMessage.remoteAddress << std::endl;
     return Stream;
 }

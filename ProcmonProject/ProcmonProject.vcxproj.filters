@@ -135,6 +135,9 @@
     <ClInclude Include="NetworkManager.hpp">
       <Filter>Header Files\Networking</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\FltPortNetworkMessage.hpp">
+      <Filter>Header Files\CommShared\Notifications</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -196,6 +199,9 @@
     </ClCompile>
     <ClCompile Include="NetworkManager.cpp">
       <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortNetworkMessage.cpp">
+      <Filter>Source Files\CommShared\Notifications</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

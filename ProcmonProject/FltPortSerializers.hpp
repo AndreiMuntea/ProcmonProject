@@ -7,6 +7,7 @@
 #include "../Common/FltPortModuleMessage.hpp"
 #include "../Common/FltPortRegistryMessage.hpp"
 #include "../Common/FltPortFileMessage.hpp"
+#include "../Common/FltPortNetworkMessage.hpp"
 
 #include <CppString.hpp>
 #include <sstream>
@@ -31,5 +32,6 @@ std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileReadMessage& Fi
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileWriteMessage& FileWriteMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileSetInformationMessage& FileSetInformationMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileDeleteMessage& FileDeleteMessage);
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::NetworkMessage& NetworkMessage);
 
 #endif //__FLT_PORT_SERIALIZERS_HPP__

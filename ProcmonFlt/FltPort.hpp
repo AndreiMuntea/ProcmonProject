@@ -22,7 +22,7 @@ namespace Minifilter
     typedef FUNC_OnMessageNotifyCallback *PFUNC_OnMessageNotifyCallback;
 
     template <class MessageType>
-    class FltPortDataPackage : public Cpp::CppPagedObject<'TLF#'>
+    class FltPortDataPackage : public Cpp::CppNonPagedObject<'TLF#'>
     {
         friend class FltPort;
     public:

@@ -179,6 +179,9 @@
     <ClInclude Include="NetworkFilter.hpp">
       <Filter>Header Files\Filters</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\FltPortNetworkMessage.hpp">
+      <Filter>Header Files\Communication\Notifications</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Minifilter.cpp">
@@ -258,6 +261,9 @@
     </ClCompile>
     <ClCompile Include="NetworkFilter.cpp">
       <Filter>Source Files\Filters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\FltPortNetworkMessage.cpp">
+      <Filter>Source Files\Communication\Notifications</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

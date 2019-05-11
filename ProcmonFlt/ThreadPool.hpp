@@ -53,7 +53,7 @@ namespace Cpp
         bool pendingShutdown = false;
         UINT8 noThreads = 0;
         HANDLE* threads = nullptr;
-        Cpp::Pushlock lock;
+        Cpp::Spinlock lock;
 
         void WaitThreads();
         void CleanupThreadPool();

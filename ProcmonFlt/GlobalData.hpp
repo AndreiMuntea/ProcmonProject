@@ -9,6 +9,8 @@
 #include "ThreadFilter.hpp"
 #include "ModuleFilter.hpp"
 #include "RegistryFilter.hpp"
+#include "NetworkFilter.hpp"
+
 #include "ConfigurationManager.hpp"
 #include "ProcessCollector.hpp"
 #include "BlackList.hpp"
@@ -28,6 +30,7 @@ typedef struct _GLOBAL_DATA
     Cpp::UniquePointer<Minifilter::ThreadFilter> ThreadFilter;
     Cpp::UniquePointer<Minifilter::ModuleFilter> ModuleFilter;
     Cpp::UniquePointer<Minifilter::RegistryFilter> RegistryFilter;
+    Cpp::UniquePointer<Minifilter::NetworkFilter> NetworkFilter;
 
     Cpp::UniquePointer<Minifilter::ProcessCollector> ProcessColector;
     Cpp::UniquePointer<Minifilter::ConfigurationManager> ConfigurationManager;

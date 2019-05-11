@@ -121,6 +121,16 @@ DriverEntry(
         goto Exit;
     }
 
+    // Create Network Filter
+    gDrvData.NetworkFilter.Update(new Minifilter::NetworkFilter(DriverObject, nullptr));
+    if (!gDrvData.NetworkFilter.IsValid() || !gDrvData.NetworkFilter->IsValid())
+    {
+        gDrvData.CommunicationPort.Update(nullptr);
+        ::FltUnregisterFilter(gDrvData.FilterHandle);
+        MyDriverLogCritical("Failed to initialize NetworkFilter");
+        goto Exit;
+    }
+
     // Start filtering
     status = ::FltStartFiltering(gDrvData.FilterHandle);
     if (!NT_SUCCESS(status))
@@ -164,6 +174,7 @@ DriverUnload(
     gDrvData.ProcessFilter.Update(nullptr);
     gDrvData.ModuleFilter.Update(nullptr);
     gDrvData.RegistryFilter.Update(nullptr);
+    gDrvData.NetworkFilter.Update(nullptr);
 
     // Close communication port (has a reference to filter handle => has to be done before FltUnregisterFilter)
     gDrvData.CommunicationPort.Update(nullptr);

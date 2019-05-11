@@ -138,7 +138,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Link>
-      <AdditionalDependencies>fltmgr.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltmgr.lib;Fwpkclnt.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalOptions>/IntegrityCheck %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -150,7 +150,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Link>
-      <AdditionalDependencies>fltmgr.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltmgr.lib;Fwpkclnt.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalOptions>/IntegrityCheck %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -162,7 +162,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
-      <AdditionalDependencies>fltmgr.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltmgr.lib;Fwpkclnt.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalOptions>/IntegrityCheck %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -174,7 +174,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
-      <AdditionalDependencies>fltmgr.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltmgr.lib;Fwpkclnt.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalOptions>/IntegrityCheck %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -186,7 +186,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
-      <AdditionalDependencies>fltmgr.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltmgr.lib;Fwpkclnt.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalOptions>/IntegrityCheck %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -198,7 +198,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <Link>
-      <AdditionalDependencies>fltmgr.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltmgr.lib;Fwpkclnt.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalOptions>/IntegrityCheck %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -210,7 +210,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <Link>
-      <AdditionalDependencies>fltmgr.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltmgr.lib;Fwpkclnt.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalOptions>/IntegrityCheck %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -222,7 +222,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <Link>
-      <AdditionalDependencies>fltmgr.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltmgr.lib;Fwpkclnt.lib;CommonCppLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalOptions>/IntegrityCheck %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -257,6 +257,7 @@
     <ClInclude Include="cpp_lock.hpp" />
     <ClInclude Include="cpp_lockguard.hpp" />
     <ClInclude Include="cpp_tags.hpp" />
+    <ClInclude Include="DeviceObject.hpp" />
     <ClInclude Include="DriverRoutines.hpp" />
     <ClInclude Include="FileFilter.hpp" />
     <ClInclude Include="FltPort.hpp" />
@@ -264,6 +265,7 @@
     <ClInclude Include="LinkedList.hpp" />
     <ClInclude Include="LinkedListEntry.hpp" />
     <ClInclude Include="ModuleFilter.hpp" />
+    <ClInclude Include="NetworkFilter.hpp" />
     <ClInclude Include="ProcessCollector.hpp" />
     <ClInclude Include="ProcessFilter.hpp" />
     <ClInclude Include="ProcessUtils.hpp" />
@@ -287,11 +289,13 @@
     <ClCompile Include="cpp_definitions.cpp" />
     <ClCompile Include="cpp_externals.cpp" />
     <ClCompile Include="cpp_init.cpp" />
+    <ClCompile Include="DeviceObject.cpp" />
     <ClCompile Include="FileFilter.cpp" />
     <ClCompile Include="FltPort.cpp" />
     <ClCompile Include="GlobalData.cpp" />
     <ClCompile Include="Minifilter.cpp" />
     <ClCompile Include="ModuleFilter.cpp" />
+    <ClCompile Include="NetworkFilter.cpp" />
     <ClCompile Include="ProcessCollector.cpp" />
     <ClCompile Include="ProcessFilter.cpp" />
     <ClCompile Include="ProcessUtils.cpp" />

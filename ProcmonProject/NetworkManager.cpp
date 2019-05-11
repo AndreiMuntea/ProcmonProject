@@ -7,7 +7,6 @@
 
 #include <iostream>
 
-
 NetworkManager::NetworkManager()
 {
     auto returnValue = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -37,7 +36,6 @@ NetworkManager::~NetworkManager()
         {
             std::wcout << "FwpmFilterDeleteById failed with Error " << std::hex << result << std::dec << std::endl;
         }
-
     }
 
     FwpmEngineClose(engineHandle);
@@ -198,7 +196,10 @@ Filter::Filter(UINT32 Address, UINT32 Mask, const std::wstring& Application)
 
 Filter::~Filter()
 {
-    FwpmFreeMemory((void**)&this->applicationBlob);
+    if (this->applicationBlob)
+    {
+        FwpmFreeMemory((void**)&this->applicationBlob);
+    }
 }
 
 const FWPM_FILTER0 * Filter::GetFilter() const

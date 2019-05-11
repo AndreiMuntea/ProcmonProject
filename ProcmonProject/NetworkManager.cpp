@@ -1,4 +1,3 @@
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "NetworkManager.hpp"
 
 #include <WinSock2.h>
@@ -67,6 +66,12 @@ void NetworkManager::BlockAccess(const std::wstring & Website, const std::wstrin
 
 void NetworkManager::UnblockAccess(const std::wstring & Website, const std::wstring & Application)
 {
+    if (this->filters.find(std::make_tuple(Website, Application)) == this->filters.end())
+    {
+        std::wcout << "No filter set for given application and website" << std::endl;
+        return;
+    }
+
     auto& filter = this->filters[std::make_tuple(Website, Application)];
     auto filterId = std::get<0>(filter);
 
@@ -81,11 +86,29 @@ void NetworkManager::UnblockAccess(const std::wstring & Website, const std::wstr
 
 UINT32 NetworkManager::ExtractIpAddress(ADDRINFOW * AddrInfo)
 {
+    std::wstring buffer(1, 0);
+    DWORD bufferSize = static_cast<DWORD>(buffer.size());
+
+    auto result = WSAAddressToStringW(AddrInfo->ai_addr, (DWORD)AddrInfo->ai_addrlen, nullptr, &buffer[0], &bufferSize);
+    
+    // If the length of the buffer pointed to by the lpszAddressString parameter 
+    // is not large enough to receive the string representation of the socket address, WSAAddressToString returns WSAEFAULT.
+    if (WSAGetLastError() == WSAEFAULT)
+    {
+        buffer.resize(bufferSize + 1);
+        result = WSAAddressToStringW(AddrInfo->ai_addr, (DWORD)AddrInfo->ai_addrlen, nullptr, &buffer[0], &bufferSize);
+    }
+
+    if (result != ERROR_SUCCESS)
+    {
+        std::wcout << "WSAAddressToStringW failed with status " << std::hex << result << std::dec << std::endl;
+        return 0;
+    }
+
     auto addr_in = (struct sockaddr_in*)(AddrInfo->ai_addr);
     auto address = ntohl(addr_in->sin_addr.S_un.S_addr);
-    auto addressString = inet_ntoa(addr_in->sin_addr);
 
-    std::cout << "Ip found: " << addressString << " hex : " << std::hex << address << std::dec << std::endl;
+    std::wcout << "Ip found: " << buffer << " hex : " << std::hex << address << std::dec << std::endl;
     return address;
 }
 

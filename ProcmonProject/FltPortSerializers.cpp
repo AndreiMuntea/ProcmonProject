@@ -210,7 +210,7 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::NetworkMessageIpV
         remote[i] = (NetworkMessageIpV4.remoteAddress >> (i * 8)) & 0xFF;
     }
 
-    Stream << "[Network activity]" << std::endl
+    Stream << "[Network activity IPv4]" << std::endl
         << "\t> [Protocol] " << static_cast<unsigned __int64>(NetworkMessageIpV4.protocol) << std::endl
         << "\t> [ICMP] " << static_cast<unsigned __int64>(NetworkMessageIpV4.icmp) << std::endl
         << "\t> [Local Address] " << local[0] << "." << local[1] << "." << local[2] << "." << local[3] << std::endl
@@ -218,5 +218,18 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::NetworkMessageIpV
         << "\t> [Local Port] " << static_cast<unsigned __int64>(NetworkMessageIpV4.localPort) << std::endl
         << "\t> [Remote Port] " << static_cast<unsigned __int64>(NetworkMessageIpV4.remotePort) << std::endl
         << "\t> [ApplicationId ] " << NetworkMessageIpV4.applicationId << std::endl;
+    return Stream;
+}
+
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::NetworkMessageIpV6 & NetworkMessageIpV6)
+{
+    Stream << "[Network activity IPv6]" << std::endl
+        << "\t> [Protocol] " << static_cast<unsigned __int64>(NetworkMessageIpV6.protocol) << std::endl
+        << "\t> [ICMP] " << static_cast<unsigned __int64>(NetworkMessageIpV6.icmp) << std::endl
+        << "\t> [Local Address] " << NetworkMessageIpV6.localAddress << std::endl
+        << "\t> [Remote Address] " << NetworkMessageIpV6.remoteAddress << std::endl
+        << "\t> [Local Port] " << static_cast<unsigned __int64>(NetworkMessageIpV6.localPort) << std::endl
+        << "\t> [Remote Port] " << static_cast<unsigned __int64>(NetworkMessageIpV6.remotePort) << std::endl
+        << "\t> [ApplicationId ] " << NetworkMessageIpV6.applicationId << std::endl;
     return Stream;
 }

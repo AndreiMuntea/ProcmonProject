@@ -188,6 +188,9 @@ FilterPort::HandleMessage(
     case KmUmShared::MessageCode::msgNetworkNotificationIpV4:
         status = HandleMessageNotification<KmUmShared::NetworkMessageIpV4>(InputData, processId, processName, timestamp);
         break;
+    case KmUmShared::MessageCode::msgNetworkNotificationIpV6:
+        status = HandleMessageNotification<KmUmShared::NetworkMessageIpV6>(InputData, processId, processName, timestamp);
+        break;
     default:
         status = ERROR_NOT_FOUND;
         break;

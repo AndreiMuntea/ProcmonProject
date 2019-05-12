@@ -2,6 +2,7 @@
 #include "trace.hpp"
 #include "NetworkFilter.tmh"
 
+#include <ntstrsafe.h>
 
 #include "GlobalData.hpp"
 #include "../Common/FltPortNetworkMessage.hpp"
@@ -455,6 +456,97 @@ Minifilter::NetworkFilter::ProcessIpV4Values(
         Protocol.uint8,
         Icmp.uint16
     );
+}
+
+void
+Minifilter::NetworkFilter::ProcessIpV6Values(
+    _In_ const FWP_VALUE0& AppId,
+    _In_ const FWP_VALUE0& LocalAddress,
+    _In_ const FWP_VALUE0& RemoteAddress,
+    _In_ const FWP_VALUE0& LocalPort,
+    _In_ const FWP_VALUE0& RemotePort,
+    _In_ const FWP_VALUE0& Protocol,
+    _In_ const FWP_VALUE0& Icmp,
+    _In_ HANDLE ProcessId
+)
+{
+    if (AppId.type != FWP_BYTE_BLOB_TYPE)
+    {
+        MyDriverLogError("Invalid type for application id");
+        return;
+    }
+
+    if (LocalAddress.type != FWP_UNICODE_STRING_TYPE || RemoteAddress.type != FWP_UNICODE_STRING_TYPE)
+    {
+        MyDriverLogError("Invalid type for address Local = 0x%d Remote = 0x%d ", LocalAddress.type, RemoteAddress.type);
+        return;
+    }
+
+    if (LocalPort.type != FWP_UINT16 || LocalPort.type != FWP_UINT16)
+    {
+        MyDriverLogError("Invalid type for port Local = 0x%d Remote = 0x%d", LocalPort.type, RemotePort.type);
+        return;
+    }
+
+    if (Protocol.type != FWP_UINT8)
+    {
+        MyDriverLogError("Invalid type for protocol type = %d", Protocol.type);
+        return;
+    }
+
+    if (Icmp.type != FWP_UINT16)
+    {
+        MyDriverLogError("Invalid type for ICMP type = %d", Icmp.type);
+        return;
+    }
+
+    UNICODE_STRING appIdBlob{ 0 };
+    appIdBlob.Buffer = (PWCHAR)AppId.byteBlob->data;
+    appIdBlob.Length = static_cast<USHORT>(AppId.byteBlob->size);
+    appIdBlob.MaximumLength = static_cast<USHORT>(AppId.byteBlob->size);
+
+    size_t localAddressSize = 0;
+    auto status = RtlStringCbLengthW(LocalAddress.unicodeString, MAXUSHORT, &localAddressSize);
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogError("RtlStringCbLengthW failed with status 0x%x", status);
+        return;
+    }
+
+    size_t remoteAddressSize = 0;
+    status = RtlStringCbLengthW(RemoteAddress.unicodeString, MAXUSHORT, &remoteAddressSize);
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogError("RtlStringCbLengthW failed with status 0x%x", status);
+        return;
+    }
+
+    MyDriverLogTrace("New data available: "
+        "AppId = %wZ LocalAddress = %S RemoteAddress = %S LocalPort = 0x%x RemotePort = 0x%x, Protocol = 0x%x ICMP = 0x%x",
+        &appIdBlob,
+        LocalAddress.unicodeString,
+        RemoteAddress.unicodeString,
+        LocalPort.uint16,
+        RemotePort.uint16,
+        Protocol.uint8,
+        Icmp.uint16
+    );
+
+    unsigned __int64 timestamp = 0;
+    KeQuerySystemTime(&timestamp);
+
+    gDrvData.CommunicationPort->Send<KmUmShared::NetworkMessageIpV6>(
+        ProcessId,
+        timestamp,
+        Cpp::NonPagedString{ AppId.byteBlob->data, AppId.byteBlob->size },
+        Cpp::NonPagedString{ (unsigned __int8*)LocalAddress.unicodeString, static_cast<unsigned __int32>(localAddressSize) },
+        Cpp::NonPagedString{ (unsigned __int8*)RemoteAddress.unicodeString, static_cast<unsigned __int32>(remoteAddressSize) },
+        LocalPort.uint16,
+        RemotePort.uint16,
+        Protocol.uint8,
+        Icmp.uint16
+        );
+
 }
 
 

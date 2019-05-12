@@ -26,6 +26,7 @@ namespace KmUmShared
         msgFileSetInformation = 16,
         msgFileDelete = 17,
         msgNetworkNotificationIpV4 = 18,
+        msgNetworkNotificationIpV6 = 19,
         msgMaxValue,
     };
 

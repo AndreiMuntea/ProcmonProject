@@ -37,6 +37,35 @@ namespace KmUmShared
         unsigned __int8 protocol = 0;
         unsigned __int16 icmp = 0;
     };
+
+    class NetworkMessageIpV6
+    {
+    public:
+        NetworkMessageIpV6() = default;
+        NetworkMessageIpV6(
+            Cpp::NonPagedString ApplicationId,
+            Cpp::NonPagedString LocalAddress,
+            Cpp::NonPagedString RemoteAddress,
+            unsigned __int16 LocalPort,
+            unsigned __int16 RemotePort,
+            unsigned __int8 Protocol,
+            unsigned __int16 Icmp
+        );
+
+        virtual ~NetworkMessageIpV6() = default;
+
+        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const NetworkMessageIpV6& NetworkMessageIpV6);
+        friend Cpp::Stream& operator >> (Cpp::Stream& Stream, NetworkMessageIpV6& NetworkMessageIpV6);
+
+    public:
+        Cpp::NonPagedString applicationId;
+        Cpp::NonPagedString localAddress;
+        Cpp::NonPagedString remoteAddress;
+        unsigned __int16 localPort = 0;
+        unsigned __int16 remotePort = 0;
+        unsigned __int8 protocol = 0;
+        unsigned __int16 icmp = 0;
+    };
 }
 
 #endif //__FLT_PORT_NETWORK_MESSAGE_HPP__

@@ -360,7 +360,7 @@ Minifilter::NetworkFilter::GetNetworkTupleIndexesForLayer(
         *RemotePortIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V6_IP_REMOTE_PORT;
         *ProtocolIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V6_IP_PROTOCOL;
         *IcmpIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V6_ICMP_TYPE;
-        break;
+        return true;
     case FWPS_LAYER_ALE_AUTH_RECV_ACCEPT_V6:
         *AppIdIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V6_ALE_APP_ID;
         *LocalAddressIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V6_IP_LOCAL_ADDRESS;
@@ -369,7 +369,7 @@ Minifilter::NetworkFilter::GetNetworkTupleIndexesForLayer(
         *RemotePortIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V6_IP_REMOTE_PORT;
         *ProtocolIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V6_IP_PROTOCOL;
         *IcmpIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V6_ICMP_TYPE;
-        break;
+        return true;
     default:
         *AppIdIndex = MAXUINT32;
         *LocalAddressIndex = MAXUINT32;

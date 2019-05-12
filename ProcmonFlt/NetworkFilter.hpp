@@ -124,13 +124,13 @@ namespace Minifilter
 
         static void 
         ProcessValues(
-            _In_ FWP_VALUE0& AppId,
-            _In_ FWP_VALUE0& LocalAddress,
-            _In_ FWP_VALUE0& RemoteAddress,
-            _In_ FWP_VALUE0& LocalPort,
-            _In_ FWP_VALUE0& RemotePort,
-            _In_ FWP_VALUE0& Protocol,
-            _In_ FWP_VALUE0& Icmp,
+            _In_ const FWP_VALUE0& AppId,
+            _In_ const FWP_VALUE0& LocalAddress,
+            _In_ const FWP_VALUE0& RemoteAddress,
+            _In_ const FWP_VALUE0& LocalPort,
+            _In_ const FWP_VALUE0& RemotePort,
+            _In_ const FWP_VALUE0& Protocol,
+            _In_ const FWP_VALUE0& Icmp,
             _In_ HANDLE ProcessId
         );
 

@@ -74,6 +74,9 @@ namespace Minifilter
         bool RegisterAuthConnectIpV4Callout();
         bool RegisterAuthRecvAcceptIpV4Callout();
 
+        bool RegisterAuthConnectIpV6Callout();
+        bool RegisterAuthRecvAcceptIpV6Callout();
+
         NTSTATUS 
         RegisterCallback(
             _In_ const GUID* LayerKey,
@@ -146,6 +149,16 @@ namespace Minifilter
         UINT32 authRecvAcceptIpV4CalloutFwpsId = 0;
         UINT32 authRecvAcceptIpV4CalloutFwpmId = 0;
         UINT64 authRecvAcceptIpV4CalloutFilterId = 0;
+
+        bool authConnectIpV6CalloutRegistered = false;
+        UINT32 authConnectIpV6CalloutFwpsId = 0;
+        UINT32 authConnectIpV6CalloutFwpmId = 0;
+        UINT64 authConnectIpV6CalloutFilterId = 0;
+
+        bool authRecvAcceptIpV6CalloutRegistered = false;
+        UINT32 authRecvAcceptIpV6CalloutFwpsId = 0;
+        UINT32 authRecvAcceptIpV6CalloutFwpmId = 0;
+        UINT64 authRecvAcceptIpV6CalloutFilterId = 0;
     };
     template<UINT16 Layer>
     inline void NetworkFilter::ClassifyFn(

@@ -14,6 +14,14 @@ static const GUID gAuthConnectIpV4GUID =
 static const GUID gAuthRecvAcceptIpv4GUID =
 { 0xaae86f30, 0x9bc2, 0x4858,{ 0xb9, 0xad, 0xff, 0xd4, 0x9d, 0x1d, 0x32, 0xf1 } };
 
+// {3785FE2B-264A-499C-A13A-DC86C9971078}
+static const GUID gAuthConnectIpV6GUID =
+{ 0x3785fe2b, 0x264a, 0x499c,{ 0xa1, 0x3a, 0xdc, 0x86, 0xc9, 0x97, 0x10, 0x78 } };
+
+// {FAC5F63E-13F9-4043-BEAA-D2E93B7A8C7F}
+static const GUID gAuthRecvAcceptIpv6GUID =
+{ 0xfac5f63e, 0x13f9, 0x4043,{ 0xbe, 0xaa, 0xd2, 0xe9, 0x3b, 0x7a, 0x8c, 0x7f } };
+
 
 Minifilter::NetworkFilter::NetworkFilter(PDRIVER_OBJECT DriverObject, PUNICODE_STRING DeviceName)
 {
@@ -33,11 +41,25 @@ Minifilter::NetworkFilter::NetworkFilter(PDRIVER_OBJECT DriverObject, PUNICODE_S
     {
         return;
     }
+    this->authConnectIpV4CalloutRegistered = true;
 
     if (!RegisterAuthRecvAcceptIpV4Callout())
     {
         return;
     }
+    this->authRecvAcceptIpV4CalloutRegistered = true;
+
+    if (!RegisterAuthConnectIpV6Callout())
+    {
+        return;
+    }
+    this->authConnectIpV6CalloutRegistered = true;
+
+    if (!RegisterAuthRecvAcceptIpV6Callout())
+    {
+        return;
+    }
+    this->authRecvAcceptIpV6CalloutRegistered = true;
 
     Validate();
 }
@@ -67,6 +89,30 @@ Minifilter::NetworkFilter::~NetworkFilter()
         NT_VERIFY(NT_SUCCESS(status));
 
         status = FwpsCalloutUnregisterById(this->authRecvAcceptIpV4CalloutFwpsId);
+        NT_VERIFY(NT_SUCCESS(status));
+    }
+
+    if (this->authConnectIpV6CalloutRegistered)
+    {
+        status = FwpmFilterDeleteById(this->engine->engineHandle, this->authConnectIpV6CalloutFilterId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = FwpmCalloutDeleteById(this->engine->engineHandle, this->authConnectIpV6CalloutFwpmId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = FwpsCalloutUnregisterById(this->authConnectIpV6CalloutFwpsId);
+        NT_VERIFY(NT_SUCCESS(status));
+    }
+
+    if (this->authRecvAcceptIpV6CalloutRegistered)
+    {
+        status = FwpmFilterDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV6CalloutFilterId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = FwpmCalloutDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV6CalloutFwpmId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = FwpsCalloutUnregisterById(this->authRecvAcceptIpV6CalloutFwpsId);
         NT_VERIFY(NT_SUCCESS(status));
     }
 
@@ -130,6 +176,40 @@ bool Minifilter::NetworkFilter::RegisterAuthRecvAcceptIpV4Callout()
         &this->authRecvAcceptIpV4CalloutFwpsId,
         &this->authRecvAcceptIpV4CalloutFwpmId,
         &this->authRecvAcceptIpV4CalloutFilterId
+    );
+
+    return NT_SUCCESS(status);
+}
+
+bool Minifilter::NetworkFilter::RegisterAuthConnectIpV6Callout()
+{
+    GUID guid = FWPM_LAYER_ALE_AUTH_CONNECT_V6;
+    auto status = RegisterCallback(
+        &guid,
+        &gAuthConnectIpV6GUID,
+        Minifilter::NetworkFilter::ClassifyFn<FWPS_LAYER_ALE_AUTH_CONNECT_V6>,
+        Minifilter::NetworkFilter::NotifyFn,
+        Minifilter::NetworkFilter::FlowDeleteFn,
+        &this->authConnectIpV6CalloutFwpsId,
+        &this->authConnectIpV6CalloutFwpmId,
+        &this->authConnectIpV6CalloutFilterId
+    );
+
+    return NT_SUCCESS(status);
+}
+
+bool Minifilter::NetworkFilter::RegisterAuthRecvAcceptIpV6Callout()
+{
+    GUID guid = FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6;
+    auto status = RegisterCallback(
+        &guid,
+        &gAuthRecvAcceptIpv6GUID,
+        Minifilter::NetworkFilter::ClassifyFn<FWPS_LAYER_ALE_AUTH_RECV_ACCEPT_V6>,
+        Minifilter::NetworkFilter::NotifyFn,
+        Minifilter::NetworkFilter::FlowDeleteFn,
+        &this->authRecvAcceptIpV6CalloutFwpsId,
+        &this->authRecvAcceptIpV6CalloutFwpmId,
+        &this->authRecvAcceptIpV6CalloutFilterId
     );
 
     return NT_SUCCESS(status);
@@ -272,6 +352,24 @@ Minifilter::NetworkFilter::GetNetworkTupleIndexesForLayer(
         *ProtocolIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V4_IP_PROTOCOL;
         *IcmpIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V4_ICMP_TYPE;
         return true;
+    case FWPS_LAYER_ALE_AUTH_CONNECT_V6:
+        *AppIdIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V6_ALE_APP_ID;
+        *LocalAddressIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V6_IP_LOCAL_ADDRESS;
+        *RemoteAddressIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V6_IP_REMOTE_ADDRESS;
+        *LocalPortIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V6_IP_LOCAL_PORT;
+        *RemotePortIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V6_IP_REMOTE_PORT;
+        *ProtocolIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V6_IP_PROTOCOL;
+        *IcmpIndex = FWPS_FIELD_ALE_AUTH_CONNECT_V6_ICMP_TYPE;
+        break;
+    case FWPS_LAYER_ALE_AUTH_RECV_ACCEPT_V6:
+        *AppIdIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V6_ALE_APP_ID;
+        *LocalAddressIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V6_IP_LOCAL_ADDRESS;
+        *RemoteAddressIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V6_IP_REMOTE_ADDRESS;
+        *LocalPortIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V6_IP_LOCAL_PORT;
+        *RemotePortIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V6_IP_REMOTE_PORT;
+        *ProtocolIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V6_IP_PROTOCOL;
+        *IcmpIndex = FWPS_FIELD_ALE_AUTH_RECV_ACCEPT_V6_ICMP_TYPE;
+        break;
     default:
         *AppIdIndex = MAXUINT32;
         *LocalAddressIndex = MAXUINT32;

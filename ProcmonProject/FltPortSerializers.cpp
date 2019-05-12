@@ -223,11 +223,26 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::NetworkMessageIpV
 
 std::wostream & operator<<(std::wostream & Stream, KmUmShared::NetworkMessageIpV6 & NetworkMessageIpV6)
 {
+    unsigned __int64 localAddress[8] = { 0 };
+    unsigned __int64 remoteAddress[8] = { 0 };
+
+    for (int i = 0; i < 8; ++i)
+    {
+        localAddress[i] = ((PWCHAR)NetworkMessageIpV6.localAddress.GetNakedPointer())[i];
+    }
+
+    for (int i = 0; i < 8; ++i)
+    {
+        remoteAddress[i] = ((PWCHAR)NetworkMessageIpV6.remoteAddress.GetNakedPointer())[i];
+    }
+
     Stream << "[Network activity IPv6]" << std::endl
         << "\t> [Protocol] " << static_cast<unsigned __int64>(NetworkMessageIpV6.protocol) << std::endl
         << "\t> [ICMP] " << static_cast<unsigned __int64>(NetworkMessageIpV6.icmp) << std::endl
-        << "\t> [Local Address] " << NetworkMessageIpV6.localAddress << std::endl
-        << "\t> [Remote Address] " << NetworkMessageIpV6.remoteAddress << std::endl
+        << "\t> [Local Address] "; for (int i = 0; i < 8; ++i) Stream << std::hex << localAddress[i] << "." << std::dec;
+    Stream << std::endl
+        << "\t> [Remote Address] "; for (int i = 0; i < 8; ++i) Stream << std::hex << remoteAddress[i] << "." << std::dec;
+    Stream << std::endl
         << "\t> [Local Port] " << static_cast<unsigned __int64>(NetworkMessageIpV6.localPort) << std::endl
         << "\t> [Remote Port] " << static_cast<unsigned __int64>(NetworkMessageIpV6.remotePort) << std::endl
         << "\t> [ApplicationId ] " << NetworkMessageIpV6.applicationId << std::endl;

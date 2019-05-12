@@ -71,10 +71,10 @@ Minifilter::NetworkFilter::~NetworkFilter()
 
     if (this->authConnectIpV4CalloutRegistered)
     {
-        status = FwpmFilterDeleteById(this->engine->engineHandle, this->authConnectIpV4CalloutFilterId);
+        status = FwpmCalloutDeleteById(this->engine->engineHandle, this->authConnectIpV4CalloutFwpmId);
         NT_VERIFY(NT_SUCCESS(status));
 
-        status = FwpmCalloutDeleteById(this->engine->engineHandle, this->authConnectIpV4CalloutFwpmId);
+        status = FwpmFilterDeleteById(this->engine->engineHandle, this->authConnectIpV4CalloutFilterId);
         NT_VERIFY(NT_SUCCESS(status));
 
         status = FwpsCalloutUnregisterById(this->authConnectIpV4CalloutFwpsId);
@@ -83,10 +83,10 @@ Minifilter::NetworkFilter::~NetworkFilter()
 
     if (this->authRecvAcceptIpV4CalloutRegistered)
     {
-        status = FwpmFilterDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV4CalloutFilterId);
+        status = FwpmCalloutDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV4CalloutFwpmId);
         NT_VERIFY(NT_SUCCESS(status));
 
-        status = FwpmCalloutDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV4CalloutFwpmId);
+        status = FwpmFilterDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV4CalloutFilterId);
         NT_VERIFY(NT_SUCCESS(status));
 
         status = FwpsCalloutUnregisterById(this->authRecvAcceptIpV4CalloutFwpsId);
@@ -95,10 +95,10 @@ Minifilter::NetworkFilter::~NetworkFilter()
 
     if (this->authConnectIpV6CalloutRegistered)
     {
-        status = FwpmFilterDeleteById(this->engine->engineHandle, this->authConnectIpV6CalloutFilterId);
+        status = FwpmCalloutDeleteById(this->engine->engineHandle, this->authConnectIpV6CalloutFwpmId);
         NT_VERIFY(NT_SUCCESS(status));
 
-        status = FwpmCalloutDeleteById(this->engine->engineHandle, this->authConnectIpV6CalloutFwpmId);
+        status = FwpmFilterDeleteById(this->engine->engineHandle, this->authConnectIpV6CalloutFilterId);
         NT_VERIFY(NT_SUCCESS(status));
 
         status = FwpsCalloutUnregisterById(this->authConnectIpV6CalloutFwpsId);
@@ -107,10 +107,10 @@ Minifilter::NetworkFilter::~NetworkFilter()
 
     if (this->authRecvAcceptIpV6CalloutRegistered)
     {
-        status = FwpmFilterDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV6CalloutFilterId);
+        status = FwpmCalloutDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV6CalloutFwpmId);
         NT_VERIFY(NT_SUCCESS(status));
 
-        status = FwpmCalloutDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV6CalloutFwpmId);
+        status = FwpmFilterDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV6CalloutFilterId);
         NT_VERIFY(NT_SUCCESS(status));
 
         status = FwpsCalloutUnregisterById(this->authRecvAcceptIpV6CalloutFwpsId);
@@ -385,7 +385,7 @@ Minifilter::NetworkFilter::GetNetworkTupleIndexesForLayer(
 }
 
 void 
-Minifilter::NetworkFilter::ProcessIpV4Values(
+Minifilter::NetworkFilter::ProcessIpValues(
     _In_ const FWP_VALUE0& AppId,
     _In_ const FWP_VALUE0& LocalAddress,
     _In_ const FWP_VALUE0& RemoteAddress,
@@ -399,12 +399,6 @@ Minifilter::NetworkFilter::ProcessIpV4Values(
     if (AppId.type != FWP_BYTE_BLOB_TYPE)
     {
         MyDriverLogError("Invalid type for application id");
-        return;
-    }
-
-    if (LocalAddress.type != FWP_UINT32 || RemoteAddress.type != FWP_UINT32)
-    {
-        MyDriverLogError("Invalid type for address Local = 0x%d Remote = 0x%d ", LocalAddress.type, RemoteAddress.type);
         return;
     }
 
@@ -426,6 +420,32 @@ Minifilter::NetworkFilter::ProcessIpV4Values(
         return;
     }
 
+    if (LocalAddress.type == FWP_UINT32 && RemoteAddress.type == FWP_UINT32)
+    {
+        ProcessIpV4Values(AppId, LocalAddress, RemoteAddress, LocalPort, RemotePort, Protocol, Icmp, ProcessId);
+    }
+    else if (LocalAddress.type == FWP_BYTE_ARRAY16_TYPE && RemoteAddress.type == FWP_BYTE_ARRAY16_TYPE)
+    {
+        ProcessIpV6Values(AppId, LocalAddress, RemoteAddress, LocalPort, RemotePort, Protocol, Icmp, ProcessId);
+    }
+    else
+    {
+        MyDriverLogError("Invalid type for address Local = %d Remote = %d ", LocalAddress.type, RemoteAddress.type);
+    }
+}
+
+void 
+Minifilter::NetworkFilter::ProcessIpV4Values(
+    _In_ const FWP_VALUE0& AppId,
+    _In_ const FWP_VALUE0& LocalAddress,
+    _In_ const FWP_VALUE0& RemoteAddress,
+    _In_ const FWP_VALUE0& LocalPort,
+    _In_ const FWP_VALUE0& RemotePort,
+    _In_ const FWP_VALUE0& Protocol,
+    _In_ const FWP_VALUE0& Icmp,
+    _In_ HANDLE ProcessId
+)
+{
     UNICODE_STRING appIdBlob{ 0 };
     appIdBlob.Buffer = (PWCHAR)AppId.byteBlob->data;
     appIdBlob.Length = static_cast<USHORT>(AppId.byteBlob->size);
@@ -470,56 +490,20 @@ Minifilter::NetworkFilter::ProcessIpV6Values(
     _In_ HANDLE ProcessId
 )
 {
-    if (AppId.type != FWP_BYTE_BLOB_TYPE)
-    {
-        MyDriverLogError("Invalid type for application id");
-        return;
-    }
-
-    if (LocalAddress.type != FWP_UNICODE_STRING_TYPE || RemoteAddress.type != FWP_UNICODE_STRING_TYPE)
-    {
-        MyDriverLogError("Invalid type for address Local = 0x%d Remote = 0x%d ", LocalAddress.type, RemoteAddress.type);
-        return;
-    }
-
-    if (LocalPort.type != FWP_UINT16 || LocalPort.type != FWP_UINT16)
-    {
-        MyDriverLogError("Invalid type for port Local = 0x%d Remote = 0x%d", LocalPort.type, RemotePort.type);
-        return;
-    }
-
-    if (Protocol.type != FWP_UINT8)
-    {
-        MyDriverLogError("Invalid type for protocol type = %d", Protocol.type);
-        return;
-    }
-
-    if (Icmp.type != FWP_UINT16)
-    {
-        MyDriverLogError("Invalid type for ICMP type = %d", Icmp.type);
-        return;
-    }
-
     UNICODE_STRING appIdBlob{ 0 };
     appIdBlob.Buffer = (PWCHAR)AppId.byteBlob->data;
     appIdBlob.Length = static_cast<USHORT>(AppId.byteBlob->size);
     appIdBlob.MaximumLength = static_cast<USHORT>(AppId.byteBlob->size);
 
-    size_t localAddressSize = 0;
-    auto status = RtlStringCbLengthW(LocalAddress.unicodeString, MAXUSHORT, &localAddressSize);
-    if (!NT_SUCCESS(status))
-    {
-        MyDriverLogError("RtlStringCbLengthW failed with status 0x%x", status);
-        return;
-    }
+    UNICODE_STRING localAddress{ 0 };
+    localAddress.Buffer = (PWCHAR)LocalAddress.byteArray16->byteArray16;
+    localAddress.Length = sizeof(LocalAddress.byteArray16->byteArray16);
+    localAddress.MaximumLength = sizeof(LocalAddress.byteArray16->byteArray16);
 
-    size_t remoteAddressSize = 0;
-    status = RtlStringCbLengthW(RemoteAddress.unicodeString, MAXUSHORT, &remoteAddressSize);
-    if (!NT_SUCCESS(status))
-    {
-        MyDriverLogError("RtlStringCbLengthW failed with status 0x%x", status);
-        return;
-    }
+    UNICODE_STRING remoteAddress{ 0 };
+    remoteAddress.Buffer = (PWCHAR)RemoteAddress.byteArray16->byteArray16;
+    remoteAddress.Length = sizeof(RemoteAddress.byteArray16->byteArray16);
+    remoteAddress.MaximumLength = sizeof(RemoteAddress.byteArray16->byteArray16);
 
     MyDriverLogTrace("New data available: "
         "AppId = %wZ LocalAddress = %S RemoteAddress = %S LocalPort = 0x%x RemotePort = 0x%x, Protocol = 0x%x ICMP = 0x%x",
@@ -539,8 +523,8 @@ Minifilter::NetworkFilter::ProcessIpV6Values(
         ProcessId,
         timestamp,
         Cpp::NonPagedString{ AppId.byteBlob->data, AppId.byteBlob->size },
-        Cpp::NonPagedString{ (unsigned __int8*)LocalAddress.unicodeString, static_cast<unsigned __int32>(localAddressSize) },
-        Cpp::NonPagedString{ (unsigned __int8*)RemoteAddress.unicodeString, static_cast<unsigned __int32>(remoteAddressSize) },
+        Cpp::NonPagedString{ LocalAddress.byteArray16->byteArray16, sizeof(LocalAddress.byteArray16->byteArray16) },
+        Cpp::NonPagedString{ RemoteAddress.byteArray16->byteArray16, sizeof(RemoteAddress.byteArray16->byteArray16) },
         LocalPort.uint16,
         RemotePort.uint16,
         Protocol.uint8,

@@ -55,7 +55,7 @@ namespace KmUmShared
         virtual ~NetworkMessageIpV6() = default;
 
         friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const NetworkMessageIpV6& NetworkMessageIpV6);
-        friend Cpp::Stream& operator >> (Cpp::Stream& Stream, NetworkMessageIpV6& NetworkMessageIpV6);
+        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, NetworkMessageIpV6& NetworkMessageIpV6);
 
     public:
         Cpp::NonPagedString applicationId;

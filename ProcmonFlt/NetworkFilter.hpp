@@ -126,6 +126,18 @@ namespace Minifilter
         );
 
         static void 
+        ProcessIpValues(
+            _In_ const FWP_VALUE0& AppId,
+            _In_ const FWP_VALUE0& LocalAddress,
+            _In_ const FWP_VALUE0& RemoteAddress,
+            _In_ const FWP_VALUE0& LocalPort,
+            _In_ const FWP_VALUE0& RemotePort,
+            _In_ const FWP_VALUE0& Protocol,
+            _In_ const FWP_VALUE0& Icmp,
+            _In_ HANDLE ProcessId
+        );
+
+        static void 
         ProcessIpV4Values(
             _In_ const FWP_VALUE0& AppId,
             _In_ const FWP_VALUE0& LocalAddress,
@@ -203,34 +215,16 @@ namespace Minifilter
             return;
         }
 
-        switch (Layer)
-        {
-        case FWPS_LAYER_ALE_AUTH_CONNECT_V4:
-        case FWPS_LAYER_ALE_AUTH_RECV_ACCEPT_V4:
-            ProcessIpV4Values(
-                FixedValues->incomingValue[AppIdIndex].value,
-                FixedValues->incomingValue[LocalAddressIndex].value,
-                FixedValues->incomingValue[RemoteAddressIndex].value,
-                FixedValues->incomingValue[LocalPortIndex].value,
-                FixedValues->incomingValue[RemotePortIndex].value,
-                FixedValues->incomingValue[ProtocolIndex].value,
-                FixedValues->incomingValue[IcmpIndex].value,
-                ULongToHandle(static_cast<DWORD>(MetaValues->processId))
-            );
-                break;
-        case FWPS_LAYER_ALE_AUTH_CONNECT_V6:
-        case FWPS_LAYER_ALE_AUTH_RECV_ACCEPT_V6:
-            ProcessIpV6Values(
-                FixedValues->incomingValue[AppIdIndex].value,
-                FixedValues->incomingValue[LocalAddressIndex].value,
-                FixedValues->incomingValue[RemoteAddressIndex].value,
-                FixedValues->incomingValue[LocalPortIndex].value,
-                FixedValues->incomingValue[RemotePortIndex].value,
-                FixedValues->incomingValue[ProtocolIndex].value,
-                FixedValues->incomingValue[IcmpIndex].value,
-                ULongToHandle(static_cast<DWORD>(MetaValues->processId))
-            );
-        }
+        ProcessIpValues(
+            FixedValues->incomingValue[AppIdIndex].value,
+            FixedValues->incomingValue[LocalAddressIndex].value,
+            FixedValues->incomingValue[RemoteAddressIndex].value,
+            FixedValues->incomingValue[LocalPortIndex].value,
+            FixedValues->incomingValue[RemotePortIndex].value,
+            FixedValues->incomingValue[ProtocolIndex].value,
+            FixedValues->incomingValue[IcmpIndex].value,
+            ULongToHandle(static_cast<DWORD>(MetaValues->processId))
+        );
     }
 };
 

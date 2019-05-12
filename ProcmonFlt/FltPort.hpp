@@ -171,10 +171,7 @@ namespace Minifilter
             goto CleanUp;
         }
 
-        if (!dataPackage->port->processCollector->GetProcessName(dataPackage->processId, dataPackage->timestamp, processName))
-        {
-            goto CleanUp;
-        }
+        dataPackage->port->processCollector->GetProcessName(dataPackage->processId, dataPackage->timestamp, processName);
 
         stream << dataPackage->processId << processName << dataPackage->timestamp << dataPackage->message;
         SendStreamMessage(dataPackage->port, stream);

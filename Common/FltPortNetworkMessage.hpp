@@ -9,11 +9,11 @@
 
 namespace KmUmShared
 {
-    class NetworkMessage
+    class NetworkMessageIpV4
     {
     public:
-        NetworkMessage() = default;
-        NetworkMessage(
+        NetworkMessageIpV4() = default;
+        NetworkMessageIpV4(
             Cpp::NonPagedString ApplicationId,
             unsigned __int32 LocalAddress,
             unsigned __int32 RemoteAddress,
@@ -23,10 +23,10 @@ namespace KmUmShared
             unsigned __int16 Icmp
         );
 
-        virtual ~NetworkMessage() = default;
+        virtual ~NetworkMessageIpV4() = default;
 
-        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const NetworkMessage& NetworkMessage);
-        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, NetworkMessage& NetworkMessage);
+        friend Cpp::Stream& operator<<(Cpp::Stream& Stream, const NetworkMessageIpV4& NetworkMessageIpV4);
+        friend Cpp::Stream& operator>>(Cpp::Stream& Stream, NetworkMessageIpV4& NetworkMessageIpV4);
 
     public:
         Cpp::NonPagedString applicationId;

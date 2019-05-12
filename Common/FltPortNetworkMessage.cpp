@@ -1,33 +1,33 @@
 #include "FltPortNetworkMessage.hpp"
 
-Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const NetworkMessage & NetworkMessage)
+Cpp::Stream & KmUmShared::operator<<(Cpp::Stream & Stream, const NetworkMessageIpV4 & NetworkMessageIpV4)
 {
-    Stream << KmUmShared::FilterMessageHeader{ MessageCode::msgNetworkNotification }
-        << NetworkMessage.applicationId
-        << NetworkMessage.icmp
-        << NetworkMessage.localAddress
-        << NetworkMessage.localPort
-        << NetworkMessage.protocol
-        << NetworkMessage.remoteAddress
-        << NetworkMessage.remotePort;
+    Stream << KmUmShared::FilterMessageHeader{ MessageCode::msgNetworkNotificationIpV4 }
+        << NetworkMessageIpV4.applicationId
+        << NetworkMessageIpV4.icmp
+        << NetworkMessageIpV4.localAddress
+        << NetworkMessageIpV4.localPort
+        << NetworkMessageIpV4.protocol
+        << NetworkMessageIpV4.remoteAddress
+        << NetworkMessageIpV4.remotePort;
 
     return Stream;
 }
 
-Cpp::Stream & KmUmShared::operator >> (Cpp::Stream & Stream, NetworkMessage & NetworkMessage)
+Cpp::Stream & KmUmShared::operator >> (Cpp::Stream & Stream, NetworkMessageIpV4 & NetworkMessageIpV4)
 {
-    Stream >> NetworkMessage.applicationId
-        >> NetworkMessage.icmp
-        >> NetworkMessage.localAddress
-        >> NetworkMessage.localPort
-        >> NetworkMessage.protocol
-        >> NetworkMessage.remoteAddress
-        >> NetworkMessage.remotePort;
+    Stream >> NetworkMessageIpV4.applicationId
+        >> NetworkMessageIpV4.icmp
+        >> NetworkMessageIpV4.localAddress
+        >> NetworkMessageIpV4.localPort
+        >> NetworkMessageIpV4.protocol
+        >> NetworkMessageIpV4.remoteAddress
+        >> NetworkMessageIpV4.remotePort;
 
     return Stream;
 }
 
-KmUmShared::NetworkMessage::NetworkMessage(
+KmUmShared::NetworkMessageIpV4::NetworkMessageIpV4(
     Cpp::NonPagedString ApplicationId,
     unsigned __int32 LocalAddress,
     unsigned __int32 RemoteAddress,

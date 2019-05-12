@@ -34,6 +34,6 @@ std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileReadMessage& Fi
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileWriteMessage& FileWriteMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileSetInformationMessage& FileSetInformationMessage);
 std::wostream& operator<<(std::wostream& Stream, KmUmShared::FileDeleteMessage& FileDeleteMessage);
-std::wostream& operator<<(std::wostream& Stream, KmUmShared::NetworkMessage& NetworkMessage);
+std::wostream& operator<<(std::wostream& Stream, KmUmShared::NetworkMessageIpV4& NetworkMessageIpV4);
 
 #endif //__FLT_PORT_SERIALIZERS_HPP__

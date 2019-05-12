@@ -126,7 +126,7 @@ namespace Minifilter
         );
 
         static void 
-        ProcessValues(
+        ProcessIpV4Values(
             _In_ const FWP_VALUE0& AppId,
             _In_ const FWP_VALUE0& LocalAddress,
             _In_ const FWP_VALUE0& RemoteAddress,
@@ -191,7 +191,7 @@ namespace Minifilter
             return;
         }
 
-        ProcessValues(
+        ProcessIpV4Values(
             FixedValues->incomingValue[AppIdIndex].value,
             FixedValues->incomingValue[LocalAddressIndex].value,
             FixedValues->incomingValue[RemoteAddressIndex].value,

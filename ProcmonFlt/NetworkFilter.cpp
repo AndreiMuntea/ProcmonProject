@@ -384,7 +384,7 @@ Minifilter::NetworkFilter::GetNetworkTupleIndexesForLayer(
 }
 
 void 
-Minifilter::NetworkFilter::ProcessValues(
+Minifilter::NetworkFilter::ProcessIpV4Values(
     _In_ const FWP_VALUE0& AppId,
     _In_ const FWP_VALUE0& LocalAddress,
     _In_ const FWP_VALUE0& RemoteAddress,
@@ -403,25 +403,25 @@ Minifilter::NetworkFilter::ProcessValues(
 
     if (LocalAddress.type != FWP_UINT32 || RemoteAddress.type != FWP_UINT32)
     {
-        MyDriverLogError("Invalid type for address");
+        MyDriverLogError("Invalid type for address Local = 0x%d Remote = 0x%d ", LocalAddress.type, RemoteAddress.type);
         return;
     }
 
     if (LocalPort.type != FWP_UINT16 || LocalPort.type != FWP_UINT16)
     {
-        MyDriverLogError("Invalid type for port");
+        MyDriverLogError("Invalid type for port Local = 0x%d Remote = 0x%d", LocalPort.type, RemotePort.type);
         return;
     }
 
     if (Protocol.type != FWP_UINT8)
     {
-        MyDriverLogError("Invalid type for protocol");
+        MyDriverLogError("Invalid type for protocol type = %d", Protocol.type);
         return;
     }
 
     if (Icmp.type != FWP_UINT16)
     {
-        MyDriverLogError("Invalid type for ICMP");
+        MyDriverLogError("Invalid type for ICMP type = %d", Icmp.type);
         return;
     }
 
@@ -444,7 +444,7 @@ Minifilter::NetworkFilter::ProcessValues(
     unsigned __int64 timestamp = 0;
     KeQuerySystemTime(&timestamp);
 
-    gDrvData.CommunicationPort->Send<KmUmShared::NetworkMessage>(
+    gDrvData.CommunicationPort->Send<KmUmShared::NetworkMessageIpV4>(
         ProcessId, 
         timestamp, 
         Cpp::NonPagedString{AppId.byteBlob->data, AppId.byteBlob->size },

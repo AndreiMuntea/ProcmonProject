@@ -194,29 +194,29 @@ std::wostream & operator<<(std::wostream & Stream, KmUmShared::FileDeleteMessage
     return Stream;
 }
 
-std::wostream & operator<<(std::wostream & Stream, KmUmShared::NetworkMessage & NetworkMessage)
+std::wostream & operator<<(std::wostream & Stream, KmUmShared::NetworkMessageIpV4 & NetworkMessageIpV4)
 {
-    NetworkMessage.localAddress = ntohl(NetworkMessage.localAddress);
+    NetworkMessageIpV4.localAddress = ntohl(NetworkMessageIpV4.localAddress);
     unsigned __int64 local[4] = { 0,0,0,0 };
     for (int i = 0; i < 4; i++)
     {
-        local[i] = (NetworkMessage.localAddress >> (i * 8)) & 0xFF;
+        local[i] = (NetworkMessageIpV4.localAddress >> (i * 8)) & 0xFF;
     }
 
-    NetworkMessage.remoteAddress = ntohl(NetworkMessage.remoteAddress);
+    NetworkMessageIpV4.remoteAddress = ntohl(NetworkMessageIpV4.remoteAddress);
     unsigned __int64 remote[4] = { 0,0,0,0 };
     for (int i = 0; i < 4; i++)
     {
-        remote[i] = (NetworkMessage.remoteAddress >> (i * 8)) & 0xFF;
+        remote[i] = (NetworkMessageIpV4.remoteAddress >> (i * 8)) & 0xFF;
     }
 
     Stream << "[Network activity]" << std::endl
-        << "\t> [Protocol] " << static_cast<unsigned __int64>(NetworkMessage.protocol) << std::endl
-        << "\t> [ICMP] " << static_cast<unsigned __int64>(NetworkMessage.icmp) << std::endl
+        << "\t> [Protocol] " << static_cast<unsigned __int64>(NetworkMessageIpV4.protocol) << std::endl
+        << "\t> [ICMP] " << static_cast<unsigned __int64>(NetworkMessageIpV4.icmp) << std::endl
         << "\t> [Local Address] " << local[0] << "." << local[1] << "." << local[2] << "." << local[3] << std::endl
         << "\t> [Remote Address] " << remote[0] << "." << remote[1] << "." << remote[2] << "." << remote[3] << std::endl
-        << "\t> [Local Port] " << static_cast<unsigned __int64>(NetworkMessage.localPort) << std::endl
-        << "\t> [Remote Port] " << static_cast<unsigned __int64>(NetworkMessage.remotePort) << std::endl
-        << "\t> [ApplicationId ] " << NetworkMessage.applicationId << std::endl;
+        << "\t> [Local Port] " << static_cast<unsigned __int64>(NetworkMessageIpV4.localPort) << std::endl
+        << "\t> [Remote Port] " << static_cast<unsigned __int64>(NetworkMessageIpV4.remotePort) << std::endl
+        << "\t> [ApplicationId ] " << NetworkMessageIpV4.applicationId << std::endl;
     return Stream;
 }

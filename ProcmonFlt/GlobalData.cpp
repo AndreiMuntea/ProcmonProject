@@ -105,7 +105,8 @@ void GdrvInitGlobalData(_In_ PDRIVER_OBJECT DriverObject)
     gDrvData.Altitude = RTL_CONSTANT_STRING(L"370030");
     gDrvData.Cookie = { 0 };
 
-    ExInitializeRundownProtection(&gDrvData.RundownProtection);
+    ExInitializeRundownProtection(&gDrvData.RundownProtection);    
+    gDrvData.ZwQueryInformationProcess = nullptr;
 }
 
 void GdrvUninitGlobalData()
@@ -129,4 +130,19 @@ void GdrvUninitGlobalData()
     gDrvData.FilterHandle = nullptr;
     gDrvData.DriverObject = nullptr;
     gDrvData.FilterRegistration = { 0 };
+
+    gDrvData.ZwQueryInformationProcess = nullptr;
+}
+
+NTSTATUS GdrvSolveDynamicFunctions()
+{
+    UNICODE_STRING function = RTL_CONSTANT_STRING(L"ZwQueryInformationProcess");
+    gDrvData.ZwQueryInformationProcess = (PFUNC_ZwQueryInformationProcess)MmGetSystemRoutineAddress(&function);
+
+    if (!gDrvData.ZwQueryInformationProcess)
+    {
+        return STATUS_NOT_FOUND;
+    }
+
+    return STATUS_SUCCESS;
 }

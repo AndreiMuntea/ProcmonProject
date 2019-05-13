@@ -96,9 +96,6 @@
     <ClInclude Include="RemoteThread.hpp">
       <Filter>Header Files\Km Utils</Filter>
     </ClInclude>
-    <ClInclude Include="trace.h">
-      <Filter>Header Files\Definitions</Filter>
-    </ClInclude>
     <ClInclude Include="GlobalData.hpp">
       <Filter>Header Files\Definitions</Filter>
     </ClInclude>
@@ -137,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="..\Common\FltPortNetworkMessage.hpp">
       <Filter>Header Files\CommShared\Notifications</Filter>
+    </ClInclude>
+    <ClInclude Include="trace.h">
+      <Filter>Header Files\Definitions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

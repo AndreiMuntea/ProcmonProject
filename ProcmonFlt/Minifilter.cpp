@@ -37,8 +37,16 @@ DriverEntry(
     // Initialize other globals 
     GdrvInitGlobalData(DriverObject);
 
+    // Solve dynamic functions
+    auto status = GdrvSolveDynamicFunctions();
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogCritical("GdrvSolveDynamicFunctions failed with status 0x%x", status);
+        goto Exit;
+    }
+
     // Register filter 
-    auto status = ::FltRegisterFilter(DriverObject, &gDrvData.FilterRegistration, &gDrvData.FilterHandle);
+    status = ::FltRegisterFilter(DriverObject, &gDrvData.FilterRegistration, &gDrvData.FilterHandle);
     if (!NT_SUCCESS(status))
     {
         MyDriverLogCritical("::FltRegisterFilter failed with status 0x%x", status);

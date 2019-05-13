@@ -80,9 +80,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="trace.hpp">
-      <Filter>Header Files\definitions</Filter>
-    </ClInclude>
     <ClInclude Include="GlobalData.hpp">
       <Filter>Header Files\definitions</Filter>
     </ClInclude>
@@ -181,6 +178,12 @@
     </ClInclude>
     <ClInclude Include="..\Common\FltPortNetworkMessage.hpp">
       <Filter>Header Files\Communication\Notifications</Filter>
+    </ClInclude>
+    <ClInclude Include="nt_defs_custom.hpp">
+      <Filter>Header Files\definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="trace.hpp">
+      <Filter>Header Files\definitions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

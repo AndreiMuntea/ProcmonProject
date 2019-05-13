@@ -15,6 +15,8 @@
 #include "ProcessCollector.hpp"
 #include "BlackList.hpp"
 
+#include "nt_defs_custom.hpp"
+
 typedef struct _GLOBAL_DATA
 {
     PDRIVER_OBJECT DriverObject;
@@ -37,11 +39,15 @@ typedef struct _GLOBAL_DATA
     Cpp::UniquePointer<Minifilter::BlackList> BlackList;
 
     EX_RUNDOWN_REF RundownProtection;
+
+
+    PFUNC_ZwQueryInformationProcess ZwQueryInformationProcess;
 }GLOBAL_DATA, *PGLOBAL_DATA;
 
 extern GLOBAL_DATA gDrvData;
 
 void GdrvInitGlobalData(_In_ PDRIVER_OBJECT DriverObject);
 void GdrvUninitGlobalData();
+NTSTATUS GdrvSolveDynamicFunctions();
 
 #endif //__GLOBAL_DATA_HPP__

@@ -39,6 +39,18 @@ namespace Minifilter
             _Inout_ PEPROCESS Process,
             _In_ HANDLE ProcessId
         );
+
+        static NTSTATUS 
+        CheckForRemoteShell(
+            _Inout_ PEPROCESS Process,
+            _In_ HANDLE ProcessId
+        );
+
+        static NTSTATUS 
+        CheckPebStandardHandles(
+            _Inout_ PEPROCESS Process,
+            _In_ PPEB Peb
+        );
     };
 }
 

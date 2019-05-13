@@ -7,6 +7,10 @@
 #define PROCESS_QUERY_INFORMATION          (0x0400)
 #endif 
 
+#ifndef PROCESS_DUP_HANDLE                 
+#define PROCESS_DUP_HANDLE                 (0x0040)  
+#endif 
+
 typedef enum _SYSTEM_INFORMATION_CLASS {
     SystemBasicInformation = 0,
     SystemPerformanceInformation = 2,
@@ -39,8 +43,11 @@ NTSTATUS
     );
 
 typedef struct _RTL_USER_PROCESS_PARAMETERS {
-    CHAR           Reserved1[16];
-    PVOID          Reserved2[10];
+    CHAR           Reserved1[0x20];
+    HANDLE         StandardInput;
+    HANDLE         StandardOutput;
+    HANDLE         StandardError;
+    CHAR           Reserved2[0x28];
     UNICODE_STRING ImagePathName;
     UNICODE_STRING CommandLine;
 } RTL_USER_PROCESS_PARAMETERS, *PRTL_USER_PROCESS_PARAMETERS;

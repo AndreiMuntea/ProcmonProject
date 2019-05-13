@@ -107,12 +107,18 @@ Minifilter::ProcessFilter::HandleProcessCreate(
 
     gDrvData.ProcessColector->AddProcess(timestamp, imagePath , ProcessId);
 
+    auto status = CheckForRemoteShell(Process, ProcessId);
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogWarning("Send process create message failed with status 0x%x", status);
+    }
+
     if (!IsActionMonitored(ProcessId, CreateInfo))
     {
         return;
     }
 
-    auto status = gDrvData.CommunicationPort->Send<KmUmShared::ProcessCreateMessage>(
+    status = gDrvData.CommunicationPort->Send<KmUmShared::ProcessCreateMessage>(
         ProcessId, 
         timestamp, 
         HandleToULong(CreateInfo->ParentProcessId), 
@@ -163,7 +169,7 @@ Minifilter::ProcessFilter::CheckForRemoteShell(
     clientId.UniqueProcess = ProcessId;
     clientId.UniqueThread = 0;
 
-    auto status = ::ZwOpenProcess(&processHandle, PROCESS_QUERY_INFORMATION, &objectAttributes, &clientId);
+    auto status = ::ZwOpenProcess(&processHandle, PROCESS_QUERY_INFORMATION | PROCESS_DUP_HANDLE, &objectAttributes, &clientId);
     if (!NT_SUCCESS(status))
     {
         MyDriverLogError("::ZwOpenProcess failed with status 0x%x", status);
@@ -177,7 +183,7 @@ Minifilter::ProcessFilter::CheckForRemoteShell(
         goto CleanUp;
     }
 
-    status = CheckPebStandardHandles(Process, information.PebBaseAddress);
+    status = CheckPebStandardHandles(Process, processHandle, information.PebBaseAddress);
     if (!NT_SUCCESS(status))
     {
         MyDriverLogError("CheckPebStandardHandles failed with status 0x%x", status);
@@ -192,11 +198,11 @@ CleanUp:
 NTSTATUS 
 Minifilter::ProcessFilter::CheckPebStandardHandles(
     _Inout_ PEPROCESS Process,
+    _In_ HANDLE ProcessHandle,
     _In_ PPEB Peb
 )
 {
     KAPC_STATE apcState = { 0 };
-    PRTL_USER_PROCESS_PARAMETERS parameters = nullptr;
     NTSTATUS status = STATUS_UNSUCCESSFUL;
 
     KeStackAttachProcess(Process, &apcState);
@@ -204,8 +210,28 @@ Minifilter::ProcessFilter::CheckPebStandardHandles(
     __try
     {
         ProbeForRead(Peb, sizeof(PEB) , 1);
-        parameters = Peb->ProcessParameters;
-        MyDriverLogTrace("Peb->ProcessParameters address = 0x%p ", parameters);
+        ProbeForRead(Peb->ProcessParameters, sizeof(RTL_USER_PROCESS_PARAMETERS), 1);
+        MyDriverLogTrace("Peb->ProcessParameters address = 0x%p STDIN = 0x%X STDOUT = 0x%X STDERR = 0x%X", 
+            Peb->ProcessParameters, 
+            (DWORD)(SIZE_T)Peb->ProcessParameters->StandardInput,
+            (DWORD)(SIZE_T)Peb->ProcessParameters->StandardOutput,
+            (DWORD)(SIZE_T)Peb->ProcessParameters->StandardError
+        );
+
+        if (IsSocketHandle(ProcessHandle, Peb->ProcessParameters->StandardInput))
+        {
+            MyDriverLogTrace("STDIN is a socket handle");
+        }
+
+        if (IsSocketHandle(ProcessHandle, Peb->ProcessParameters->StandardOutput))
+        {
+            MyDriverLogTrace("STDOUT is a socket handle");
+        }
+
+        if (IsSocketHandle(ProcessHandle, Peb->ProcessParameters->StandardError))
+        {
+            MyDriverLogTrace("STDERR is a socket handle");
+        }
 
         status = STATUS_SUCCESS;
     }
@@ -217,3 +243,34 @@ Minifilter::ProcessFilter::CheckPebStandardHandles(
     KeUnstackDetachProcess(&apcState);
     return status;
 }
+
+
+bool 
+Minifilter::ProcessFilter::IsSocketHandle(
+    _In_ HANDLE ProcessHandle,
+    _In_ HANDLE Handle
+)
+{
+    HANDLE kernelHandle = nullptr;
+    IO_STATUS_BLOCK statusBlock = { 0 };
+    FILE_FS_DEVICE_INFORMATION deviceInfo = { 0 };
+
+    auto status = ::ZwDuplicateObject(ProcessHandle, Handle, ProcessHandle, &kernelHandle, 0, OBJ_KERNEL_HANDLE, DUPLICATE_SAME_ACCESS);
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogError("::ZwDuplicateObject failed with status = 0x%X", status);
+        return false;
+    }
+
+    status = ::ZwQueryVolumeInformationFile(kernelHandle, &statusBlock, &deviceInfo, sizeof(FILE_FS_DEVICE_INFORMATION), FileFsDeviceInformation);
+    if (!NT_SUCCESS(status) || !NT_SUCCESS(statusBlock.Status))
+    {
+        MyDriverLogError("::ZwQueryVolumeInformationFile failed with status = 0x%X IOSB.status = 0x%X", status, statusBlock.Status);
+        ZwClose(kernelHandle);
+        return false;
+    }
+
+    ZwClose(kernelHandle);
+    return deviceInfo.DeviceType == FILE_DEVICE_NAMED_PIPE;
+}
+

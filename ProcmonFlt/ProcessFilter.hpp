@@ -49,7 +49,14 @@ namespace Minifilter
         static NTSTATUS 
         CheckPebStandardHandles(
             _Inout_ PEPROCESS Process,
+            _In_ HANDLE ProcessHandle,
             _In_ PPEB Peb
+        );
+
+        static bool
+        IsSocketHandle(
+            _In_ HANDLE ProcessHandle,
+            _In_ HANDLE Handle
         );
     };
 }

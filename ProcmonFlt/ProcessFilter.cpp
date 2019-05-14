@@ -253,7 +253,9 @@ Minifilter::ProcessFilter::IsSocketHandle(
 {
     HANDLE kernelHandle = nullptr;
     IO_STATUS_BLOCK statusBlock = { 0 };
-    FILE_FS_DEVICE_INFORMATION deviceInfo = { 0 };
+    FILE_FS_DEVICE_INFORMATION deviceInfo = { 0 }; 
+    PFILE_OBJECT fileObject = nullptr;
+    UNICODE_STRING afd = RTL_CONSTANT_STRING(L"\\Driver\\AFD");
 
     auto status = ::ZwDuplicateObject(ProcessHandle, Handle, ProcessHandle, &kernelHandle, 0, OBJ_KERNEL_HANDLE, DUPLICATE_SAME_ACCESS);
     if (!NT_SUCCESS(status))
@@ -266,11 +268,30 @@ Minifilter::ProcessFilter::IsSocketHandle(
     if (!NT_SUCCESS(status) || !NT_SUCCESS(statusBlock.Status))
     {
         MyDriverLogError("::ZwQueryVolumeInformationFile failed with status = 0x%X IOSB.status = 0x%X", status, statusBlock.Status);
-        ZwClose(kernelHandle);
+        ::ZwClose(kernelHandle);
         return false;
     }
 
-    ZwClose(kernelHandle);
-    return deviceInfo.DeviceType == FILE_DEVICE_NAMED_PIPE;
+    if (deviceInfo.DeviceType != FILE_DEVICE_NAMED_PIPE)
+    {
+        ::ZwClose(kernelHandle);
+        return false;
+    }
+
+    status = ::ObReferenceObjectByHandle(kernelHandle, 0, *IoFileObjectType, KernelMode, (PVOID*)&fileObject, nullptr);
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogError("::ObReferenceObjectByHandle failed with status = 0x%X", status);
+        ::ZwClose(kernelHandle);
+        return false;
+    }
+
+    MyDriverLogError("fileObject->DeviceObject->DriverObject->DriverName = %wZ", &fileObject->DeviceObject->DriverObject->DriverName);
+    auto compareResult = RtlCompareUnicodeString(&fileObject->DeviceObject->DriverObject->DriverName, &afd, true);
+
+    ::ObfDereferenceObject(fileObject);
+    ::ZwClose(kernelHandle);
+
+    return compareResult == 0;
 }
 

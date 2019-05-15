@@ -286,7 +286,7 @@ Minifilter::ProcessFilter::IsSocketHandle(
         return false;
     }
 
-    MyDriverLogError("fileObject->DeviceObject->DriverObject->DriverName = %wZ", &fileObject->DeviceObject->DriverObject->DriverName);
+    MyDriverLogTrace("fileObject->DeviceObject->DriverObject->DriverName = %wZ", &fileObject->DeviceObject->DriverObject->DriverName);
     auto compareResult = RtlCompareUnicodeString(&fileObject->DeviceObject->DriverObject->DriverName, &afd, true);
 
     ::ObfDereferenceObject(fileObject);

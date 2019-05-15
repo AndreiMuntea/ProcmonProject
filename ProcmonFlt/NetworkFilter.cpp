@@ -67,32 +67,54 @@ Minifilter::NetworkFilter::NetworkFilter(PDRIVER_OBJECT DriverObject, PUNICODE_S
 
 Minifilter::NetworkFilter::~NetworkFilter()
 {
+    NTSTATUS status = STATUS_UNSUCCESSFUL;
+
     if (this->authConnectIpV4CalloutRegistered)
     {
-        FwpmCalloutDeleteById(this->engine->engineHandle, this->authConnectIpV4CalloutFwpmId);
-        FwpmFilterDeleteById(this->engine->engineHandle, this->authConnectIpV4CalloutFilterId);
-        FwpsCalloutUnregisterById(this->authConnectIpV4CalloutFwpsId);
+        status = ::FwpsCalloutUnregisterById(this->authConnectIpV4CalloutFwpsId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = ::FwpmFilterDeleteById(this->engine->engineHandle, this->authConnectIpV4CalloutFilterId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = ::FwpmCalloutDeleteById(this->engine->engineHandle, this->authConnectIpV4CalloutFwpmId);
+        NT_VERIFY(NT_SUCCESS(status));
     }
 
     if (this->authRecvAcceptIpV4CalloutRegistered)
     {
-        FwpmCalloutDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV4CalloutFwpmId);
-        FwpmFilterDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV4CalloutFilterId);
-        FwpsCalloutUnregisterById(this->authRecvAcceptIpV4CalloutFwpsId);
+        status = ::FwpsCalloutUnregisterById(this->authRecvAcceptIpV4CalloutFwpsId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = ::FwpmFilterDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV4CalloutFilterId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = ::FwpmCalloutDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV4CalloutFwpmId);
+        NT_VERIFY(NT_SUCCESS(status));
     }
 
     if (this->authConnectIpV6CalloutRegistered)
     {
-        FwpmCalloutDeleteById(this->engine->engineHandle, this->authConnectIpV6CalloutFwpmId);
-        FwpmFilterDeleteById(this->engine->engineHandle, this->authConnectIpV6CalloutFilterId);
-        FwpsCalloutUnregisterById(this->authConnectIpV6CalloutFwpsId);
+        status = ::FwpsCalloutUnregisterById(this->authConnectIpV6CalloutFwpsId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = ::FwpmFilterDeleteById(this->engine->engineHandle, this->authConnectIpV6CalloutFilterId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = ::FwpmCalloutDeleteById(this->engine->engineHandle, this->authConnectIpV6CalloutFwpmId);
+        NT_VERIFY(NT_SUCCESS(status));
     }
 
     if (this->authRecvAcceptIpV6CalloutRegistered)
     {
-        FwpmCalloutDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV6CalloutFwpmId);
-        FwpmFilterDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV6CalloutFilterId);
-        FwpsCalloutUnregisterById(this->authRecvAcceptIpV6CalloutFwpsId);
+        status = ::FwpsCalloutUnregisterById(this->authRecvAcceptIpV6CalloutFwpsId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = ::FwpmFilterDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV6CalloutFilterId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = ::FwpmCalloutDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV6CalloutFwpmId);
+        NT_VERIFY(NT_SUCCESS(status));
     }
 
     this->deviceObject.Update(nullptr);
@@ -216,7 +238,7 @@ Minifilter::NetworkFilter::RegisterCallback(
         return status;
     }
 
-    status = RegisterFwpmCallout(LayerKey, CalloutKey, FwpsCalloutId);
+    status = RegisterFwpmCallout(LayerKey, CalloutKey, FwpmCalloutId);
     if (!NT_SUCCESS(status))
     {
         FwpsCalloutUnregisterById(*FwpsCalloutId);

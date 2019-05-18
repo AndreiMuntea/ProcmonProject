@@ -121,6 +121,49 @@ Minifilter::NetworkFilter::~NetworkFilter()
     this->engine.Update(nullptr);
 }
 
+void 
+Minifilter::NetworkFilter::ClassifyFn(
+    _In_ const FWPS_INCOMING_VALUES0* FixedValues,
+    _In_ const FWPS_INCOMING_METADATA_VALUES0* MetaValues,
+    _Inout_opt_ void* LayerData,
+    _In_opt_ const void* ClassifyContext,
+    _In_ const FWPS_FILTER2* Filter,
+    _In_ UINT64 FlowContext,
+    _Inout_ FWPS_CLASSIFY_OUT0* Classify
+)
+{
+    UNREFERENCED_PARAMETER(MetaValues);
+    UNREFERENCED_PARAMETER(LayerData);
+    UNREFERENCED_PARAMETER(Filter);
+    UNREFERENCED_PARAMETER(FlowContext);
+    UNREFERENCED_PARAMETER(Classify);
+    UNREFERENCED_PARAMETER(ClassifyContext);
+
+    UINT AppIdIndex = 0;
+    UINT LocalAddressIndex = 0;
+    UINT RemoteAddressIndex = 0;
+    UINT LocalPortIndex = 0;
+    UINT RemotePortIndex = 0;
+    UINT ProtocolIndex = 0;
+    UINT IcmpIndex = 0;
+
+    if (!GetNetworkTupleIndexesForLayer(FixedValues->layerId, &AppIdIndex, &LocalAddressIndex, &RemoteAddressIndex, &LocalPortIndex, &RemotePortIndex, &ProtocolIndex, &IcmpIndex))
+    {
+        return;
+    }
+
+    ProcessIpValues(
+        FixedValues->incomingValue[AppIdIndex].value,
+        FixedValues->incomingValue[LocalAddressIndex].value,
+        FixedValues->incomingValue[RemoteAddressIndex].value,
+        FixedValues->incomingValue[LocalPortIndex].value,
+        FixedValues->incomingValue[RemotePortIndex].value,
+        FixedValues->incomingValue[ProtocolIndex].value,
+        FixedValues->incomingValue[IcmpIndex].value,
+        ULongToHandle(static_cast<DWORD>(MetaValues->processId))
+    );
+}
+
 NTSTATUS 
 Minifilter::NetworkFilter::NotifyFn(
     _In_ FWPS_CALLOUT_NOTIFY_TYPE NotifyType, 
@@ -154,7 +197,7 @@ bool Minifilter::NetworkFilter::RegisterAuthConnectIpV4Callout()
     auto status = RegisterCallback(
         &guid,
         &gAuthConnectIpV4GUID,
-        Minifilter::NetworkFilter::ClassifyFn<FWPS_LAYER_ALE_AUTH_CONNECT_V4>,
+        Minifilter::NetworkFilter::ClassifyFn,
         Minifilter::NetworkFilter::NotifyFn,
         Minifilter::NetworkFilter::FlowDeleteFn,
         &this->authConnectIpV4CalloutFwpsId,
@@ -171,7 +214,7 @@ bool Minifilter::NetworkFilter::RegisterAuthRecvAcceptIpV4Callout()
     auto status = RegisterCallback(
         &guid,
         &gAuthRecvAcceptIpv4GUID,
-        Minifilter::NetworkFilter::ClassifyFn<FWPS_LAYER_ALE_AUTH_RECV_ACCEPT_V4>,
+        Minifilter::NetworkFilter::ClassifyFn,
         Minifilter::NetworkFilter::NotifyFn,
         Minifilter::NetworkFilter::FlowDeleteFn,
         &this->authRecvAcceptIpV4CalloutFwpsId,
@@ -188,7 +231,7 @@ bool Minifilter::NetworkFilter::RegisterAuthConnectIpV6Callout()
     auto status = RegisterCallback(
         &guid,
         &gAuthConnectIpV6GUID,
-        Minifilter::NetworkFilter::ClassifyFn<FWPS_LAYER_ALE_AUTH_CONNECT_V6>,
+        Minifilter::NetworkFilter::ClassifyFn,
         Minifilter::NetworkFilter::NotifyFn,
         Minifilter::NetworkFilter::FlowDeleteFn,
         &this->authConnectIpV6CalloutFwpsId,
@@ -205,7 +248,7 @@ bool Minifilter::NetworkFilter::RegisterAuthRecvAcceptIpV6Callout()
     auto status = RegisterCallback(
         &guid,
         &gAuthRecvAcceptIpv6GUID,
-        Minifilter::NetworkFilter::ClassifyFn<FWPS_LAYER_ALE_AUTH_RECV_ACCEPT_V6>,
+        Minifilter::NetworkFilter::ClassifyFn,
         Minifilter::NetworkFilter::NotifyFn,
         Minifilter::NetworkFilter::FlowDeleteFn,
         &this->authRecvAcceptIpV6CalloutFwpsId,

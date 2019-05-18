@@ -14,6 +14,7 @@
 #pragma warning (disable : 4067)
 
 #include <CppUniquePointer.hpp>
+#include <CppSharedPointer.hpp>
 #include "cpp_allocator_object.hpp"
 #include "DeviceObject.hpp"
 
@@ -30,12 +31,64 @@ namespace Minifilter
     class NetworkEngine : public Cpp::CppNonPagedObject<'TEN#'>
     {
         friend class NetworkFilter;
+        friend class NetworkCallout;
     public:
         NetworkEngine();
         virtual ~NetworkEngine();
 
     private:
         HANDLE engineHandle = nullptr;
+    };
+
+    class NetworkCallout : public Cpp::CppNonPagedObject<'TEN#'>
+    {
+        friend class NetworkFilter;
+    public:
+        NetworkCallout(
+            Cpp::UniquePointer<DeviceObject>& DeviceObject,
+            Cpp::SharedPointer<NetworkEngine>& Engine,
+            FWPS_CALLOUT_CLASSIFY_FN2 ClassifyFunction,
+            FWPS_CALLOUT_NOTIFY_FN2 NotifyFunction,
+            FWPS_CALLOUT_FLOW_DELETE_NOTIFY_FN0 FlowDeleteFunction,
+            const GUID& LayerKey,
+            const GUID& CalloutKey
+        );
+        virtual ~NetworkCallout();
+
+    protected:
+        NTSTATUS
+        RegisterFwpsCallout(
+            Cpp::UniquePointer<DeviceObject>& DeviceObject
+        );
+
+        NTSTATUS
+        RegisterFwpmCallout(
+            Cpp::UniquePointer<DeviceObject>& DeviceObject
+        );
+
+        NTSTATUS 
+        RegisterFilter(
+            Cpp::UniquePointer<DeviceObject>& DeviceObject
+        );
+
+        bool
+        RegisterCallout(
+            Cpp::UniquePointer<DeviceObject>& DeviceObject
+        );
+
+    private:    
+        Cpp::SharedPointer<NetworkEngine> engine;
+
+        UINT32 calloutFwpsId = 0;
+        UINT32 calloutFwpmId = 0;
+        UINT64 calloutFilterId = 0;
+
+        FWPS_CALLOUT_CLASSIFY_FN2 classifyFunction;
+        FWPS_CALLOUT_NOTIFY_FN2 notifyFunction;
+        FWPS_CALLOUT_FLOW_DELETE_NOTIFY_FN0 flowDeleteFunction;
+
+        GUID layerKey;
+        GUID calloutKey;
     };
 
     class NetworkFilter : public Cpp::CppNonPagedObject<'TFN#'>
@@ -70,48 +123,6 @@ namespace Minifilter
         );
 
     private:
-        bool RegisterAuthConnectIpV4Callout();
-        bool RegisterAuthRecvAcceptIpV4Callout();
-
-        bool RegisterAuthConnectIpV6Callout();
-        bool RegisterAuthRecvAcceptIpV6Callout();
-
-        NTSTATUS 
-        RegisterCallback(
-            _In_ const GUID* LayerKey,
-            _In_ const GUID* CalloutKey,
-            _In_ FWPS_CALLOUT_CLASSIFY_FN2 ClassifyFunction,
-            _In_ FWPS_CALLOUT_NOTIFY_FN2 NotifyFunction,
-            _In_ FWPS_CALLOUT_FLOW_DELETE_NOTIFY_FN0 FlowDeleteFunction,
-            _Out_ UINT32* FwpsCalloutId,
-            _Out_ UINT32* FwpmCalloutId,
-            _Out_ UINT64* FilterId
-        );
-
-        NTSTATUS
-        RegisterFwpsCallout(
-            _In_ const GUID* LayerKey,
-            _In_ const GUID* CalloutKey,
-            _In_ FWPS_CALLOUT_CLASSIFY_FN2 ClassifyFunction,
-            _In_ FWPS_CALLOUT_NOTIFY_FN2 NotifyFunction,
-            _In_ FWPS_CALLOUT_FLOW_DELETE_NOTIFY_FN0 FlowDeleteFunction,
-            _Out_ UINT32* FwpsCalloutId
-        );
-
-        NTSTATUS
-        RegisterFwpmCallout(
-            _In_ const GUID* LayerKey,
-            _In_ const GUID* CalloutKey,
-            _Out_ UINT32* FwpmCalloutId
-        );
-
-        NTSTATUS 
-        RegisterFilter(
-            _In_ const GUID* LayerKey,
-            _In_ const GUID* CalloutKey,
-            _Out_ UINT64* FilterId
-        );
-
         static bool 
         GetNetworkTupleIndexesForLayer(
             _In_ UINT16 LayerId,
@@ -161,27 +172,13 @@ namespace Minifilter
         );
 
         Cpp::UniquePointer<DeviceObject> deviceObject;
-        Cpp::UniquePointer<NetworkEngine> engine;
+        Cpp::SharedPointer<NetworkEngine> engine;
 
-        bool authConnectIpV4CalloutRegistered = false;
-        UINT32 authConnectIpV4CalloutFwpsId = 0;
-        UINT32 authConnectIpV4CalloutFwpmId = 0;
-        UINT64 authConnectIpV4CalloutFilterId = 0;
+        Cpp::UniquePointer<NetworkCallout> authConnectIpv4Callout;
+        Cpp::UniquePointer<NetworkCallout> authRecvIpv4Callout;
 
-        bool authRecvAcceptIpV4CalloutRegistered = false;
-        UINT32 authRecvAcceptIpV4CalloutFwpsId = 0;
-        UINT32 authRecvAcceptIpV4CalloutFwpmId = 0;
-        UINT64 authRecvAcceptIpV4CalloutFilterId = 0;
-
-        bool authConnectIpV6CalloutRegistered = false;
-        UINT32 authConnectIpV6CalloutFwpsId = 0;
-        UINT32 authConnectIpV6CalloutFwpmId = 0;
-        UINT64 authConnectIpV6CalloutFilterId = 0;
-
-        bool authRecvAcceptIpV6CalloutRegistered = false;
-        UINT32 authRecvAcceptIpV6CalloutFwpsId = 0;
-        UINT32 authRecvAcceptIpV6CalloutFwpmId = 0;
-        UINT64 authRecvAcceptIpV6CalloutFilterId = 0;
+        Cpp::UniquePointer<NetworkCallout> authConnectIpv6Callout;
+        Cpp::UniquePointer<NetworkCallout> authRecvIpv6Callout;
     };
 
 };

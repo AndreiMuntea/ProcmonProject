@@ -38,84 +38,40 @@ Minifilter::NetworkFilter::NetworkFilter(PDRIVER_OBJECT DriverObject, PUNICODE_S
         return;
     }
 
-    if (!RegisterAuthConnectIpV4Callout())
+    this->authConnectIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V4,gAuthConnectIpV4GUID });
+    if (!this->authConnectIpv4Callout.IsValid() || !this->authConnectIpv4Callout->IsValid())
     {
         return;
     }
-    this->authConnectIpV4CalloutRegistered = true;
 
-    if (!RegisterAuthRecvAcceptIpV4Callout())
+    this->authRecvIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4, gAuthRecvAcceptIpv4GUID });
+    if (!this->authRecvIpv4Callout.IsValid() || !this->authRecvIpv4Callout->IsValid())
     {
         return;
     }
-    this->authRecvAcceptIpV4CalloutRegistered = true;
 
-    if (!RegisterAuthConnectIpV6Callout())
+    this->authConnectIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V6, gAuthConnectIpV6GUID });
+    if (!this->authConnectIpv6Callout.IsValid() || !this->authConnectIpv6Callout->IsValid())
     {
         return;
     }
-    this->authConnectIpV6CalloutRegistered = true;
 
-    if (!RegisterAuthRecvAcceptIpV6Callout())
+    this->authRecvIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6, gAuthRecvAcceptIpv6GUID });
+    if (!this->authRecvIpv6Callout.IsValid() || !this->authRecvIpv6Callout->IsValid())
     {
         return;
     }
-    this->authRecvAcceptIpV6CalloutRegistered = true;
 
     Validate();
 }
 
 Minifilter::NetworkFilter::~NetworkFilter()
 {
-    NTSTATUS status = STATUS_UNSUCCESSFUL;
+    this->authConnectIpv4Callout.Update(nullptr);
+    this->authRecvIpv4Callout.Update(nullptr);
 
-    if (this->authConnectIpV4CalloutRegistered)
-    {
-        status = ::FwpsCalloutUnregisterById(this->authConnectIpV4CalloutFwpsId);
-        NT_VERIFY(NT_SUCCESS(status));
-
-        status = ::FwpmFilterDeleteById(this->engine->engineHandle, this->authConnectIpV4CalloutFilterId);
-        NT_VERIFY(NT_SUCCESS(status));
-
-        status = ::FwpmCalloutDeleteById(this->engine->engineHandle, this->authConnectIpV4CalloutFwpmId);
-        NT_VERIFY(NT_SUCCESS(status));
-    }
-
-    if (this->authRecvAcceptIpV4CalloutRegistered)
-    {
-        status = ::FwpsCalloutUnregisterById(this->authRecvAcceptIpV4CalloutFwpsId);
-        NT_VERIFY(NT_SUCCESS(status));
-
-        status = ::FwpmFilterDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV4CalloutFilterId);
-        NT_VERIFY(NT_SUCCESS(status));
-
-        status = ::FwpmCalloutDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV4CalloutFwpmId);
-        NT_VERIFY(NT_SUCCESS(status));
-    }
-
-    if (this->authConnectIpV6CalloutRegistered)
-    {
-        status = ::FwpsCalloutUnregisterById(this->authConnectIpV6CalloutFwpsId);
-        NT_VERIFY(NT_SUCCESS(status));
-
-        status = ::FwpmFilterDeleteById(this->engine->engineHandle, this->authConnectIpV6CalloutFilterId);
-        NT_VERIFY(NT_SUCCESS(status));
-
-        status = ::FwpmCalloutDeleteById(this->engine->engineHandle, this->authConnectIpV6CalloutFwpmId);
-        NT_VERIFY(NT_SUCCESS(status));
-    }
-
-    if (this->authRecvAcceptIpV6CalloutRegistered)
-    {
-        status = ::FwpsCalloutUnregisterById(this->authRecvAcceptIpV6CalloutFwpsId);
-        NT_VERIFY(NT_SUCCESS(status));
-
-        status = ::FwpmFilterDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV6CalloutFilterId);
-        NT_VERIFY(NT_SUCCESS(status));
-
-        status = ::FwpmCalloutDeleteById(this->engine->engineHandle, this->authRecvAcceptIpV6CalloutFwpmId);
-        NT_VERIFY(NT_SUCCESS(status));
-    }
+    this->authConnectIpv6Callout.Update(nullptr);
+    this->authRecvIpv6Callout.Update(nullptr);
 
     this->deviceObject.Update(nullptr);
     this->engine.Update(nullptr);
@@ -197,180 +153,6 @@ Minifilter::NetworkFilter::FlowDeleteFn(
     UNREFERENCED_PARAMETER(LayerId);
     UNREFERENCED_PARAMETER(CalloutId);
     UNREFERENCED_PARAMETER(FlowContext);
-
-}
-
-bool Minifilter::NetworkFilter::RegisterAuthConnectIpV4Callout()
-{
-    GUID guid = FWPM_LAYER_ALE_AUTH_CONNECT_V4;
-    auto status = RegisterCallback(
-        &guid,
-        &gAuthConnectIpV4GUID,
-        Minifilter::NetworkFilter::ClassifyFn,
-        Minifilter::NetworkFilter::NotifyFn,
-        Minifilter::NetworkFilter::FlowDeleteFn,
-        &this->authConnectIpV4CalloutFwpsId,
-        &this->authConnectIpV4CalloutFwpmId,
-        &this->authConnectIpV4CalloutFilterId
-    );
-
-    return NT_SUCCESS(status);
-}
-
-bool Minifilter::NetworkFilter::RegisterAuthRecvAcceptIpV4Callout()
-{
-    GUID guid = FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4;
-    auto status = RegisterCallback(
-        &guid,
-        &gAuthRecvAcceptIpv4GUID,
-        Minifilter::NetworkFilter::ClassifyFn,
-        Minifilter::NetworkFilter::NotifyFn,
-        Minifilter::NetworkFilter::FlowDeleteFn,
-        &this->authRecvAcceptIpV4CalloutFwpsId,
-        &this->authRecvAcceptIpV4CalloutFwpmId,
-        &this->authRecvAcceptIpV4CalloutFilterId
-    );
-
-    return NT_SUCCESS(status);
-}
-
-bool Minifilter::NetworkFilter::RegisterAuthConnectIpV6Callout()
-{
-    GUID guid = FWPM_LAYER_ALE_AUTH_CONNECT_V6;
-    auto status = RegisterCallback(
-        &guid,
-        &gAuthConnectIpV6GUID,
-        Minifilter::NetworkFilter::ClassifyFn,
-        Minifilter::NetworkFilter::NotifyFn,
-        Minifilter::NetworkFilter::FlowDeleteFn,
-        &this->authConnectIpV6CalloutFwpsId,
-        &this->authConnectIpV6CalloutFwpmId,
-        &this->authConnectIpV6CalloutFilterId
-    );
-
-    return NT_SUCCESS(status);
-}
-
-bool Minifilter::NetworkFilter::RegisterAuthRecvAcceptIpV6Callout()
-{
-    GUID guid = FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6;
-    auto status = RegisterCallback(
-        &guid,
-        &gAuthRecvAcceptIpv6GUID,
-        Minifilter::NetworkFilter::ClassifyFn,
-        Minifilter::NetworkFilter::NotifyFn,
-        Minifilter::NetworkFilter::FlowDeleteFn,
-        &this->authRecvAcceptIpV6CalloutFwpsId,
-        &this->authRecvAcceptIpV6CalloutFwpmId,
-        &this->authRecvAcceptIpV6CalloutFilterId
-    );
-
-    return NT_SUCCESS(status);
-}
-
-NTSTATUS 
-Minifilter::NetworkFilter::RegisterCallback(
-    _In_ const GUID* LayerKey,
-    _In_ const GUID* CalloutKey,
-    _In_ FWPS_CALLOUT_CLASSIFY_FN2 ClassifyFunction,
-    _In_ FWPS_CALLOUT_NOTIFY_FN2 NotifyFunction,
-    _In_ FWPS_CALLOUT_FLOW_DELETE_NOTIFY_FN0 FlowDeleteFunction,
-    _Out_ UINT32* FwpsCalloutId,
-    _Out_ UINT32* FwpmCalloutId,
-    _Out_ UINT64* FilterId
-)
-{
-    *FwpsCalloutId = 0;
-    *FwpmCalloutId = 0;
-
-    auto status = RegisterFwpsCallout(LayerKey, CalloutKey, ClassifyFunction, NotifyFunction, FlowDeleteFunction, FwpsCalloutId);
-    if (!NT_SUCCESS(status))
-    {
-        MyDriverLogCritical("RegisterFwpsCallout failed with status 0x%x", status);
-        return status;
-    }
-
-    status = RegisterFwpmCallout(LayerKey, CalloutKey, FwpmCalloutId);
-    if (!NT_SUCCESS(status))
-    {
-        FwpsCalloutUnregisterById(*FwpsCalloutId);
-
-        MyDriverLogCritical("RegisterFwpmCallout failed with status 0x%x", status);
-        return status;
-    }
-
-    status = RegisterFilter(LayerKey, CalloutKey, FilterId);
-    if (!NT_SUCCESS(status))
-    {
-        FwpmCalloutDeleteById(this->engine->engineHandle, *FwpmCalloutId);
-        FwpsCalloutUnregisterById(*FwpsCalloutId);
-
-        MyDriverLogCritical("RegisterFilter for callout failed with status 0x%x", status);
-        return status;
-    }
-
-    return status;
-}
-
-NTSTATUS 
-Minifilter::NetworkFilter::RegisterFwpsCallout(
-    _In_ const GUID* LayerKey,
-    _In_ const GUID* CalloutKey,
-    _In_ FWPS_CALLOUT_CLASSIFY_FN2 ClassifyFunction,
-    _In_ FWPS_CALLOUT_NOTIFY_FN2 NotifyFunction,
-    _In_ FWPS_CALLOUT_FLOW_DELETE_NOTIFY_FN0 FlowDeleteFunction,
-    _Out_ UINT32* FwpsCalloutId
-)
-{
-    UNREFERENCED_PARAMETER(LayerKey);
-    FWPS_CALLOUT fwpsCallout = { 0 };
-
-    fwpsCallout.calloutKey = *CalloutKey;
-    fwpsCallout.classifyFn = ClassifyFunction;
-    fwpsCallout.notifyFn = NotifyFunction;
-    fwpsCallout.flowDeleteFn = FlowDeleteFunction;
-
-    return ::FwpsCalloutRegister(this->deviceObject->GetDeviceObject(), &fwpsCallout, FwpsCalloutId);
-}
-
-NTSTATUS 
-Minifilter::NetworkFilter::RegisterFwpmCallout(
-    _In_ const GUID* LayerKey,
-    _In_ const GUID* CalloutKey,
-    _Out_ UINT32* FwpmCalloutId
-)
-{
-    FWPM_CALLOUT fwpmCallout = { 0 };
-    FWPM_DISPLAY_DATA displayData = { 0 };
-
-    displayData.name = L"Dummy Name";
-    displayData.description = L"Dummy Description";
-
-    fwpmCallout.calloutKey = *CalloutKey;
-    fwpmCallout.displayData = displayData;
-    fwpmCallout.applicableLayer = *LayerKey;
-
-    return ::FwpmCalloutAdd(this->engine->engineHandle, &fwpmCallout, nullptr, FwpmCalloutId);
-}
-
-NTSTATUS 
-Minifilter::NetworkFilter::RegisterFilter(
-    _In_ const GUID* LayerKey,
-    _In_ const GUID* CalloutKey,
-    _Out_ UINT64* FilterId
-)
-{
-    FWPM_FILTER filter = { 0 };
-
-    filter.layerKey = *LayerKey;
-    filter.displayData.name = L"Dummy filter name";
-    filter.displayData.description = L"Dummy Description";
-
-    filter.action.type = FWP_ACTION_CALLOUT_INSPECTION;
-    filter.action.calloutKey = *CalloutKey;
-    filter.weight.type = FWP_EMPTY;
-
-    return FwpmFilterAdd(this->engine->engineHandle, &filter, nullptr, FilterId);
 }
 
 bool 
@@ -594,4 +376,136 @@ Minifilter::NetworkEngine::~NetworkEngine()
         auto status = ::FwpmEngineClose(this->engineHandle);
         NT_VERIFY(NT_SUCCESS(status));
     }
+}
+
+Minifilter::NetworkCallout::NetworkCallout(
+    Cpp::UniquePointer<DeviceObject>& DeviceObject,
+    Cpp::SharedPointer<NetworkEngine>& Engine,
+    FWPS_CALLOUT_CLASSIFY_FN2 ClassifyFunction,
+    FWPS_CALLOUT_NOTIFY_FN2 NotifyFunction,
+    FWPS_CALLOUT_FLOW_DELETE_NOTIFY_FN0 FlowDeleteFunction,
+    const GUID& LayerKey,
+    const GUID& CalloutKey
+) : engine{Engine},
+    classifyFunction{ClassifyFunction},
+    notifyFunction{NotifyFunction},
+    flowDeleteFunction{FlowDeleteFunction}
+{
+    if (!engine.IsValid() || !engine->IsValid())
+    {
+        return;
+    }
+
+    RtlCopyMemory(&this->layerKey, &LayerKey, sizeof(GUID));
+    RtlCopyMemory(&this->calloutKey, &CalloutKey, sizeof(GUID));
+
+    if (RegisterCallout(DeviceObject))
+    {
+        Validate();
+    }
+}
+
+Minifilter::NetworkCallout::~NetworkCallout()
+{
+    NTSTATUS status = STATUS_UNSUCCESSFUL;
+    if (this->IsValid())
+    {
+        status = ::FwpsCalloutUnregisterById(this->calloutFwpsId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = ::FwpmFilterDeleteById(this->engine->engineHandle, this->calloutFilterId);
+        NT_VERIFY(NT_SUCCESS(status));
+
+        status = ::FwpmCalloutDeleteById(this->engine->engineHandle, this->calloutFwpmId);
+        NT_VERIFY(NT_SUCCESS(status));
+    }
+
+    this->engine.Update(nullptr);
+}
+
+NTSTATUS 
+Minifilter::NetworkCallout::RegisterFwpsCallout(
+    Cpp::UniquePointer<DeviceObject>& DeviceObject
+)
+{
+    FWPS_CALLOUT fwpsCallout = { 0 };
+
+    fwpsCallout.calloutKey = this->calloutKey;
+    fwpsCallout.classifyFn = this->classifyFunction;
+    fwpsCallout.notifyFn = this->notifyFunction;
+    fwpsCallout.flowDeleteFn = this->flowDeleteFunction;
+
+    return ::FwpsCalloutRegister(DeviceObject->GetDeviceObject(), &fwpsCallout, &this->calloutFwpsId);
+}
+
+NTSTATUS 
+Minifilter::NetworkCallout::RegisterFwpmCallout(
+    Cpp::UniquePointer<DeviceObject>& DeviceObject
+)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+    FWPM_CALLOUT fwpmCallout = { 0 };
+    FWPM_DISPLAY_DATA displayData = { 0 };
+
+    displayData.name = L"Dummy Name";
+    displayData.description = L"Dummy Description";
+
+    fwpmCallout.calloutKey = this->calloutKey;
+    fwpmCallout.displayData = displayData;
+    fwpmCallout.applicableLayer = this->layerKey;
+
+    return ::FwpmCalloutAdd(this->engine->engineHandle, &fwpmCallout, nullptr, &this->calloutFwpmId);
+}
+
+NTSTATUS 
+Minifilter::NetworkCallout::RegisterFilter(
+    Cpp::UniquePointer<DeviceObject>& DeviceObject
+)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+    FWPM_FILTER filter = { 0 };
+
+    filter.layerKey = this->layerKey;
+    filter.displayData.name = L"Dummy filter name";
+    filter.displayData.description = L"Dummy Description";
+
+    filter.action.type = FWP_ACTION_CALLOUT_INSPECTION;
+    filter.action.calloutKey = this->calloutKey;
+    filter.weight.type = FWP_EMPTY;
+
+    return FwpmFilterAdd(this->engine->engineHandle, &filter, nullptr, &this->calloutFilterId);
+}
+
+bool 
+Minifilter::NetworkCallout::RegisterCallout(
+    Cpp::UniquePointer<DeviceObject>& DeviceObject
+)
+{
+    auto status = RegisterFwpsCallout(DeviceObject);
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogCritical("RegisterFwpsCallout failed with status 0x%x", status);
+        return false;
+    }
+
+    status = RegisterFwpmCallout(DeviceObject);
+    if (!NT_SUCCESS(status))
+    {
+        FwpsCalloutUnregisterById(this->calloutFwpsId);
+
+        MyDriverLogCritical("RegisterFwpmCallout failed with status 0x%x", status);
+        return false;
+    }
+
+    status = RegisterFilter(DeviceObject);
+    if (!NT_SUCCESS(status))
+    {
+        FwpsCalloutUnregisterById(this->calloutFwpsId);
+        FwpmCalloutDeleteById(this->engine->engineHandle, this->calloutFwpmId);
+
+        MyDriverLogCritical("RegisterFilter for callout failed with status 0x%x", status);
+        return false;
+    }
+
+    return true;
 }

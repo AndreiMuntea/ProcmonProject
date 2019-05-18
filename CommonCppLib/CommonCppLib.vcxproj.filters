@@ -54,6 +54,9 @@
     <ClInclude Include="include\CppNonPagedString.hpp">
       <Filter>Header Files\Data Structures</Filter>
     </ClInclude>
+    <ClInclude Include="include\CppSharedPointer.hpp">
+      <Filter>Header Files\Data Structures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CppString.cpp">

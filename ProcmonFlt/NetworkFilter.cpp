@@ -147,21 +147,30 @@ Minifilter::NetworkFilter::ClassifyFn(
     UINT ProtocolIndex = 0;
     UINT IcmpIndex = 0;
 
-    if (!GetNetworkTupleIndexesForLayer(FixedValues->layerId, &AppIdIndex, &LocalAddressIndex, &RemoteAddressIndex, &LocalPortIndex, &RemotePortIndex, &ProtocolIndex, &IcmpIndex))
-    {
-        return;
-    }
-
-    ProcessIpValues(
-        FixedValues->incomingValue[AppIdIndex].value,
-        FixedValues->incomingValue[LocalAddressIndex].value,
-        FixedValues->incomingValue[RemoteAddressIndex].value,
-        FixedValues->incomingValue[LocalPortIndex].value,
-        FixedValues->incomingValue[RemotePortIndex].value,
-        FixedValues->incomingValue[ProtocolIndex].value,
-        FixedValues->incomingValue[IcmpIndex].value,
-        ULongToHandle(static_cast<DWORD>(MetaValues->processId))
+    bool ok = GetNetworkTupleIndexesForLayer(
+        FixedValues->layerId, 
+        &AppIdIndex, 
+        &LocalAddressIndex, 
+        &RemoteAddressIndex, 
+        &LocalPortIndex, 
+        &RemotePortIndex, 
+        &ProtocolIndex, 
+        &IcmpIndex
     );
+
+    if (ok)
+    {
+        ProcessIpValues(
+            FixedValues->incomingValue[AppIdIndex].value,
+            FixedValues->incomingValue[LocalAddressIndex].value,
+            FixedValues->incomingValue[RemoteAddressIndex].value,
+            FixedValues->incomingValue[LocalPortIndex].value,
+            FixedValues->incomingValue[RemotePortIndex].value,
+            FixedValues->incomingValue[ProtocolIndex].value,
+            FixedValues->incomingValue[IcmpIndex].value,
+            ULongToHandle(static_cast<DWORD>(MetaValues->processId))
+        );
+    }
 }
 
 NTSTATUS 
@@ -494,6 +503,9 @@ Minifilter::NetworkFilter::ProcessIpV4Values(
     appIdBlob.Length = static_cast<USHORT>(AppId.byteBlob->size);
     appIdBlob.MaximumLength = static_cast<USHORT>(AppId.byteBlob->size);
 
+    unsigned __int64 timestamp = 0;
+    KeQuerySystemTime(&timestamp);
+
     MyDriverLogTrace("New data available: "
         "AppId = %wZ LocalAddress = 0x%x RemoteAddress = 0x%x LocalPort = 0x%x RemotePort = 0x%x, Protocol = 0x%x ICMP = 0x%x",
         &appIdBlob,
@@ -504,9 +516,6 @@ Minifilter::NetworkFilter::ProcessIpV4Values(
         Protocol.uint8,
         Icmp.uint16
     );
-
-    unsigned __int64 timestamp = 0;
-    KeQuerySystemTime(&timestamp);
 
     gDrvData.CommunicationPort->Send<KmUmShared::NetworkMessageIpV4>(
         ProcessId, 
@@ -538,15 +547,8 @@ Minifilter::NetworkFilter::ProcessIpV6Values(
     appIdBlob.Length = static_cast<USHORT>(AppId.byteBlob->size);
     appIdBlob.MaximumLength = static_cast<USHORT>(AppId.byteBlob->size);
 
-    UNICODE_STRING localAddress{ 0 };
-    localAddress.Buffer = (PWCHAR)LocalAddress.byteArray16->byteArray16;
-    localAddress.Length = sizeof(LocalAddress.byteArray16->byteArray16);
-    localAddress.MaximumLength = sizeof(LocalAddress.byteArray16->byteArray16);
-
-    UNICODE_STRING remoteAddress{ 0 };
-    remoteAddress.Buffer = (PWCHAR)RemoteAddress.byteArray16->byteArray16;
-    remoteAddress.Length = sizeof(RemoteAddress.byteArray16->byteArray16);
-    remoteAddress.MaximumLength = sizeof(RemoteAddress.byteArray16->byteArray16);
+    unsigned __int64 timestamp = 0;
+    KeQuerySystemTime(&timestamp);
 
     MyDriverLogTrace("New data available: "
         "AppId = %wZ LocalAddress = %S RemoteAddress = %S LocalPort = 0x%x RemotePort = 0x%x, Protocol = 0x%x ICMP = 0x%x",
@@ -559,9 +561,6 @@ Minifilter::NetworkFilter::ProcessIpV6Values(
         Icmp.uint16
     );
 
-    unsigned __int64 timestamp = 0;
-    KeQuerySystemTime(&timestamp);
-
     gDrvData.CommunicationPort->Send<KmUmShared::NetworkMessageIpV6>(
         ProcessId,
         timestamp,
@@ -572,8 +571,7 @@ Minifilter::NetworkFilter::ProcessIpV6Values(
         RemotePort.uint16,
         Protocol.uint8,
         Icmp.uint16
-        );
-
+    );
 }
 
 

@@ -498,6 +498,7 @@ Minifilter::NetworkFilter::ProcessDataStream(
 
     LogBuffer(buffer, (USHORT)BufferSize);
 
+    // Stream buffer begins with pattern so we replace it
     if (BufferSize >= patternSize && patternSize == RtlCompareMemory(pattern, buffer, patternSize))
     {
         MyDriverLogTrace("A new match was found!");
@@ -519,6 +520,7 @@ Minifilter::NetworkFilter::ProcessDataStream(
         return;
     }
 
+    // Skip bytes until we got a pattern match
     for (i = 0; i < BufferSize; ++i)
     {
         if (i + patternSize > BufferSize)

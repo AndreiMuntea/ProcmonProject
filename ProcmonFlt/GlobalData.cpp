@@ -5,6 +5,8 @@
 GLOBAL_DATA gDrvData;
 
 static UNICODE_STRING gFltPortName = RTL_CONSTANT_STRING(L"\\MyCommunicationPort");
+static UNICODE_STRING gStringToBeReplaced = RTL_CONSTANT_STRING(L"very hot");
+static UNICODE_STRING gStringToReplace = RTL_CONSTANT_STRING(L"very cold");
 
 static CONST FLT_OPERATION_REGISTRATION Callbacks[] =
 {
@@ -108,8 +110,9 @@ void GdrvInitGlobalData(_In_ PDRIVER_OBJECT DriverObject)
     ExInitializeRundownProtection(&gDrvData.RundownProtection);    
     gDrvData.ZwQueryInformationProcess = nullptr;
 
-    gDrvData.NetworkStringToBeReplaced = RTL_CONSTANT_STRING(L"very hot");
-    gDrvData.NetworkStringToReplace = RTL_CONSTANT_STRING(L"very cold");
+    gDrvData.NetworkStringToBeReplaced = Cpp::NonPagedString{ (unsigned __int8*)gStringToBeReplaced.Buffer, gStringToBeReplaced.Length };
+    gDrvData.NetworkStringToReplace = Cpp::NonPagedString{ (unsigned __int8*)gStringToReplace.Buffer, gStringToReplace.Length };
+    gDrvData.NetworkStringToReplaceMdl = nullptr;
 }
 
 void GdrvUninitGlobalData()
@@ -136,8 +139,10 @@ void GdrvUninitGlobalData()
 
     gDrvData.ZwQueryInformationProcess = nullptr;
 
-    gDrvData.NetworkStringToBeReplaced = { 0,0,nullptr };
-    gDrvData.NetworkStringToReplace = { 0,0,nullptr };
+    if (gDrvData.NetworkStringToReplaceMdl)
+    {
+        IoFreeMdl(gDrvData.NetworkStringToReplaceMdl);
+    }
 }
 
 NTSTATUS GdrvSolveDynamicFunctions()
@@ -150,5 +155,24 @@ NTSTATUS GdrvSolveDynamicFunctions()
         return STATUS_NOT_FOUND;
     }
 
+    return STATUS_SUCCESS;
+}
+
+NTSTATUS GdrvAllocateStringToReplaceMdl()
+{
+    gDrvData.NetworkStringToReplaceMdl= IoAllocateMdl(
+        gDrvData.NetworkStringToReplace.GetNakedPointer(),  // VirtualAddress
+        gDrvData.NetworkStringToReplace.GetSize(),          // Length
+        false,                                              // SecondaryBuffer
+        false,                                              // ChargeQuota
+        nullptr                                             // Irp
+    );
+
+    if (!gDrvData.NetworkStringToReplaceMdl)
+    {
+        return STATUS_INSUFFICIENT_RESOURCES;
+    }
+
+    MmBuildMdlForNonPagedPool(gDrvData.NetworkStringToReplaceMdl);
     return STATUS_SUCCESS;
 }

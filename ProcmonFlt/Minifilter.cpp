@@ -45,6 +45,14 @@ DriverEntry(
         goto Exit;
     }
 
+    // Allocate MDL for string network buffer to be replaced
+    status = GdrvAllocateStringToReplaceMdl();
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogCritical("GdrvAllocateStringToReplaceMdl failed with status 0x%x", status);
+        goto Exit;
+    }
+
     // Register filter 
     status = ::FltRegisterFilter(DriverObject, &gDrvData.FilterRegistration, &gDrvData.FilterHandle);
     if (!NT_SUCCESS(status))

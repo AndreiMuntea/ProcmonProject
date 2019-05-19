@@ -3,6 +3,7 @@
 
 #include <fltKernel.h>
 #include <CppUniquePointer.hpp>
+#include <CppNonPagedString.hpp>
 
 #include "FltPort.hpp"
 #include "ProcessFilter.hpp"
@@ -42,14 +43,18 @@ typedef struct _GLOBAL_DATA
 
     PFUNC_ZwQueryInformationProcess ZwQueryInformationProcess;
 
-    UNICODE_STRING NetworkStringToBeReplaced;
-    UNICODE_STRING NetworkStringToReplace;
+    Cpp::NonPagedString NetworkStringToBeReplaced;
+    Cpp::NonPagedString NetworkStringToReplace;
+    MDL* NetworkStringToReplaceMdl;
+
 }GLOBAL_DATA, *PGLOBAL_DATA;
 
 extern GLOBAL_DATA gDrvData;
 
 void GdrvInitGlobalData(_In_ PDRIVER_OBJECT DriverObject);
 void GdrvUninitGlobalData();
+
 NTSTATUS GdrvSolveDynamicFunctions();
+NTSTATUS GdrvAllocateStringToReplaceMdl();
 
 #endif //__GLOBAL_DATA_HPP__

@@ -14,6 +14,7 @@
 #pragma warning (disable : 4067)
 
 #include <CppUniquePointer.hpp>
+#include <CppNonPagedString.hpp>
 #include <CppSharedPointer.hpp>
 #include "cpp_allocator_object.hpp"
 #include "DeviceObject.hpp"
@@ -28,6 +29,29 @@
 
 namespace Minifilter
 {
+    class NetBufferListPool : public Cpp::CppNonPagedObject<'LBN#'>
+    {
+        friend class NetworkFilter;
+    public:
+        NetBufferListPool(PDRIVER_OBJECT DriverObject);
+        virtual ~NetBufferListPool();
+
+    private:
+        NDIS_GENERIC_OBJECT* ndisGenericObject = nullptr;
+        NDIS_HANDLE netBufferListPool = nullptr;
+    };
+
+    class InjectionHandle : public Cpp::CppNonPagedObject<'JNI#'>
+    {
+        friend class NetworkFilter;
+    public:
+        InjectionHandle();
+        virtual ~InjectionHandle();
+
+    private:
+        HANDLE injectionHandle = nullptr;
+    };
+
     class NetworkEngine : public Cpp::CppNonPagedObject<'TEN#'>
     {
         friend class NetworkFilter;
@@ -51,8 +75,10 @@ namespace Minifilter
             FWPS_CALLOUT_NOTIFY_FN2 NotifyFunction,
             FWPS_CALLOUT_FLOW_DELETE_NOTIFY_FN0 FlowDeleteFunction,
             const GUID& LayerKey,
-            const GUID& CalloutKey
+            const GUID& CalloutKey,
+            const FWP_ACTION_TYPE& ActionType
         );
+
         virtual ~NetworkCallout();
 
     protected:
@@ -68,12 +94,14 @@ namespace Minifilter
 
         NTSTATUS 
         RegisterFilter(
-            Cpp::UniquePointer<DeviceObject>& DeviceObject
+            Cpp::UniquePointer<DeviceObject>& DeviceObject,
+            const FWP_ACTION_TYPE& ActionType
         );
 
         bool
         RegisterCallout(
-            Cpp::UniquePointer<DeviceObject>& DeviceObject
+            Cpp::UniquePointer<DeviceObject>& DeviceObject,
+            const FWP_ACTION_TYPE& ActionType
         );
 
     private:    
@@ -190,10 +218,24 @@ namespace Minifilter
 
         static void 
         ProcessDataStream(
+            _In_ const FWPS_INCOMING_VALUES0* FixedValues,
+            _In_ const FWPS_INCOMING_METADATA_VALUES0* MetaValues,
+            _In_ const FWPS_FILTER2* Filter,
             _Inout_ FWPS_STREAM_CALLOUT_IO_PACKET* IoPacket,
             _Inout_ FWPS_CLASSIFY_OUT* Classify,
             _In_ PVOID Buffer,
             _In_ SIZE_T BufferSize
+        );
+
+        static NTSTATUS
+        InjectBuffer(
+            _In_ Cpp::UniquePointer<InjectionHandle>& InjectionHandle,
+            _In_ Cpp::UniquePointer<NetBufferListPool>& NblPool,
+            _In_ Cpp::NonPagedString& ReplacementBuffer,
+            _In_ UINT64 FlowHandle,
+            _In_ UINT16 LayerId,
+            _In_ UINT32 StreamFlags,
+            _In_ UINT32 CalloutId
         );
 
         static void 
@@ -203,8 +245,25 @@ namespace Minifilter
             _In_ SIZE_T Bytes
         );
 
+        static void 
+        BlockBytes(
+            _Inout_ FWPS_STREAM_CALLOUT_IO_PACKET* IoPacket,
+            _Inout_ FWPS_CLASSIFY_OUT* Classify,
+            _In_ SIZE_T Bytes
+        );
+
+        static void NTAPI
+        InjectCompletionRoutine(
+            _In_ void* Context,
+            _Inout_ NET_BUFFER_LIST* NetBufferList,
+            _In_ BOOLEAN DispatchLevel
+        );
+
         Cpp::UniquePointer<DeviceObject> deviceObject;
         Cpp::SharedPointer<NetworkEngine> engine;
+
+        Cpp::UniquePointer<InjectionHandle> injectionHandle;
+        Cpp::UniquePointer<NetBufferListPool> nblPool;
 
         Cpp::UniquePointer<NetworkCallout> authConnectIpv4Callout;
         Cpp::UniquePointer<NetworkCallout> authRecvIpv4Callout;
@@ -214,6 +273,7 @@ namespace Minifilter
 
         Cpp::UniquePointer<NetworkCallout> streamIpv4Callout;
         Cpp::UniquePointer<NetworkCallout> streamIpv6Callout;
+
     };
 
 };

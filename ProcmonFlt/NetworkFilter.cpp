@@ -8,6 +8,7 @@
 #include "../Common/FltPortNetworkMessage.hpp"
 
 #define STREAM_EDIT_TAG_BUFFER     'BES#' // #SEB -> Stream Edit Buffer
+#define STREAM_EDIT_TAG_NBL_POOL   'LBN#' // #NBL -> Net Buffer List pool
 
 static inline void
 LogBuffer(
@@ -58,38 +59,50 @@ Minifilter::NetworkFilter::NetworkFilter(PDRIVER_OBJECT DriverObject, PUNICODE_S
         return;
     }
 
-    //this->authConnectIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V4,gAuthConnectIpV4GUID });
+    this->injectionHandle.Update(new InjectionHandle());
+    if (!injectionHandle.IsValid() || !injectionHandle->IsValid())
+    {
+        return;
+    }
+
+    this->nblPool.Update(new NetBufferListPool(DriverObject));
+    if (!nblPool.IsValid() || !nblPool->IsValid())
+    {
+        return;
+    }
+
+    //this->authConnectIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V4,gAuthConnectIpV4GUID, FWP_ACTION_CALLOUT_INSPECTION });
     //if (!this->authConnectIpv4Callout.IsValid() || !this->authConnectIpv4Callout->IsValid())
     //{
     //    return;
     //}
     //
-    //this->authRecvIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4, gAuthRecvAcceptIpv4GUID });
+    //this->authRecvIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4, gAuthRecvAcceptIpv4GUID, FWP_ACTION_CALLOUT_INSPECTION });
     //if (!this->authRecvIpv4Callout.IsValid() || !this->authRecvIpv4Callout->IsValid())
     //{
     //    return;
     //}
     //
-    //this->authConnectIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V6, gAuthConnectIpV6GUID });
+    //this->authConnectIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V6, gAuthConnectIpV6GUID, FWP_ACTION_CALLOUT_INSPECTION });
     //if (!this->authConnectIpv6Callout.IsValid() || !this->authConnectIpv6Callout->IsValid())
     //{
     //    return;
     //}
     //
-    //this->authRecvIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6, gAuthRecvAcceptIpv6GUID });
+    //this->authRecvIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6, gAuthRecvAcceptIpv6GUID, FWP_ACTION_CALLOUT_INSPECTION });
     //if (!this->authRecvIpv6Callout.IsValid() || !this->authRecvIpv6Callout->IsValid())
     //{
     //    return;
     //}
 
     /// INLINE stream editing
-    this->streamIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,InlineStreamClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_STREAM_V4, gStreamLayerIpV4GUID });
+    this->streamIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,InlineStreamClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_STREAM_V4, gStreamLayerIpV4GUID, FWP_ACTION_CALLOUT_TERMINATING });
     if (!this->streamIpv4Callout.IsValid() || !this->streamIpv4Callout->IsValid())
     {
         return;
     }
 
-    this->streamIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,InlineStreamClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_STREAM_V6, gStreamLayerIpV6GUID });
+    this->streamIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,InlineStreamClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_STREAM_V6, gStreamLayerIpV6GUID, FWP_ACTION_CALLOUT_TERMINATING });
     if (!this->streamIpv6Callout.IsValid() || !this->streamIpv6Callout->IsValid())
     {
         return;
@@ -108,6 +121,9 @@ Minifilter::NetworkFilter::~NetworkFilter()
 
     this->streamIpv4Callout.Update(nullptr);
     this->streamIpv6Callout.Update(nullptr);
+
+    this->injectionHandle.Update(nullptr);
+    this->nblPool.Update(nullptr);
 
     this->deviceObject.Update(nullptr);
     this->engine.Update(nullptr);
@@ -205,7 +221,7 @@ Minifilter::NetworkFilter::InlineStreamClassifyFn(
         return;
     }
 
-    ProcessDataStream(ioPacket, Classify, buffer, streamData->dataLength);
+    ProcessDataStream(FixedValues, MetaValues, Filter, ioPacket, Classify, buffer, streamData->dataLength);
     ExFreePoolWithTag(buffer, STREAM_EDIT_TAG_BUFFER);
 }
 
@@ -457,7 +473,6 @@ Minifilter::NetworkFilter::CopyStreamDataToBuffer(
         ExFreePoolWithTag(buffer, STREAM_EDIT_TAG_BUFFER);
         return STATUS_INVALID_BUFFER_SIZE;
     }
-    LogBuffer(buffer, (USHORT)(bytesCopied));
 
     *Buffer = buffer;
     return STATUS_SUCCESS;
@@ -465,6 +480,9 @@ Minifilter::NetworkFilter::CopyStreamDataToBuffer(
 
 void 
 Minifilter::NetworkFilter::ProcessDataStream(
+    _In_ const FWPS_INCOMING_VALUES0* FixedValues,
+    _In_ const FWPS_INCOMING_METADATA_VALUES0* MetaValues,
+    _In_ const FWPS_FILTER2* Filter,
     _Inout_ FWPS_STREAM_CALLOUT_IO_PACKET* IoPacket,
     _Inout_ FWPS_CLASSIFY_OUT* Classify,
     _In_ PVOID Buffer,
@@ -473,16 +491,31 @@ Minifilter::NetworkFilter::ProcessDataStream(
 {
     PBYTE buffer = (PBYTE)Buffer;
 
-    PBYTE pattern = (PBYTE)gDrvData.NetworkStringToBeReplaced.Buffer;
-    SIZE_T patternSize = gDrvData.NetworkStringToBeReplaced.Length;
+    PBYTE pattern = (PBYTE)gDrvData.NetworkStringToBeReplaced.GetNakedPointer();
+    SIZE_T patternSize = gDrvData.NetworkStringToBeReplaced.GetSize();
+
     SIZE_T i = 0;
 
-    if (BufferSize >= patternSize && patternSize == RtlCompareMemory(pattern, Buffer, patternSize))
+    LogBuffer(buffer, (USHORT)BufferSize);
+
+    if (BufferSize >= patternSize && patternSize == RtlCompareMemory(pattern, buffer, patternSize))
     {
-        // do injection;
         MyDriverLogTrace("A new match was found!");
 
-        PermitBytes(IoPacket, Classify, patternSize);
+        auto status = InjectBuffer(
+            gDrvData.NetworkFilter->injectionHandle,
+            gDrvData.NetworkFilter->nblPool,
+            gDrvData.NetworkStringToReplace,
+            MetaValues->flowHandle,
+            FixedValues->layerId,
+            IoPacket->streamData->flags,
+            Filter->action.calloutId
+        );
+
+        // If we successfuly injected a replacement buffer, we block the pattern, otherwise we allow it
+        (NT_SUCCESS(status)) ? BlockBytes(IoPacket, Classify, patternSize)
+                             : PermitBytes(IoPacket, Classify, patternSize);
+
         return;
     }
 
@@ -490,7 +523,7 @@ Minifilter::NetworkFilter::ProcessDataStream(
     {
         if (i + patternSize > BufferSize)
         {
-            i = BufferSize + 1;
+            i = BufferSize;
             break;
         }
 
@@ -500,7 +533,61 @@ Minifilter::NetworkFilter::ProcessDataStream(
         }
     }
 
-    PermitBytes(IoPacket, Classify, i - 1);
+    PermitBytes(IoPacket, Classify, i);
+}
+
+NTSTATUS 
+Minifilter::NetworkFilter::InjectBuffer(
+    _In_ Cpp::UniquePointer<InjectionHandle>& InjectionHandle,
+    _In_ Cpp::UniquePointer<NetBufferListPool>& NblPool,
+    _In_ Cpp::NonPagedString& ReplacementBuffer,
+    _In_ UINT64 FlowHandle,
+    _In_ UINT16 LayerId,
+    _In_ UINT32 StreamFlags,
+    _In_ UINT32 CalloutId
+)
+{
+    NET_BUFFER_LIST* nbl = nullptr;
+
+    auto status = ::FwpsAllocateNetBufferAndNetBufferList(
+        NblPool->netBufferListPool,         // PoolHandle
+        0,                                  // ContextSize
+        0,                                  // ContextBackFill
+        gDrvData.NetworkStringToReplaceMdl, // MdlChain
+        0,                                  // DataOffset
+        ReplacementBuffer.GetSize(),        // DataLength
+        &nbl                                // NetBufferList
+    );
+
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogError("::FwpsAllocateNetBufferAndNetBufferList has failed with status 0x%x", status);
+        return status;
+    }
+
+    status = ::FwpsStreamInjectAsync(
+        InjectionHandle->injectionHandle,   // InjectionHandle
+        nullptr,                            // InjectionContext
+        0,                                  // Flags
+        FlowHandle,                         // FlowId
+        CalloutId,                          // CalloutId
+        LayerId,                            // LayerId
+        StreamFlags,                        // StreamFlags
+        nbl,                                // NetBufferList
+        ReplacementBuffer.GetSize(),        // DataLength
+        InjectCompletionRoutine,            // CompletionFn
+        nullptr                             // CompletionContext
+    );
+
+    if (!NT_SUCCESS(status))
+    {
+        ::FwpsFreeNetBufferList(nbl);
+
+        MyDriverLogError("::FwpsStreamInjectAsync has failed with status 0x%x", status);
+        return status;
+    }
+
+    return STATUS_SUCCESS;
 }
 
 void 
@@ -513,6 +600,31 @@ Minifilter::NetworkFilter::PermitBytes(
     IoPacket->streamAction = FWPS_STREAM_ACTION_NONE; 
     IoPacket->countBytesEnforced = Bytes; 
     Classify->actionType = FWP_ACTION_PERMIT; 
+}
+
+void 
+Minifilter::NetworkFilter::BlockBytes(
+    _Inout_ FWPS_STREAM_CALLOUT_IO_PACKET* IoPacket,
+    _Inout_ FWPS_CLASSIFY_OUT* Classify,
+    _In_ SIZE_T Bytes
+)
+{
+    IoPacket->streamAction = FWPS_STREAM_ACTION_NONE;
+    IoPacket->countBytesEnforced = Bytes;
+    Classify->actionType = FWP_ACTION_BLOCK;
+}
+
+void 
+Minifilter::NetworkFilter::InjectCompletionRoutine(
+    _In_ void* Context,
+    _Inout_ NET_BUFFER_LIST* NetBufferList,
+    _In_ BOOLEAN DispatchLevel
+)
+{
+    UNREFERENCED_PARAMETER(Context);
+    UNREFERENCED_PARAMETER(DispatchLevel);
+
+    ::FwpsFreeNetBufferList(NetBufferList);
 }
 
 
@@ -544,7 +656,8 @@ Minifilter::NetworkCallout::NetworkCallout(
     FWPS_CALLOUT_NOTIFY_FN2 NotifyFunction,
     FWPS_CALLOUT_FLOW_DELETE_NOTIFY_FN0 FlowDeleteFunction,
     const GUID& LayerKey,
-    const GUID& CalloutKey
+    const GUID& CalloutKey,
+    const FWP_ACTION_TYPE& ActionType
 ) : engine{Engine},
     classifyFunction{ClassifyFunction},
     notifyFunction{NotifyFunction},
@@ -558,7 +671,7 @@ Minifilter::NetworkCallout::NetworkCallout(
     RtlCopyMemory(&this->layerKey, &LayerKey, sizeof(GUID));
     RtlCopyMemory(&this->calloutKey, &CalloutKey, sizeof(GUID));
 
-    if (RegisterCallout(DeviceObject))
+    if (RegisterCallout(DeviceObject, ActionType))
     {
         Validate();
     }
@@ -618,7 +731,8 @@ Minifilter::NetworkCallout::RegisterFwpmCallout(
 
 NTSTATUS 
 Minifilter::NetworkCallout::RegisterFilter(
-    Cpp::UniquePointer<DeviceObject>& DeviceObject
+    Cpp::UniquePointer<DeviceObject>& DeviceObject,
+    const FWP_ACTION_TYPE& ActionType
 )
 {
     UNREFERENCED_PARAMETER(DeviceObject);
@@ -628,7 +742,7 @@ Minifilter::NetworkCallout::RegisterFilter(
     filter.displayData.name = L"Dummy filter name";
     filter.displayData.description = L"Dummy Description";
 
-    filter.action.type = FWP_ACTION_CALLOUT_INSPECTION;
+    filter.action.type = ActionType;
     filter.action.calloutKey = this->calloutKey;
     filter.weight.type = FWP_EMPTY;
 
@@ -637,7 +751,8 @@ Minifilter::NetworkCallout::RegisterFilter(
 
 bool 
 Minifilter::NetworkCallout::RegisterCallout(
-    Cpp::UniquePointer<DeviceObject>& DeviceObject
+    Cpp::UniquePointer<DeviceObject>& DeviceObject,
+    const FWP_ACTION_TYPE& ActionType
 )
 {
     auto status = RegisterFwpsCallout(DeviceObject);
@@ -656,7 +771,7 @@ Minifilter::NetworkCallout::RegisterCallout(
         return false;
     }
 
-    status = RegisterFilter(DeviceObject);
+    status = RegisterFilter(DeviceObject, ActionType);
     if (!NT_SUCCESS(status))
     {
         FwpsCalloutUnregisterById(this->calloutFwpsId);
@@ -667,4 +782,68 @@ Minifilter::NetworkCallout::RegisterCallout(
     }
 
     return true;
+}
+
+Minifilter::NetBufferListPool::NetBufferListPool(PDRIVER_OBJECT DriverObject)
+{
+    NET_BUFFER_LIST_POOL_PARAMETERS nblPoolParams = { 0 };
+
+    this->ndisGenericObject = ::NdisAllocateGenericObject(DriverObject, STREAM_EDIT_TAG_NBL_POOL, 0);
+    if (!this->ndisGenericObject)
+    {
+        MyDriverLogCritical("::NdisAllocateGenericObject failed!");
+        return;
+    }
+
+    nblPoolParams.Header.Type = NDIS_OBJECT_TYPE_DEFAULT;
+    nblPoolParams.Header.Revision = NET_BUFFER_LIST_POOL_PARAMETERS_REVISION_1;
+    nblPoolParams.Header.Size = NDIS_SIZEOF_NET_BUFFER_LIST_POOL_PARAMETERS_REVISION_1;
+    nblPoolParams.fAllocateNetBuffer = TRUE;
+    nblPoolParams.DataSize = 0;
+    nblPoolParams.PoolTag = STREAM_EDIT_TAG_NBL_POOL;
+
+    this->netBufferListPool = ::NdisAllocateNetBufferListPool(this->ndisGenericObject, &nblPoolParams);
+    if (!this->netBufferListPool)
+    {
+        MyDriverLogCritical("::NdisAllocateNetBufferListPool failed!");
+        return;
+    }
+
+    this->Validate();
+}
+
+Minifilter::NetBufferListPool::~NetBufferListPool()
+{
+    if (this->netBufferListPool)
+    {
+        ::NdisFreeNetBufferListPool(this->netBufferListPool);
+        this->netBufferListPool = nullptr;
+    }
+
+    if (this->ndisGenericObject)
+    {
+        ::NdisFreeGenericObject(this->ndisGenericObject);
+        this->ndisGenericObject = nullptr;
+    }
+}
+
+Minifilter::InjectionHandle::InjectionHandle()
+{
+    auto status = ::FwpsInjectionHandleCreate(AF_UNSPEC, FWPS_INJECTION_TYPE_STREAM, &this->injectionHandle);
+    if (!NT_SUCCESS(status))
+    {
+        MyDriverLogCritical("::FwpsInjectionHandleCreate failed with status 0x%X!", status);
+        return;
+    }
+
+    Validate();
+}
+
+Minifilter::InjectionHandle::~InjectionHandle()
+{
+    if (this->injectionHandle)
+    {
+        auto status = ::FwpsInjectionHandleDestroy(this->injectionHandle);
+        NT_VERIFY(NT_SUCCESS(status));
+    }
 }

@@ -107,6 +107,9 @@ void GdrvInitGlobalData(_In_ PDRIVER_OBJECT DriverObject)
 
     ExInitializeRundownProtection(&gDrvData.RundownProtection);    
     gDrvData.ZwQueryInformationProcess = nullptr;
+
+    gDrvData.NetworkStringToBeReplaced = RTL_CONSTANT_STRING(L"very hot");
+    gDrvData.NetworkStringToReplace = RTL_CONSTANT_STRING(L"very cold");
 }
 
 void GdrvUninitGlobalData()
@@ -132,6 +135,9 @@ void GdrvUninitGlobalData()
     gDrvData.FilterRegistration = { 0 };
 
     gDrvData.ZwQueryInformationProcess = nullptr;
+
+    gDrvData.NetworkStringToBeReplaced = { 0,0,nullptr };
+    gDrvData.NetworkStringToReplace = { 0,0,nullptr };
 }
 
 NTSTATUS GdrvSolveDynamicFunctions()

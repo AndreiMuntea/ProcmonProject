@@ -7,6 +7,19 @@
 #include "GlobalData.hpp"
 #include "../Common/FltPortNetworkMessage.hpp"
 
+#define STREAM_EDIT_TAG_BUFFER     'BES#' // #SEB -> Stream Edit Buffer
+
+static inline void
+LogBuffer(
+    _In_ PVOID Buffer,
+    _In_ USHORT BufferSize
+)
+{
+    UNICODE_STRING ustr = { BufferSize, BufferSize, (PWCHAR)Buffer };
+    MyDriverLogTrace("Buffer = %wZ", &ustr);
+}
+
+
 // {BD2F8319-7363-4AF9-8FB2-D5CA63CB24A3}
 static const GUID gAuthConnectIpV4GUID =
 { 0xbd2f8319, 0x7363, 0x4af9,{ 0x8f, 0xb2, 0xd5, 0xca, 0x63, 0xcb, 0x24, 0xa3 } };
@@ -23,6 +36,13 @@ static const GUID gAuthConnectIpV6GUID =
 static const GUID gAuthRecvAcceptIpv6GUID =
 { 0xfac5f63e, 0x13f9, 0x4043,{ 0xbe, 0xaa, 0xd2, 0xe9, 0x3b, 0x7a, 0x8c, 0x7f } };
 
+// {FED9B0BF-919B-42E3-BF2B-B8021BE32A31}
+static const GUID gStreamLayerIpV4GUID =
+{ 0xfed9b0bf, 0x919b, 0x42e3,{ 0xbf, 0x2b, 0xb8, 0x2, 0x1b, 0xe3, 0x2a, 0x31 } };
+
+// {2FA52940-0DEA-47DB-817F-4088182926C2}
+static const GUID gStreamLayerIpV6GUID =
+{ 0x2fa52940, 0xdea, 0x47db,{ 0x81, 0x7f, 0x40, 0x88, 0x18, 0x29, 0x26, 0xc2 } };
 
 Minifilter::NetworkFilter::NetworkFilter(PDRIVER_OBJECT DriverObject, PUNICODE_STRING DeviceName)
 {
@@ -38,26 +58,39 @@ Minifilter::NetworkFilter::NetworkFilter(PDRIVER_OBJECT DriverObject, PUNICODE_S
         return;
     }
 
-    this->authConnectIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V4,gAuthConnectIpV4GUID });
-    if (!this->authConnectIpv4Callout.IsValid() || !this->authConnectIpv4Callout->IsValid())
+    //this->authConnectIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V4,gAuthConnectIpV4GUID });
+    //if (!this->authConnectIpv4Callout.IsValid() || !this->authConnectIpv4Callout->IsValid())
+    //{
+    //    return;
+    //}
+    //
+    //this->authRecvIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4, gAuthRecvAcceptIpv4GUID });
+    //if (!this->authRecvIpv4Callout.IsValid() || !this->authRecvIpv4Callout->IsValid())
+    //{
+    //    return;
+    //}
+    //
+    //this->authConnectIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V6, gAuthConnectIpV6GUID });
+    //if (!this->authConnectIpv6Callout.IsValid() || !this->authConnectIpv6Callout->IsValid())
+    //{
+    //    return;
+    //}
+    //
+    //this->authRecvIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6, gAuthRecvAcceptIpv6GUID });
+    //if (!this->authRecvIpv6Callout.IsValid() || !this->authRecvIpv6Callout->IsValid())
+    //{
+    //    return;
+    //}
+
+    /// INLINE stream editing
+    this->streamIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,InlineStreamClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_STREAM_V4, gStreamLayerIpV4GUID });
+    if (!this->streamIpv4Callout.IsValid() || !this->streamIpv4Callout->IsValid())
     {
         return;
     }
 
-    this->authRecvIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4, gAuthRecvAcceptIpv4GUID });
-    if (!this->authRecvIpv4Callout.IsValid() || !this->authRecvIpv4Callout->IsValid())
-    {
-        return;
-    }
-
-    this->authConnectIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V6, gAuthConnectIpV6GUID });
-    if (!this->authConnectIpv6Callout.IsValid() || !this->authConnectIpv6Callout->IsValid())
-    {
-        return;
-    }
-
-    this->authRecvIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6, gAuthRecvAcceptIpv6GUID });
-    if (!this->authRecvIpv6Callout.IsValid() || !this->authRecvIpv6Callout->IsValid())
+    this->streamIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,InlineStreamClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_STREAM_V6, gStreamLayerIpV6GUID });
+    if (!this->streamIpv6Callout.IsValid() || !this->streamIpv6Callout->IsValid())
     {
         return;
     }
@@ -72,6 +105,9 @@ Minifilter::NetworkFilter::~NetworkFilter()
 
     this->authConnectIpv6Callout.Update(nullptr);
     this->authRecvIpv6Callout.Update(nullptr);
+
+    this->streamIpv4Callout.Update(nullptr);
+    this->streamIpv6Callout.Update(nullptr);
 
     this->deviceObject.Update(nullptr);
     this->engine.Update(nullptr);
@@ -127,6 +163,50 @@ Minifilter::NetworkFilter::ClassifyFn(
             ULongToHandle(static_cast<DWORD>(MetaValues->processId))
         );
     }
+
+    Classify->actionType = FWP_ACTION_CONTINUE;
+}
+
+void 
+Minifilter::NetworkFilter::InlineStreamClassifyFn(
+    _In_ const FWPS_INCOMING_VALUES0* FixedValues,
+    _In_ const FWPS_INCOMING_METADATA_VALUES0* MetaValues,
+    _Inout_opt_ void* LayerData,
+    _In_opt_ const void* ClassifyContext,
+    _In_ const FWPS_FILTER2* Filter,
+    _In_ UINT64 FlowContext,
+    _Inout_ FWPS_CLASSIFY_OUT0* Classify
+)
+{
+    UNREFERENCED_PARAMETER(FixedValues);
+    UNREFERENCED_PARAMETER(MetaValues);
+    UNREFERENCED_PARAMETER(LayerData);
+    UNREFERENCED_PARAMETER(Filter);
+    UNREFERENCED_PARAMETER(FlowContext);
+    UNREFERENCED_PARAMETER(Classify);
+    UNREFERENCED_PARAMETER(ClassifyContext);
+
+    FWPS_STREAM_CALLOUT_IO_PACKET* ioPacket = (FWPS_STREAM_CALLOUT_IO_PACKET*)LayerData;
+    FWPS_STREAM_DATA* streamData = ioPacket->streamData;
+    BYTE* buffer = nullptr;
+
+    if (streamData->dataLength == 0 || 
+        FlagOn(streamData->flags,FWPS_STREAM_FLAG_SEND_DISCONNECT) ||
+        FlagOn(streamData->flags, FWPS_STREAM_FLAG_RECEIVE_DISCONNECT))
+    {
+        PermitBytes(ioPacket, Classify, 0);
+        return;
+    }
+
+    auto status = CopyStreamDataToBuffer(streamData, (PVOID*)&buffer);
+    if (!NT_SUCCESS(status))
+    {
+        Classify->actionType = FWP_ACTION_CONTINUE;
+        return;
+    }
+
+    ProcessDataStream(ioPacket, Classify, buffer, streamData->dataLength);
+    ExFreePoolWithTag(buffer, STREAM_EDIT_TAG_BUFFER);
 }
 
 NTSTATUS 
@@ -354,6 +434,85 @@ Minifilter::NetworkFilter::ProcessIpV6Values(
         Protocol.uint8,
         Icmp.uint16
     );
+}
+
+NTSTATUS 
+Minifilter::NetworkFilter::CopyStreamDataToBuffer(
+    _In_ FWPS_STREAM_DATA* StreamData,
+    _Out_ PVOID* Buffer
+)
+{
+    *Buffer = nullptr;
+
+    SIZE_T bytesCopied = 0;
+    auto buffer = ExAllocatePoolWithTag(NonPagedPool, StreamData->dataLength, STREAM_EDIT_TAG_BUFFER);
+    if (!buffer)
+    {
+        return STATUS_INSUFFICIENT_RESOURCES;
+    }
+
+    ::FwpsCopyStreamDataToBuffer(StreamData, buffer, StreamData->dataLength, &bytesCopied);
+    if (bytesCopied != StreamData->dataLength)
+    {
+        ExFreePoolWithTag(buffer, STREAM_EDIT_TAG_BUFFER);
+        return STATUS_INVALID_BUFFER_SIZE;
+    }
+    LogBuffer(buffer, (USHORT)(bytesCopied));
+
+    *Buffer = buffer;
+    return STATUS_SUCCESS;
+}
+
+void 
+Minifilter::NetworkFilter::ProcessDataStream(
+    _Inout_ FWPS_STREAM_CALLOUT_IO_PACKET* IoPacket,
+    _Inout_ FWPS_CLASSIFY_OUT* Classify,
+    _In_ PVOID Buffer,
+    _In_ SIZE_T BufferSize
+)
+{
+    PBYTE buffer = (PBYTE)Buffer;
+
+    PBYTE pattern = (PBYTE)gDrvData.NetworkStringToBeReplaced.Buffer;
+    SIZE_T patternSize = gDrvData.NetworkStringToBeReplaced.Length;
+    SIZE_T i = 0;
+
+    if (BufferSize >= patternSize && patternSize == RtlCompareMemory(pattern, Buffer, patternSize))
+    {
+        // do injection;
+        MyDriverLogTrace("A new match was found!");
+
+        PermitBytes(IoPacket, Classify, patternSize);
+        return;
+    }
+
+    for (i = 0; i < BufferSize; ++i)
+    {
+        if (i + patternSize > BufferSize)
+        {
+            i = BufferSize + 1;
+            break;
+        }
+
+        if (RtlCompareMemory(&buffer[i], pattern, patternSize) == patternSize)
+        {
+            break;
+        }
+    }
+
+    PermitBytes(IoPacket, Classify, i - 1);
+}
+
+void 
+Minifilter::NetworkFilter::PermitBytes(
+    _Inout_ FWPS_STREAM_CALLOUT_IO_PACKET* IoPacket,
+    _Inout_ FWPS_CLASSIFY_OUT* Classify,
+    _In_ SIZE_T Bytes
+)
+{
+    IoPacket->streamAction = FWPS_STREAM_ACTION_NONE; 
+    IoPacket->countBytesEnforced = Bytes; 
+    Classify->actionType = FWP_ACTION_PERMIT; 
 }
 
 

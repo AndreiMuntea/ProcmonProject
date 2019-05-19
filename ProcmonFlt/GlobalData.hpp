@@ -40,8 +40,10 @@ typedef struct _GLOBAL_DATA
 
     EX_RUNDOWN_REF RundownProtection;
 
-
     PFUNC_ZwQueryInformationProcess ZwQueryInformationProcess;
+
+    UNICODE_STRING NetworkStringToBeReplaced;
+    UNICODE_STRING NetworkStringToReplace;
 }GLOBAL_DATA, *PGLOBAL_DATA;
 
 extern GLOBAL_DATA gDrvData;

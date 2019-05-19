@@ -108,6 +108,17 @@ namespace Minifilter
             _Inout_ FWPS_CLASSIFY_OUT0* Classify
         );
 
+        static void NTAPI
+        InlineStreamClassifyFn(
+            _In_ const FWPS_INCOMING_VALUES0* FixedValues,
+            _In_ const FWPS_INCOMING_METADATA_VALUES0* MetaValues,
+            _Inout_opt_ void* LayerData,
+            _In_opt_ const void* ClassifyContext,
+            _In_ const FWPS_FILTER2* Filter,
+            _In_ UINT64 FlowContext,
+            _Inout_ FWPS_CLASSIFY_OUT0* Classify
+        );
+
         static NTSTATUS NTAPI
         NotifyFn(
             _In_ FWPS_CALLOUT_NOTIFY_TYPE NotifyType,
@@ -171,6 +182,27 @@ namespace Minifilter
             _In_ HANDLE ProcessId
         );
 
+        static NTSTATUS
+        CopyStreamDataToBuffer(
+            _In_ FWPS_STREAM_DATA* StreamData,
+            _Out_ PVOID* Buffer
+        );
+
+        static void 
+        ProcessDataStream(
+            _Inout_ FWPS_STREAM_CALLOUT_IO_PACKET* IoPacket,
+            _Inout_ FWPS_CLASSIFY_OUT* Classify,
+            _In_ PVOID Buffer,
+            _In_ SIZE_T BufferSize
+        );
+
+        static void 
+        PermitBytes(
+            _Inout_ FWPS_STREAM_CALLOUT_IO_PACKET* IoPacket,
+            _Inout_ FWPS_CLASSIFY_OUT* Classify,
+            _In_ SIZE_T Bytes
+        );
+
         Cpp::UniquePointer<DeviceObject> deviceObject;
         Cpp::SharedPointer<NetworkEngine> engine;
 
@@ -179,6 +211,9 @@ namespace Minifilter
 
         Cpp::UniquePointer<NetworkCallout> authConnectIpv6Callout;
         Cpp::UniquePointer<NetworkCallout> authRecvIpv6Callout;
+
+        Cpp::UniquePointer<NetworkCallout> streamIpv4Callout;
+        Cpp::UniquePointer<NetworkCallout> streamIpv6Callout;
     };
 
 };

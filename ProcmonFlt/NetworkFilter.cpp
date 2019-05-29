@@ -71,29 +71,29 @@ Minifilter::NetworkFilter::NetworkFilter(PDRIVER_OBJECT DriverObject, PUNICODE_S
         return;
     }
 
-    //this->authConnectIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V4,gAuthConnectIpV4GUID, FWP_ACTION_CALLOUT_INSPECTION });
-    //if (!this->authConnectIpv4Callout.IsValid() || !this->authConnectIpv4Callout->IsValid())
-    //{
-    //    return;
-    //}
-    //
-    //this->authRecvIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4, gAuthRecvAcceptIpv4GUID, FWP_ACTION_CALLOUT_INSPECTION });
-    //if (!this->authRecvIpv4Callout.IsValid() || !this->authRecvIpv4Callout->IsValid())
-    //{
-    //    return;
-    //}
-    //
-    //this->authConnectIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V6, gAuthConnectIpV6GUID, FWP_ACTION_CALLOUT_INSPECTION });
-    //if (!this->authConnectIpv6Callout.IsValid() || !this->authConnectIpv6Callout->IsValid())
-    //{
-    //    return;
-    //}
-    //
-    //this->authRecvIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6, gAuthRecvAcceptIpv6GUID, FWP_ACTION_CALLOUT_INSPECTION });
-    //if (!this->authRecvIpv6Callout.IsValid() || !this->authRecvIpv6Callout->IsValid())
-    //{
-    //    return;
-    //}
+    this->authConnectIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V4,gAuthConnectIpV4GUID, FWP_ACTION_CALLOUT_INSPECTION });
+    if (!this->authConnectIpv4Callout.IsValid() || !this->authConnectIpv4Callout->IsValid())
+    {
+        return;
+    }
+    
+    this->authRecvIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V4, gAuthRecvAcceptIpv4GUID, FWP_ACTION_CALLOUT_INSPECTION });
+    if (!this->authRecvIpv4Callout.IsValid() || !this->authRecvIpv4Callout->IsValid())
+    {
+        return;
+    }
+    
+    this->authConnectIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_CONNECT_V6, gAuthConnectIpV6GUID, FWP_ACTION_CALLOUT_INSPECTION });
+    if (!this->authConnectIpv6Callout.IsValid() || !this->authConnectIpv6Callout->IsValid())
+    {
+        return;
+    }
+    
+    this->authRecvIpv6Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,ClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_ALE_AUTH_RECV_ACCEPT_V6, gAuthRecvAcceptIpv6GUID, FWP_ACTION_CALLOUT_INSPECTION });
+    if (!this->authRecvIpv6Callout.IsValid() || !this->authRecvIpv6Callout->IsValid())
+    {
+        return;
+    }
 
     /// INLINE stream editing
     this->streamIpv4Callout.Update(new NetworkCallout{ this->deviceObject, this->engine,InlineStreamClassifyFn, NotifyFn, FlowDeleteFn, FWPM_LAYER_STREAM_V4, gStreamLayerIpV4GUID, FWP_ACTION_CALLOUT_TERMINATING });

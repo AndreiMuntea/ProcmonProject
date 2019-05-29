@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Driver Files">
+      <UniqueIdentifier>{8E41214B-6785-4CFE-B992-037D68949A14}</UniqueIdentifier>
+      <Extensions>inf;inv;inx;mof;mc;</Extensions>
+    </Filter>
+    <Filter Include="Header Files\cpp_support">
+      <UniqueIdentifier>{310abce1-c487-47e0-88bf-b2c90f0c2215}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\cpp_support">
+      <UniqueIdentifier>{93faa581-2826-4b68-beec-3adb15a7ebad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\data_structures">
+      <UniqueIdentifier>{b2fdedff-d9c2-48d8-b1d7-c5adb20f04d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\cpp_support\functional">
+      <UniqueIdentifier>{a1e3dee7-f961-4c78-8afd-97077679c621}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{0747c722-71ae-4e94-8541-45fd1858e664}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Inf Include="KeyboardFilter.inf">
+      <Filter>Driver Files</Filter>
+    </Inf>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="trace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalData.hpp">
+      <Filter>Header Files\data_structures</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedList.hpp">
+      <Filter>Header Files\data_structures</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedListEntry.hpp">
+      <Filter>Header Files\data_structures</Filter>
+    </ClInclude>
+    <ClInclude Include="Queue.hpp">
+      <Filter>Header Files\data_structures</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadPool.hpp">
+      <Filter>Header Files\data_structures</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_lock.hpp">
+      <Filter>Header Files\cpp_support</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_definitions.hpp">
+      <Filter>Header Files\cpp_support\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_init.hpp">
+      <Filter>Header Files\cpp_support\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_tags.hpp">
+      <Filter>Header Files\cpp_support\functional</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_alocator_object.hpp">
+      <Filter>Header Files\cpp_support</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_object.hpp">
+      <Filter>Header Files\cpp_support</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_lockguard.hpp">
+      <Filter>Header Files\cpp_support</Filter>
+    </ClInclude>
+    <ClInclude Include="cpp_unique_pointer.hpp">
+      <Filter>Header Files\cpp_support</Filter>
+    </ClInclude>
+    <ClInclude Include="File.hpp">
+      <Filter>Header Files\data_structures</Filter>
+    </ClInclude>
+    <ClInclude Include="ScanCodeContext.hpp">
+      <Filter>Header Files\data_structures</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Driver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_definitions.cpp">
+      <Filter>Source Files\cpp_support</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp_init.cpp">
+      <Filter>Source Files\cpp_support</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalData.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="File.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ScanCodeContext.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
